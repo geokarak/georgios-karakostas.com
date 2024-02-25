@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}{{ SITENAME }}{% endblock %}
+{% block content %}
+    <div class="article-list nu">
+        {% for article in articles | selectattr('category', '==', 'blog') %}
+            <div>
+                <a href="{{ article.url }}">{{ article.title }}</a>
+            </div>
+            <i><time>{{ article.date | strftime("%B %-d, %Y") }}</time></i>
+        {% else %}
+            No posts yet!
+        {% endfor %}
+    </div>
+{% endblock %}

@@ -1,0 +1,57 @@
+{# 
+    This file contains the HTML code defining the common structure of all the pages while 
+    exposing customisable blocks of the form {% block content %}{% endblock %} 
+#}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>
+            {% block title %}{% endblock %}
+        </title>
+        {% include "header.html" %}
+    </head>
+    <body>
+        <header class="container nu">
+            <h1 style="line-height:1.6;
+                       font-size:105%;
+                       letter-spacing:0.004rem;
+                       margin:0 0 0.25em 0">
+                <a style="text-decoration: none;" href="/">{{ SITENAME }}</a>
+            </h1>
+            <ul style="list-style:none;padding:0;margin:0;">
+                <li>
+                    <a href="/about"
+                       {% if output_file == 'about.html' %}style="text-decoration: underline"{% endif %}>About</a>
+                </li>
+                <li>
+                    <a href="/"
+                       {% if output_file == 'index.html' %}style="text-decoration: underline"{% endif %}>Blog</a>
+                </li>
+                <div class="line"></div>
+                <div style="display:inline-block;">Photography</div>
+                <!-- <div style="display:inline-block;">&#128247;</div> -->
+                <div class="line"></div>
+                <li>
+                    <a href="/exploration"
+                       {% if output_file == 'exploration.html' %}style="text-decoration: underline"{% endif %}>Exploration</a>
+                </li>
+                <li>
+                    <a href="/portraits"
+                       {% if output_file == 'portraits.html' %}style="text-decoration: underline"{% endif %}>Portraits</a>
+                </li>
+                <li>
+                    <a href="/street"
+                       {% if output_file == 'street.html' %}style="text-decoration: underline"{% endif %}>Street</a>
+                </li>
+            </ul>
+        </header>
+        <div class="separator">
+            <div class="container vertical-spacing no-top main-content">
+                {% block content %}{% endblock %}
+            </div>
+        </div>
+        <footer class="container nu no-top">
+            {% include "footer.html" %}
+        </footer>
+    </body>
+</html>
