@@ -2,10 +2,12 @@
 {% block title %}{{ page.title }} - {{ SITENAME }}{% endblock %}
 {% block content %}
     <div class="gallery">
-        {% for photo in articles | selectattr('category', '==', 'exploration') | sort(attribute='date', reverse=True) %}
+        {% for article in articles | selectattr('category', '==', 'exploration') | sort(attribute='date', reverse=True) %}
             <div>
-                <a href="{{ photo.url }}">
-                    <img loading="lazy" src="{{ photo.thumbnail_url }}" alt="Photo" />
+                <a href="{{ article.photo_url }}"
+                   data-lightbox="exploration"
+                   data-title="">
+                    <img src="{{ article.photo_url }}" alt="Photo" />
                 </a>
             </div>
         {% endfor %}
