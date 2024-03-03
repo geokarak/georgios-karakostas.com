@@ -26,7 +26,7 @@ def add_photos(articleGenerator):
         category = photo_mta.get("category")
 
         date = photo_mta.get("date", "")
-        date_object = datetime.datetime.strptime(date, "%Y-%m-%d")
+        date_object = datetime.datetime.strptime(date, "%Y%m%d")
 
         location = photo_mta.get("location")
         caption = photo_mta.get("caption", "")
@@ -38,7 +38,7 @@ def add_photos(articleGenerator):
         new_article = Article(
             caption,
             {
-                "title": date,
+                "title": category.capitalize(),
                 "date": date_object,
                 "location": location,
                 "photo_url": photo_url,
