@@ -169,12 +169,12 @@ div.gallery {
 }
 
 div.gallery>div {
-  display: flex;
+  /* display: flex; */
   justify-content: center;
   align-items: center;
   overflow: hidden;
   aspect-ratio: 1;
-  /**background-color:red;**/
+  /* background-color:red; */
 }
 
 div.gallery img {
@@ -309,14 +309,14 @@ img.rounded {
   width: 200px;
 }
 
-hr {
+/* hr {
   display: block;
   height: 1px;
   border: 0;
   border-top: 1px solid #ccc;
   margin: 1em 0;
   padding: 0;
-}
+} */
 
 .line {
   width: 22px;
