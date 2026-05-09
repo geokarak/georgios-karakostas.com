@@ -35,18 +35,16 @@
                 <div class="line"></div>
                 <div style="display:inline-block;">Photography</div>
                 <div class="line"></div>
-                <li>
-                    <a href="/exploration"
-                       {% if output_file == 'exploration.html' %}style="text-decoration: underline"{% endif %}>Exploration</a>
-                </li>
-                <li>
-                    <a href="/portraits"
-                       {% if output_file == 'portraits.html' %}style="text-decoration: underline"{% endif %}>Portraits</a>
-                </li>
-                <li>
-                    <a href="/street"
-                       {% if output_file == 'street.html' %}style="text-decoration: underline"{% endif %}>Street</a>
-                </li>
+                {% if pages %}
+                    {% for nav_page in pages | sort(attribute='slug') %}
+                        {% if nav_page.template == 'gallery' %}
+                            <li>
+                                <a href="/{{ nav_page.slug }}"
+                                   {% if output_file == nav_page.slug + '.html' %}style="text-decoration: underline"{% endif %}>{{ nav_page.title }}</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
             </ul>
         </header>
         <div class="separator">

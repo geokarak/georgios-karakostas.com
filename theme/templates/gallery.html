@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}{{ page.title }} - {{ SITENAME }}{% endblock %}
+{% block content %}
+    <div class="gallery">
+        {% for article in articles | sort(attribute='date', reverse=True) %}
+            {% if article.photo_url is defined and article.category == page.slug %}
+                <div>
+                    <a href="{{ article.photo_url }}"
+                       data-lightbox="{{ page.slug }}"
+                       data-title="{{ article.caption or '' }}">
+                        <img src="{{ article.photo_url }}" alt="Photo" />
+                    </a>
+                </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+{% endblock %}
