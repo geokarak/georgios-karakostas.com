@@ -1,3 +1,7 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "georgios-karakostas-com"
 version = "0.1.0"
@@ -29,3 +33,6 @@ dependencies = [
     "invoke==2.2.0",
     "livereload==2.7.1",
 ]
+
+[tool.setuptools]
+py-modules = []
