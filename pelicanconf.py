@@ -14,7 +14,6 @@ STATIC_PATHS = [
     "extra/favicons",
     "extra/robots.txt",
     "images",
-    "notebooks",
 ]
 
 

@@ -372,18 +372,6 @@ img.rounded {
   padding-left: 18px;
 }
 
-.notebook-embed-wrap {
-  margin: 20px 0;
-}
-
-.notebook-embed {
-  width: 100%;
-  min-height: 820px;
-  border: 1px solid #3a4657;
-  border-radius: 10px;
-  background: #101720;
-}
-
 /* hr {
   display: block;
   height: 1px;
