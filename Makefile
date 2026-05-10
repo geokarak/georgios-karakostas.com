@@ -1,5 +1,7 @@
 OUTPUT_DIR = output
 INGEST_SRC ?= inbox
+NOTEBOOK_SRC ?= notebooks/dummy_interactive.py
+NOTEBOOK_OUT ?= content/notebooks/dummy_interactive.html
 
 venv:
 	uv sync
@@ -16,4 +18,7 @@ ingest:
 test:
 	uv run pytest
 
-.PHONY: venv run clean ingest test
+export-notebook:
+	uv tool run marimo export html $(NOTEBOOK_SRC) -o $(NOTEBOOK_OUT)
+
+.PHONY: venv run clean ingest test export-notebook

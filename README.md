@@ -14,6 +14,16 @@ uv run pelican -s pelicanconf.py -t theme -o output -l -r
 uv run pytest
 ```
 
+## Interactive marimo articles
+
+Create or update a notebook at `notebooks/dummy_interactive.py`, then export it as static HTML:
+
+```bash
+make export-notebook
+```
+
+The export target writes to `content/notebooks/dummy_interactive.html`, which can be embedded inside any article with an `iframe`.
+
 ## Photo workflow
 
 Drop new photos into `inbox/<category>/` and run:
