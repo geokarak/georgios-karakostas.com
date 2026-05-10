@@ -1,14 +1,23 @@
 {% extends "base.html" %}
 {% block title %}{{ SITENAME }}{% endblock %}
 {% block content %}
-    <div class="article-list nu">
-        {% for article in articles | selectattr('category', '==', 'blog') %}
-            <div>
-                <a href="{{ article.url }}">{{ article.title }}</a>
-            </div>
-            <i><time>{{ article.date | strftime("%B %-d, %Y") }}</time></i>
+    {% if page and page.slug == 'blog' %}
+        <div class="article-list nu">
+            {% for article in articles | selectattr('category', '==', 'blog') %}
+                <div>
+                    <a href="{{ article.url }}">{{ article.title }}</a>
+                </div>
+                <i><time>{{ article.date | strftime("%B %-d, %Y") }}</time></i>
+            {% else %}
+                No posts yet!
+            {% endfor %}
+        </div>
+    {% else %}
+        {% set about_page = (pages | selectattr('slug', 'equalto', 'about') | list | first) %}
+        {% if about_page %}
+            {{ about_page.content }}
         {% else %}
-            No posts yet!
-        {% endfor %}
-    </div>
+            <p>About page not found.</p>
+        {% endif %}
+    {% endif %}
 {% endblock %}

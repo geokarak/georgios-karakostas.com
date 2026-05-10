@@ -15,38 +15,33 @@
         <link href="{{ SITEURL }}/theme/css/lightbox.css"
               rel="stylesheet"
               type="text/css" />
-        <header class="container nu">
-            <h1 class="site-title">
-                <a href="{{ SITEURL }}/">{{ SITENAME }}</a>
-            </h1>
-            <nav aria-label="Primary navigation">
-                <ul class="nav-list">
-                    <li>
-                        <a href="{{ SITEURL }}/about/"
-                           {% if output_file == 'about.html' %}class="active"{% endif %}>About</a>
-                    </li>
+        {% set on_about = output_file == 'index.html' or (page and page.slug == 'about') %}
+        {% set on_blog = (page and page.slug == 'blog') or (article and article.category == 'blog') %}
+        {% set on_photography = (page and (page.template == 'gallery' or page.slug == 'photography')) or (article and article.category != 'blog') %}
+        <header class="container nu site-header">
+            <nav class="primary-nav" aria-label="Primary navigation">
+                <ul class="nav-inline">
                     <li>
                         <a href="{{ SITEURL }}/"
-                           {% if output_file == 'index.html' %}class="active"{% endif %}>Blog</a>
+                           {% if on_about %}class="active"{% endif %}>About</a>
+                    </li>
+                    <li>
+                        <a href="{{ SITEURL }}/blog/"
+                           {% if on_blog %}class="active"{% endif %}>Blog</a>
+                    </li>
+                    <li>
+                        <a href="{{ SITEURL }}/photography/"
+                           {% if on_photography %}class="active"{% endif %}>Photography</a>
                     </li>
                 </ul>
-                <div class="nav-group-title" aria-hidden="true">
-                    <span class="line"></span>
-                    <span>Photography</span>
-                    <span class="line"></span>
-                </div>
-                <ul class="nav-list">
-                    {% if pages %}
-                        {% for nav_page in pages | sort(attribute='slug') %}
-                            {% if nav_page.template == 'gallery' %}
-                                <li>
-                                    <a href="{{ SITEURL }}/{{ nav_page.url }}"
-                                       {% if output_file == nav_page.save_as %}class="active"{% endif %}>{{ nav_page.title }}</a>
-                                </li>
-                            {% endif %}
-                        {% endfor %}
-                    {% endif %}
-                </ul>
+                <details class="nav-menu">
+                    <summary>Menu</summary>
+                    <ul class="nav-list">
+                        <li><a href="{{ SITEURL }}/">About</a></li>
+                        <li><a href="{{ SITEURL }}/blog/">Blog</a></li>
+                        <li><a href="{{ SITEURL }}/photography/">Photography</a></li>
+                    </ul>
+                </details>
             </nav>
         </header>
         <div class="separator">
