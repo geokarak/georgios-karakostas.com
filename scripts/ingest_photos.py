@@ -11,6 +11,7 @@ from PIL import Image
 
 SUPPORTED_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp"}
 EXIF_DATE_TAGS = (36867, 36868, 306)
+DISPLAY_TITLE_EXCEPTIONS = {"iphone": "iPhone"}
 
 
 def slugify(value: str) -> str:
@@ -106,6 +107,8 @@ def source_images(src_dir: Path) -> list[Path]:
 
 
 def title_from_slug(slug: str) -> str:
+    if slug in DISPLAY_TITLE_EXCEPTIONS:
+        return DISPLAY_TITLE_EXCEPTIONS[slug]
     return " ".join(part.capitalize() for part in slug.split("-") if part)
 
 

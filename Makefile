@@ -13,4 +13,7 @@ clean:
 ingest:
 	uv run python scripts/ingest_photos.py --src $(INGEST_SRC)
 
-.PHONY: venv run clean ingest
+test:
+	uv run pytest
+
+.PHONY: venv run clean ingest test

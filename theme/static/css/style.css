@@ -2,7 +2,6 @@
   --color-light-primary: #111;
   --color-light-secondary: #111;
   --color-light-background: #fff;
-  --color-light-background: #fff;
   --color-light-code: #fff;
   --color-light-code-background: #f6f8fa;
   --color-light-filtering: 0%;
@@ -21,7 +20,7 @@
   --code-color: var(--color-light-code);
   --code-background: var(--color-light-code-background);
   --base-font: -apple-system, BlinkMacSystemFont, avenir next, avenir, segoe ui, helvetica neue, helvetica, Cantarell, Ubuntu, roboto, noto, arial, sans-serif;
-  --fancy-font: font-family: Iowan Old Style, Apple Garamond, Baskerville, Times New Roman, Droid Serif, Times, Source Serif Pro, serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol;
+  --fancy-font: Iowan Old Style, Apple Garamond, Baskerville, Times New Roman, Droid Serif, Times, Source Serif Pro, serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol;
   --code-font: Menlo, Consolas, Monaco, Liberation Mono, Lucida Console,
     monospace;
 }
@@ -59,6 +58,33 @@ h6 {
   padding-right: 20px;
   margin-left: auto;
   margin-right: auto;
+}
+
+.site-title {
+  line-height: 1.6;
+  font-size: 105%;
+  letter-spacing: 0.004rem;
+  margin: 0 0 0.25em 0;
+}
+
+.site-title a {
+  text-decoration: none;
+}
+
+.nav-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.nav-list a.active {
+  text-decoration: underline;
+}
+
+.nav-group-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .main-content img {
@@ -161,8 +187,12 @@ footer {
   padding-bottom: 20px;
 }
 
+.footer-links {
+  text-align: center;
+}
+
 div.gallery {
-  padding: 20px;
+  padding: 20px 0;
   gap: 10px;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -249,6 +279,11 @@ canvas.marks {
 
   div.gallery {
     gap: 2px;
+    grid-template-columns: 1fr;
+  }
+
+  .about-logo {
+    width: 70%;
   }
 }
 
@@ -309,6 +344,20 @@ img.rounded {
   width: 200px;
 }
 
+.about-logo-wrap {
+  text-align: center;
+}
+
+.about-logo {
+  width: 40%;
+  margin-top: -10px;
+  filter: invert(var(--image-filtering));
+}
+
+.about-quote {
+  text-align: center;
+}
+
 /* hr {
   display: block;
   height: 1px;
@@ -324,4 +373,10 @@ img.rounded {
   border: 0.1px solid #C4C4C4;
   margin: 3px;
   display:inline-block;
+}
+
+@media screen and (max-width: 900px) {
+  div.gallery {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }

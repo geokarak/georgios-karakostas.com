@@ -3,13 +3,17 @@
 <meta name="generator" content="Pelican v{{ PELICAN_VERSION }}" />
 <meta name="author" content="{{ AUTHOR }}">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:creator" content="{{ TWITTER_HANDLE }}">
+{% if TWITTER_HANDLE %}
+    <meta name="twitter:creator" content="{{ TWITTER_HANDLE }}">
+{% endif %}
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
-<link rel="stylesheet" type="text/css" href="/theme/css/style.css" />
-<link type="application/atom+xml"
-      rel="alternate"
-      href="{{ SITEURL }}/{{ FEED_ALL_ATOM }}"
-      title="{{ SITENAME }}" />
+<link rel="stylesheet" type="text/css" href="{{ SITEURL }}/theme/css/style.css" />
+{% if FEED_ALL_ATOM %}
+    <link type="application/atom+xml"
+          rel="alternate"
+          href="{{ SITEURL }}/{{ FEED_ALL_ATOM }}"
+          title="{{ SITENAME }}" />
+{% endif %}
 <link rel="apple-touch-icon"
       sizes="180x180"
       href="/favicons/apple-touch-icon.png">
@@ -30,7 +34,7 @@
     <link rel="stylesheet"
           type="text/css"
           href="{{ SITEURL }}/theme/css/code.css" />
-    <link rel="canonical" href="{{ SITEURL }}/{{ article.url }}" />
+    <link rel="canonical" href="{% if SITEURL %}{{ SITEURL }}/{{ article.url }}{% else %}/{{ article.url }}{% endif %}" />
     <meta property="og:title" content="{{ article.title }}" />
     <meta property="og:url" content="{{ SITEURL }}/{{ article.url }}" />
     <meta name="twitter:url" content="{{ SITEURL }}/{{ article.url }}">
@@ -53,7 +57,7 @@
             "name": "{{ AUTHOR }}",
             "logo": {
                 "@type": "ImageObject",
-                "url": "{{ SITEURL }}/{{ SITELOGO }}"
+                "url": "{% if SITELOGO %}{{ SITEURL }}/{{ SITELOGO }}{% endif %}"
 
             }
         },
@@ -101,9 +105,9 @@
     <meta name="twitter:url" content="{{ SITEURL }}/{{ page.url }}">
     <meta name="twitter:title" content="{{ page.title }}">
     <meta name="twitter:description" content="{{ page.title }}">
-    <meta property="og:image" content="{{ SITEURL }}/{{ SITELOGO }}" />
-    <meta name="twitter:image" content="{{ SITEURL }}/{{ SITELOGO }}">
-    <link rel="canonical" href="{{ SITEURL }}/{{ page.url }}" />
+    <meta property="og:image" content="{% if SITELOGO %}{{ SITEURL }}/{{ SITELOGO }}{% endif %}" />
+    <meta name="twitter:image" content="{% if SITELOGO %}{{ SITEURL }}/{{ SITELOGO }}{% endif %}">
+    <link rel="canonical" href="{% if SITEURL %}{{ SITEURL }}/{{ page.url }}{% else %}/{{ page.url }}{% endif %}" />
     <meta property="og:title" content="{{ page.title }}" />
     <meta property="og:url" content="{{ SITEURL }}/{{ page.url }}" />
     <script type="application/ld+json">
@@ -119,7 +123,7 @@
     </script>
 {% else %}
     <meta name="description" content="{{ SITE_DESCRIPTION }}" />
-    <link rel="canonical" href="{{ SITEURL }}" />
+    <link rel="canonical" href="{% if SITEURL %}{{ SITEURL }}{% else %}/{% endif %}" />
     <meta name="follow_it-verification-code" content="KRrlNDwePq9uk4Fcv4Nr" />
     <meta property="og:title" content="{{ SITENAME }}" />
     <meta property="og:url" content="{{ SITEURL }}" />
@@ -127,8 +131,8 @@
     <meta name="twitter:url" content="{{ SITEURL }}">
     <meta name="twitter:title" content="{{ SITENAME }}">
     <meta name="twitter:description" content="{{ SITE_DESCRIPTION }}">
-    <meta property="og:image" content="{{ SITEURL }}/{{ SITELOGO }}" />
-    <meta name="twitter:image" content="{{ SITEURL }}/{{ SITELOGO }}">
+    <meta property="og:image" content="{% if SITELOGO %}{{ SITEURL }}/{{ SITELOGO }}{% endif %}" />
+    <meta name="twitter:image" content="{% if SITELOGO %}{{ SITEURL }}/{{ SITELOGO }}{% endif %}">
     <script type="application/ld+json">
     {
         "@context": "http://schema.org",

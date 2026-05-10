@@ -2,6 +2,8 @@ AUTHOR = "Georgios Karakostas"
 SITENAME = "Georgios Karakostas"
 SITEURL = ""
 SITE_DESCRIPTION = "My personal website"
+SITELOGO = "images/about/the-g-logo.png"
+TWITTER_HANDLE = ""
 
 TIMEZONE = "Europe/Brussels"
 DEFAULT_LANG = "en"
@@ -12,12 +14,11 @@ STATIC_PATHS = [
     "extra/favicons",
     "extra/robots.txt",
     "images",
-    "extra",
 ]
 
 
 EXTRA_PATH_METADATA = {
-    "extra/CNAME": {"extra/CNAME": {"path": "CNAME"}},
+    "extra/CNAME": {"path": "CNAME"},
     "extra/robots.txt": {"path": "robots.txt"},
 }
 

@@ -1,3 +1,3 @@
-title: Iphone
+title: iPhone
 slug: iphone
 template: gallery

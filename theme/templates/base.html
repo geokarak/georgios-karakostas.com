@@ -12,45 +12,47 @@
     </head>
     <body>
         <script src="{{ SITEURL }}/theme/js/lightbox-plus-jquery.min.js"></script>
-        <script src="{{ SITEURL }}/theme/js/lightbox.min.js"></script>
         <link href="{{ SITEURL }}/theme/css/lightbox.css"
               rel="stylesheet"
               type="text/css" />
         <header class="container nu">
-            <h1 style="line-height:1.6;
-                       font-size:105%;
-                       letter-spacing:0.004rem;
-                       margin:0 0 0.25em 0">
-                <a style="text-decoration: none;" href="/">{{ SITENAME }}</a>
+            <h1 class="site-title">
+                <a href="{{ SITEURL }}/">{{ SITENAME }}</a>
             </h1>
-            <ul style="list-style:none;padding:0;margin:0;">
-                <li>
-                    <a href="/about"
-                       {% if output_file == 'about.html' %}style="text-decoration: underline"{% endif %}>About</a>
-                </li>
-                <li>
-                    <a href="/"
-                       {% if output_file == 'index.html' %}style="text-decoration: underline"{% endif %}>Blog</a>
-                </li>
-                <div class="line"></div>
-                <div style="display:inline-block;">Photography</div>
-                <div class="line"></div>
-                {% if pages %}
-                    {% for nav_page in pages | sort(attribute='slug') %}
-                        {% if nav_page.template == 'gallery' %}
-                            <li>
-                                <a href="/{{ nav_page.slug }}"
-                                   {% if output_file == nav_page.slug + '.html' %}style="text-decoration: underline"{% endif %}>{{ nav_page.title }}</a>
-                            </li>
-                        {% endif %}
-                    {% endfor %}
-                {% endif %}
-            </ul>
+            <nav aria-label="Primary navigation">
+                <ul class="nav-list">
+                    <li>
+                        <a href="{{ SITEURL }}/about/"
+                           {% if output_file == 'about.html' %}class="active"{% endif %}>About</a>
+                    </li>
+                    <li>
+                        <a href="{{ SITEURL }}/"
+                           {% if output_file == 'index.html' %}class="active"{% endif %}>Blog</a>
+                    </li>
+                </ul>
+                <div class="nav-group-title" aria-hidden="true">
+                    <span class="line"></span>
+                    <span>Photography</span>
+                    <span class="line"></span>
+                </div>
+                <ul class="nav-list">
+                    {% if pages %}
+                        {% for nav_page in pages | sort(attribute='slug') %}
+                            {% if nav_page.template == 'gallery' %}
+                                <li>
+                                    <a href="{{ SITEURL }}/{{ nav_page.url }}"
+                                       {% if output_file == nav_page.save_as %}class="active"{% endif %}>{{ nav_page.title }}</a>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
+                </ul>
+            </nav>
         </header>
         <div class="separator">
-            <div class="container vertical-spacing no-top main-content">
+            <main class="container vertical-spacing no-top main-content">
                 {% block content %}{% endblock %}
-            </div>
+            </main>
         </div>
         <footer class="container nu no-top">
             {% include "footer.html" %}

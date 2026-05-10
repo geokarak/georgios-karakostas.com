@@ -11,6 +11,7 @@ BASE_DIR = Path(__file__).resolve(strict=True).parents[2]
 CONTENT_DIR = BASE_DIR / "content"
 IMAGES_DIR = BASE_DIR / "content" / "images" / "photos"
 SUPPORTED_IMAGE_EXTENSIONS = (".png", ".jpg", ".jpeg", ".webp")
+DISPLAY_TITLE_EXCEPTIONS = {"iphone": "iPhone"}
 
 logger = logging.getLogger(__name__)
 
@@ -42,6 +43,10 @@ def find_image_for_metadata(metadata_path, metadata):
             return candidate
 
     return None
+
+
+def display_title(category):
+    return DISPLAY_TITLE_EXCEPTIONS.get(category, category.capitalize())
 
 
 def load_photos_from_sidecars(path):
@@ -78,6 +83,7 @@ def load_photos_from_sidecars(path):
         photos.append(
             {
                 "id": photo_id,
+                "photo_id": photo_id,
                 "category": category,
                 "date": date_object,
                 "location": metadata.get("location"),
@@ -103,11 +109,12 @@ def add_photos(articleGenerator):
         new_article = Article(
             photo["caption"],
             {
-                "title": category.capitalize(),
+                "title": display_title(category),
                 "date": photo["date"],
                 "location": photo["location"],
                 "photo_url": photo["photo_url"],
                 "thumbnail_url": photo["photo_url"],
+                "photo_id": photo["photo_id"],
                 "category": base_reader.process_metadata("category", category),
                 "url": f"{category}/{photo_id}.html",
                 "save_as": f"{category}/{photo_id}.html",

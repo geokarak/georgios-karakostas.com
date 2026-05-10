@@ -11,6 +11,7 @@ This project uses [uv](https://docs.astral.sh/uv/) for dependency management.
 ```bash
 uv sync
 uv run pelican -s pelicanconf.py -t theme -o output -l -r
+uv run pytest
 ```
 
 ## Photo workflow

@@ -2,15 +2,10 @@ title: About me
 slug: about
 template: about
 
-<center>
-    <img style="width:40%;
-                margin-top:-10px;
-                filter: invert(var(--image-filtering))"
-         class="logo"
-         src="{static}/images/about/the-g-logo.png"
-         alt="logo.png">
-</center>
+<div class="about-logo-wrap">
+    <img class="about-logo" src="{static}/images/about/the-g-logo.png" alt="G logo">
+</div>
 
-<center><i>"A bad day with photography is still better than a good day without it."</i></center>
+<p class="about-quote"><i>"A bad day with photography is still better than a good day without it."</i></p>
 
 I'm a mathematician by training and a photographer by heart, professionally active in the domain of AI and Machine Learning since 2019, and presently employed as a Senior MLOps Engineer.

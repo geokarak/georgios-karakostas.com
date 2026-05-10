@@ -8,7 +8,8 @@
                     <a href="{{ article.photo_url }}"
                        data-lightbox="{{ page.slug }}"
                        data-title="{{ article.caption or '' }}">
-                        <img src="{{ article.photo_url }}" alt="Photo" />
+                        <img src="{{ article.photo_url }}"
+                             alt="{{ article.caption | striptags if article.caption else article.photo_id | replace('-', ' ') }}" />
                     </a>
                 </div>
             {% endif %}
