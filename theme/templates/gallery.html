@@ -1,13 +1,18 @@
 {% extends "base.html" %}
 {% block title %}{{ page.title }} - {{ SITENAME }}{% endblock %}
+{% block extra_head %}
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/glightbox/dist/css/glightbox.min.css" />
+{% endblock %}
 {% block content %}
     <div class="gallery">
         {% for article in articles | sort(attribute='date', reverse=True) %}
             {% if article.photo_url is defined and article.category == page.slug %}
                 <div>
                     <a href="{{ article.photo_url }}"
-                       data-lightbox="{{ page.slug }}"
-                       data-title="{{ article.caption or '' }}">
+                       class="glightbox"
+                       data-gallery="{{ page.slug }}"
+                       data-title="{{ article.caption | striptags if article.caption else '' }}">
                         <img src="{{ article.photo_url }}"
                              alt="{{ article.caption | striptags if article.caption else article.photo_id | replace('-', ' ') }}" />
                     </a>
@@ -15,4 +20,16 @@
             {% endif %}
         {% endfor %}
     </div>
+{% endblock %}
+{% block extra_scripts %}
+    <script src="https://cdn.jsdelivr.net/npm/glightbox/dist/js/glightbox.min.js"></script>
+    <script>
+      GLightbox({
+        selector: ".glightbox",
+        touchNavigation: true,
+        loop: true,
+        closeButton: true,
+        zoomable: true,
+      });
+    </script>
 {% endblock %}

@@ -9,12 +9,9 @@
             {% block title %}{% endblock %}
         </title>
         {% include "header.html" %}
+        {% block extra_head %}{% endblock %}
     </head>
     <body>
-        <script src="{{ SITEURL }}/theme/js/lightbox-plus-jquery.min.js"></script>
-        <link href="{{ SITEURL }}/theme/css/lightbox.css"
-              rel="stylesheet"
-              type="text/css" />
         {% set on_about = output_file == 'index.html' or (page and page.slug == 'about') %}
         {% set on_blog = (page and page.slug == 'blog') or (article and article.category == 'blog') %}
         {% set on_photography = (page and (page.template == 'gallery' or page.slug == 'photography')) or (article and article.category != 'blog') %}
@@ -52,5 +49,6 @@
         <footer class="container nu no-top">
             {% include "footer.html" %}
         </footer>
+        {% block extra_scripts %}{% endblock %}
     </body>
 </html>
