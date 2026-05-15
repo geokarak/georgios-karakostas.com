@@ -8,3 +8,7 @@
 - [ ] Check bundle/loading impact of PhotoSwipe integration (CDN vs self-hosted assets).
 - [ ] Evaluate maintenance complexity in Pelican templates (initial integration + future changes).
 - [ ] If benefits are clear, create a migration plan and rollback path from GLightbox.
+
+## Harden Dropbox photo sync workflow
+
+- [ ] Handle races between normal pushes and the scheduled Dropbox photo sync workflow, likely by rebasing on the latest `main` before the automation commits and pushes.

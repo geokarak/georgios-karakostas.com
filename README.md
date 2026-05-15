@@ -26,10 +26,15 @@ By default, ingest moves files out of `inbox/` into `content/images/photos/...` 
 
 This creates:
 
-- `content/images/photos/<category>/<id>.<ext>`
+- `content/images/photos/<category>/<id>-display.webp`
+- `content/images/photos/<category>/<id>-thumb.webp`
 - `content/images/photos/<category>/<id>.json`
 
-Metadata JSON is auto-generated with date/category/id and can be edited later for `caption`, `location`, and `published`.
+Metadata JSON is auto-generated with date/category/id plus the generated derivative filenames, and can be edited later for `caption`, `location`, and `published`.
+
+Ingest stores only web-ready derivatives in the repository: a display image and a thumbnail, both as WebP.
+
+By default, ingest removes files from `inbox/` after processing. Using `--copy` keeps the source files in the inbox while still storing only the generated WebP derivatives and metadata in the repository.
 
 Any new category folder under `inbox/` (for example `inbox/macro/`) is automatically available as a browsable gallery page at `/<category>/` after ingest + build.
 

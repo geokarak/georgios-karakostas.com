@@ -15,17 +15,24 @@ def test_parse_date_raises_for_invalid_format():
         photos.parse_date("22/02/2024")
 
 
-def test_find_image_for_metadata_prefers_filename(tmp_path):
+def test_find_image_by_filename_returns_existing_file(tmp_path):
     metadata_path = tmp_path / "photo.json"
     metadata_path.write_text("{}", encoding="utf-8")
     preferred = tmp_path / "custom-name.webp"
     preferred.write_bytes(b"img")
 
-    found = photos.find_image_for_metadata(
-        metadata_path,
-        {"filename": "custom-name.webp"},
-    )
+    found = photos.find_image_by_filename(metadata_path, "custom-name.webp")
     assert found == preferred
+
+
+def test_find_image_by_filename_supports_derivative_only_entries(tmp_path):
+    metadata_path = tmp_path / "photo.json"
+    metadata_path.write_text("{}", encoding="utf-8")
+    derivative = tmp_path / "photo-display.webp"
+    derivative.write_bytes(b"img")
+
+    found = photos.find_image_by_filename(metadata_path, "photo-display.webp")
+    assert found == derivative
 
 
 def test_load_photos_from_sidecars_builds_photo_entries(tmp_path):
@@ -39,13 +46,16 @@ def test_load_photos_from_sidecars_builds_photo_entries(tmp_path):
         "date": "2024-02-22",
         "caption": "In the park",
         "location": "Tubize",
-        "filename": "2024-02-22-champ-du-tordoir.jpg",
+        "display_filename": "2024-02-22-champ-du-tordoir-display.webp",
+        "thumbnail_filename": "2024-02-22-champ-du-tordoir-thumb.webp",
     }
     metadata_path = photos_dir / "2024-02-22-champ-du-tordoir.json"
-    image_path = photos_dir / "2024-02-22-champ-du-tordoir.jpg"
+    display_path = photos_dir / metadata["display_filename"]
+    thumbnail_path = photos_dir / metadata["thumbnail_filename"]
 
     metadata_path.write_text(json.dumps(metadata), encoding="utf-8")
-    image_path.write_bytes(b"img")
+    display_path.write_bytes(b"img")
+    thumbnail_path.write_bytes(b"img")
 
     original_content_dir = photos.CONTENT_DIR
     try:
@@ -57,7 +67,65 @@ def test_load_photos_from_sidecars_builds_photo_entries(tmp_path):
     assert len(loaded) == 1
     assert loaded[0]["photo_id"] == metadata["id"]
     assert loaded[0]["caption"] == "In the park"
-    assert loaded[0]["photo_url"] == "../images/photos/iphone/2024-02-22-champ-du-tordoir.jpg"
+    assert loaded[0]["photo_url"] == "../images/photos/iphone/2024-02-22-champ-du-tordoir-display.webp"
+    assert loaded[0]["thumbnail_url"] == "../images/photos/iphone/2024-02-22-champ-du-tordoir-thumb.webp"
+
+
+def test_load_photos_from_sidecars_prefers_generated_derivatives(tmp_path):
+    content_dir = tmp_path / "content"
+    photos_dir = content_dir / "images" / "photos" / "iphone"
+    photos_dir.mkdir(parents=True, exist_ok=True)
+
+    metadata = {
+        "id": "2024-02-22-champ-du-tordoir",
+        "category": "iphone",
+        "date": "2024-02-22",
+        "display_filename": "2024-02-22-champ-du-tordoir-display.webp",
+        "thumbnail_filename": "2024-02-22-champ-du-tordoir-thumb.webp",
+    }
+    metadata_path = photos_dir / "2024-02-22-champ-du-tordoir.json"
+    metadata_path.write_text(json.dumps(metadata), encoding="utf-8")
+    (photos_dir / metadata["display_filename"]).write_bytes(b"img")
+    (photos_dir / metadata["thumbnail_filename"]).write_bytes(b"img")
+
+    original_content_dir = photos.CONTENT_DIR
+    try:
+        photos.CONTENT_DIR = content_dir
+        loaded = photos.load_photos_from_sidecars(content_dir / "images" / "photos")
+    finally:
+        photos.CONTENT_DIR = original_content_dir
+
+    assert loaded[0]["photo_url"] == "../images/photos/iphone/2024-02-22-champ-du-tordoir-display.webp"
+    assert loaded[0]["thumbnail_url"] == "../images/photos/iphone/2024-02-22-champ-du-tordoir-thumb.webp"
+
+
+def test_load_photos_from_sidecars_skips_entries_missing_derivatives(tmp_path):
+    content_dir = tmp_path / "content"
+    photos_dir = content_dir / "images" / "photos" / "iphone"
+    photos_dir.mkdir(parents=True, exist_ok=True)
+
+    metadata_path = photos_dir / "broken.json"
+    metadata_path.write_text(
+        json.dumps(
+            {
+                "id": "broken",
+                "category": "iphone",
+                "date": "2024-02-22",
+                "display_filename": "broken-display.webp",
+                "thumbnail_filename": "broken-thumb.webp",
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    original_content_dir = photos.CONTENT_DIR
+    try:
+        photos.CONTENT_DIR = content_dir
+        loaded = photos.load_photos_from_sidecars(content_dir / "images" / "photos")
+    finally:
+        photos.CONTENT_DIR = original_content_dir
+
+    assert loaded == []
 
 
 def test_load_photos_from_sidecars_skips_unpublished(tmp_path):

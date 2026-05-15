@@ -10,7 +10,6 @@ from pelican.readers import BaseReader
 BASE_DIR = Path(__file__).resolve(strict=True).parents[2]
 CONTENT_DIR = BASE_DIR / "content"
 IMAGES_DIR = BASE_DIR / "content" / "images" / "photos"
-SUPPORTED_IMAGE_EXTENSIONS = (".png", ".jpg", ".jpeg", ".webp")
 DISPLAY_TITLE_EXCEPTIONS = {"iphone": "iPhone"}
 
 logger = logging.getLogger(__name__)
@@ -30,15 +29,9 @@ def relative_photo_url(image_file):
     return f"../{relative_path}"
 
 
-def find_image_for_metadata(metadata_path, metadata):
-    filename = metadata.get("filename")
+def find_image_by_filename(metadata_path, filename):
     if filename:
         candidate = metadata_path.parent / filename
-        if candidate.exists() and candidate.suffix.lower() in SUPPORTED_IMAGE_EXTENSIONS:
-            return candidate
-
-    for extension in SUPPORTED_IMAGE_EXTENSIONS:
-        candidate = metadata_path.with_suffix(extension)
         if candidate.exists():
             return candidate
 
@@ -75,8 +68,12 @@ def load_photos_from_sidecars(path):
             logger.warning("Skipping %s: %s", metadata_path, error)
             continue
 
-        image_file = find_image_for_metadata(metadata_path, metadata)
-        if not image_file:
+        display_file = find_image_by_filename(metadata_path, metadata.get("display_filename"))
+        thumbnail_file = find_image_by_filename(
+            metadata_path,
+            metadata.get("thumbnail_filename"),
+        )
+        if not display_file or not thumbnail_file:
             logger.warning("Skipping %s: matching image file not found", metadata_path)
             continue
 
@@ -88,7 +85,8 @@ def load_photos_from_sidecars(path):
                 "date": date_object,
                 "location": metadata.get("location"),
                 "caption": metadata.get("caption", ""),
-                "photo_url": relative_photo_url(image_file),
+                "photo_url": relative_photo_url(display_file),
+                "thumbnail_url": relative_photo_url(thumbnail_file),
             }
         )
 
@@ -113,7 +111,7 @@ def add_photos(articleGenerator):
                 "date": photo["date"],
                 "location": photo["location"],
                 "photo_url": photo["photo_url"],
-                "thumbnail_url": photo["photo_url"],
+                "thumbnail_url": photo["thumbnail_url"],
                 "photo_id": photo["photo_id"],
                 "category": base_reader.process_metadata("category", category),
                 "url": f"{category}/{photo_id}.html",

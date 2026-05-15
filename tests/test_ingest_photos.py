@@ -1,6 +1,8 @@
 import json
 from pathlib import Path
 
+from PIL import Image
+
 from scripts import ingest_photos
 
 
@@ -68,7 +70,70 @@ def test_generated_metadata_schema_is_serializable():
         "location": "",
         "caption": "",
         "published": True,
-        "filename": "2024-01-01-photo.jpg",
+        "display_filename": "2024-01-01-photo-display.webp",
+        "thumbnail_filename": "2024-01-01-photo-thumb.webp",
     }
     serialized = json.dumps(metadata)
     assert isinstance(serialized, str)
+
+
+def test_save_web_derivative_resizes_large_image(tmp_path):
+    source = tmp_path / "source.jpg"
+    destination = tmp_path / "thumb.webp"
+
+    Image.new("RGB", (4032, 3024), color="navy").save(source, format="JPEG")
+
+    ingest_photos.save_web_derivative(source, destination, max_edge=900)
+
+    assert destination.exists()
+    with Image.open(destination) as image:
+        assert max(image.size) == 900
+
+
+def test_derivative_paths_use_expected_suffixes(tmp_path):
+    display_file, thumbnail_file = ingest_photos.derivative_paths(tmp_path, "2024-01-01-photo")
+
+    assert display_file.name == "2024-01-01-photo-display.webp"
+    assert thumbnail_file.name == "2024-01-01-photo-thumb.webp"
+
+
+def test_main_writes_only_derivatives_and_metadata(tmp_path, monkeypatch):
+    src_dir = tmp_path / "inbox" / "iphone"
+    dest_dir = tmp_path / "content" / "images" / "photos"
+    src_dir.mkdir(parents=True)
+    source = src_dir / "test.jpg"
+    Image.new("RGB", (1600, 1200), color="green").save(source, format="JPEG")
+
+    monkeypatch.setattr(
+        ingest_photos,
+        "parse_args",
+        lambda: type(
+            "Args",
+            (),
+            {
+                "src": str(tmp_path / "inbox"),
+                "dest": str(dest_dir),
+                "category": None,
+                "copy": False,
+                "draft": False,
+                "dry_run": False,
+            },
+        )(),
+    )
+    monkeypatch.setattr(ingest_photos, "ensure_gallery_page", lambda *args, **kwargs: None)
+
+    assert ingest_photos.main() == 0
+
+    category_dir = dest_dir / "iphone"
+    metadata_files = list(category_dir.glob("*.json"))
+    assert len(metadata_files) == 1
+
+    metadata = json.loads(metadata_files[0].read_text(encoding="utf-8"))
+    assert metadata["display_filename"].endswith("-display.webp")
+    assert metadata["thumbnail_filename"].endswith("-thumb.webp")
+    assert "filename" not in metadata
+
+    assert (category_dir / metadata["display_filename"]).exists()
+    assert (category_dir / metadata["thumbnail_filename"]).exists()
+    assert list(category_dir.glob("*.jpg")) == []
+    assert not source.exists()

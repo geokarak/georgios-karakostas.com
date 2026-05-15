@@ -4,14 +4,18 @@ import argparse
 import datetime as dt
 import json
 import re
-import shutil
 from pathlib import Path
 
-from PIL import Image
+from PIL import Image, ImageOps
 
 SUPPORTED_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp"}
 EXIF_DATE_TAGS = (36867, 36868, 306)
 DISPLAY_TITLE_EXCEPTIONS = {"iphone": "iPhone"}
+DISPLAY_MAX_EDGE = 2200
+THUMBNAIL_MAX_EDGE = 900
+DERIVATIVE_FORMAT = "WEBP"
+DERIVATIVE_EXTENSION = ".webp"
+DERIVATIVE_QUALITY = 82
 
 
 def slugify(value: str) -> str:
@@ -87,10 +91,8 @@ def unique_id(category_dir: Path, base_id: str) -> str:
     counter = 2
     while True:
         metadata_exists = (category_dir / f"{candidate}.json").exists()
-        image_exists = any(
-            (category_dir / f"{candidate}{extension}").exists()
-            for extension in SUPPORTED_EXTENSIONS
-        )
+        display_file, thumbnail_file = derivative_paths(category_dir, candidate)
+        image_exists = display_file.exists() or thumbnail_file.exists()
         if not metadata_exists and not image_exists:
             return candidate
         candidate = f"{base_id}-{counter}"
@@ -133,6 +135,30 @@ def ensure_gallery_page(category: str, project_root: Path, dry_run: bool) -> Non
     page_file.write_text(page_content, encoding="utf-8")
 
 
+def derivative_paths(category_dir: Path, photo_id: str) -> tuple[Path, Path]:
+    display_file = category_dir / f"{photo_id}-display{DERIVATIVE_EXTENSION}"
+    thumbnail_file = category_dir / f"{photo_id}-thumb{DERIVATIVE_EXTENSION}"
+    return display_file, thumbnail_file
+
+
+def save_web_derivative(source_file: Path, destination_file: Path, max_edge: int) -> None:
+    with Image.open(source_file) as image:
+        rendered = ImageOps.exif_transpose(image)
+        if rendered.mode not in {"RGB", "RGBA"}:
+            rendered = rendered.convert("RGB")
+
+        rendered.thumbnail((max_edge, max_edge), Image.Resampling.LANCZOS)
+        save_options = {
+            "format": DERIVATIVE_FORMAT,
+            "quality": DERIVATIVE_QUALITY,
+            "method": 6,
+        }
+        if rendered.mode == "RGBA":
+            save_options["lossless"] = False
+
+        rendered.save(destination_file, **save_options)
+
+
 def main() -> int:
     args = parse_args()
 
@@ -171,9 +197,8 @@ def main() -> int:
         base_id = f"{detected_dt.strftime('%Y-%m-%d')}-{raw_stem}"
         photo_id = unique_id(category_dir, base_id)
 
-        extension = source_file.suffix.lower()
-        destination_file = category_dir / f"{photo_id}{extension}"
         metadata_file = category_dir / f"{photo_id}.json"
+        display_file, thumbnail_file = derivative_paths(category_dir, photo_id)
 
         metadata = {
             "id": photo_id,
@@ -182,27 +207,32 @@ def main() -> int:
             "location": "",
             "caption": "",
             "published": not args.draft,
-            "filename": destination_file.name,
+            "display_filename": display_file.name,
+            "thumbnail_filename": thumbnail_file.name,
         }
 
         if args.dry_run:
-            print(f"[DRY RUN] {source_file} -> {destination_file}")
+            print(f"[DRY RUN] display -> {display_file}")
+            print(f"[DRY RUN] thumbnail -> {thumbnail_file}")
             print(f"[DRY RUN] metadata -> {metadata_file}")
             ensure_gallery_page(category, project_root, dry_run=True)
             copied += 1
             continue
 
         category_dir.mkdir(parents=True, exist_ok=True)
+        save_web_derivative(source_file, display_file, DISPLAY_MAX_EDGE)
+        save_web_derivative(source_file, thumbnail_file, THUMBNAIL_MAX_EDGE)
+
         if not args.copy:
-            shutil.move(str(source_file), str(destination_file))
-        else:
-            shutil.copy2(source_file, destination_file)
+            source_file.unlink()
 
         metadata_file.write_text(json.dumps(metadata, indent=2) + "\n", encoding="utf-8")
         ensure_gallery_page(category, project_root, dry_run=False)
 
         copied += 1
-        print(f"Ingested {source_file.name} -> {destination_file.relative_to(dest_dir)}")
+        print(
+            f"Ingested {source_file.name} -> {display_file.relative_to(dest_dir.parent)}"
+        )
 
     print(f"Done. Ingested: {copied}, Skipped: {skipped}")
     if not args.dry_run and args.copy:

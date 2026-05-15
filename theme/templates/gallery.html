@@ -13,7 +13,7 @@
                        class="glightbox"
                        data-gallery="{{ page.slug }}"
                        data-title="{{ article.caption | striptags if article.caption else '' }}">
-                        <img src="{{ article.photo_url }}"
+                        <img src="{{ article.thumbnail_url }}"
                              alt="{{ article.caption | striptags if article.caption else article.photo_id | replace('-', ' ') }}" />
                     </a>
                 </div>
