@@ -4,8 +4,6 @@ import logging
 from pathlib import Path
 
 from pelican import signals
-from pelican.contents import Article
-from pelican.readers import BaseReader
 
 BASE_DIR = Path(__file__).resolve(strict=True).parents[2]
 CONTENT_DIR = BASE_DIR / "content"
@@ -93,37 +91,37 @@ def load_photos_from_sidecars(path):
     return photos
 
 
-def add_photos(articleGenerator):
-    settings = articleGenerator.settings
-    base_reader = BaseReader(settings)
+def group_photos_by_category(photos):
+    grouped = {}
+    for photo in photos:
+        grouped.setdefault(photo["category"], []).append(photo)
+    return grouped
+
+
+def format_photo_summary(photos_by_category):
+    if not photos_by_category:
+        return "Photos: total=0"
+
+    total = sum(len(items) for items in photos_by_category.values())
+    parts = [
+        f"{category}={len(items)}"
+        for category, items in sorted(photos_by_category.items())
+    ]
+    return f"Photos: total={total} | " + ", ".join(parts)
+
+
+def add_photos_to_context(generators):
+    if not generators:
+        return
 
     photos_list = load_photos_from_sidecars(IMAGES_DIR)
-
-    counter = 0
-    for photo in photos_list:
-        category = photo["category"]
-        photo_id = photo["id"]
-
-        new_article = Article(
-            photo["caption"],
-            {
-                "title": display_title(category),
-                "date": photo["date"],
-                "location": photo["location"],
-                "photo_url": photo["photo_url"],
-                "thumbnail_url": photo["thumbnail_url"],
-                "photo_id": photo["photo_id"],
-                "category": base_reader.process_metadata("category", category),
-                "url": f"{category}/{photo_id}.html",
-                "save_as": f"{category}/{photo_id}.html",
-            },
-        )
-
-        articleGenerator.articles.append(new_article)
-        counter += 1
-
-    logger.info(f"Added {counter} photos to the article list")
+    shared_context = generators[0].context
+    shared_context["photos"] = photos_list
+    photos_by_category = group_photos_by_category(photos_list)
+    shared_context["photos_by_category"] = photos_by_category
+    logger.info("Loaded %s photos into shared template context", len(photos_list))
+    print(format_photo_summary(photos_by_category))
 
 
 def register():
-    signals.article_generator_finalized.connect(add_photos)
+    signals.all_generators_finalized.connect(add_photos_to_context)

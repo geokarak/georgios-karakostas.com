@@ -6,18 +6,16 @@
 {% endblock %}
 {% block content %}
     <div class="gallery">
-        {% for article in articles | sort(attribute='date', reverse=True) %}
-            {% if article.photo_url is defined and article.category == page.slug %}
+        {% for photo in photos_by_category.get(page.slug, []) | sort(attribute='date', reverse=True) %}
                 <div>
-                    <a href="{{ article.photo_url }}"
+                    <a href="{{ photo.photo_url }}"
                        class="glightbox"
                        data-gallery="{{ page.slug }}"
-                       data-title="{{ article.caption | striptags if article.caption else '' }}">
-                        <img src="{{ article.thumbnail_url }}"
-                             alt="{{ article.caption | striptags if article.caption else article.photo_id | replace('-', ' ') }}" />
+                       data-title="{{ photo.caption | striptags if photo.caption else '' }}">
+                        <img src="{{ photo.thumbnail_url }}"
+                             alt="{{ photo.caption | striptags if photo.caption else photo.photo_id | replace('-', ' ') }}" />
                     </a>
                 </div>
-            {% endif %}
         {% endfor %}
     </div>
 {% endblock %}

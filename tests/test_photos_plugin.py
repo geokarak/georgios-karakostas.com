@@ -156,6 +156,56 @@ def test_load_photos_from_sidecars_skips_unpublished(tmp_path):
     assert loaded == []
 
 
+def test_group_photos_by_category_groups_entries():
+    grouped = photos.group_photos_by_category(
+        [
+            {"category": "iphone", "photo_id": "a"},
+            {"category": "iphone", "photo_id": "b"},
+            {"category": "street", "photo_id": "c"},
+        ]
+    )
+
+    assert [photo["photo_id"] for photo in grouped["iphone"]] == ["a", "b"]
+    assert [photo["photo_id"] for photo in grouped["street"]] == ["c"]
+
+
+def test_format_photo_summary_sorts_categories():
+    summary = photos.format_photo_summary(
+        {
+            "street": [{"photo_id": "a"}],
+            "iphone": [{"photo_id": "b"}, {"photo_id": "c"}],
+        }
+    )
+
+    assert summary == "Photos: total=3 | iphone=2, street=1"
+
+
+def test_format_photo_summary_handles_empty_collection():
+    assert photos.format_photo_summary({}) == "Photos: total=0"
+
+
+def test_add_photos_to_context_populates_shared_context(monkeypatch):
+    sample_photos = [
+        {
+            "category": "iphone",
+            "photo_id": "sample",
+            "photo_url": "../images/photos/iphone/sample-display.webp",
+            "thumbnail_url": "../images/photos/iphone/sample-thumb.webp",
+            "caption": "",
+            "date": photos.parse_date("2024-02-22"),
+        }
+    ]
+    monkeypatch.setattr(photos, "load_photos_from_sidecars", lambda path: sample_photos)
+
+    shared_context = {}
+    generator = type("Generator", (), {"context": shared_context})()
+
+    photos.add_photos_to_context([generator])
+
+    assert shared_context["photos"] == sample_photos
+    assert shared_context["photos_by_category"]["iphone"] == sample_photos
+
+
 def test_display_title_handles_iphone_exception():
     assert photos.display_title("iphone") == "iPhone"
     assert photos.display_title("macro") == "Macro"
