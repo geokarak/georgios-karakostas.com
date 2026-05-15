@@ -53,6 +53,8 @@ The local `inbox/` workflow can stay in place alongside a second Dropbox-based u
 
 The `.github/workflows/dropbox-photo-sync.yml` workflow runs every 15 minutes and can also be triggered manually from GitHub Actions.
 
+Dropbox app settings are available at `https://www.dropbox.com/developers/apps`.
+
 Recommended Dropbox layout:
 
 ```text

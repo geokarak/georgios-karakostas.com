@@ -215,14 +215,14 @@ def sync_dropbox_inbox(
     if archive_root == inbox_root or archive_root.is_relative_to(inbox_root):
         raise ValueError("Archive path must live outside the Dropbox inbox path")
 
+    staging_dir.mkdir(parents=True, exist_ok=True)
+
     token = require_access_token()
     files = list_remote_images(token, inbox_root)
 
     if not files:
         print(f"No Dropbox images found in {inbox_root.as_posix()}")
         return 0
-
-    staging_dir.mkdir(parents=True, exist_ok=True)
 
     downloaded = 0
     for entry in files:
