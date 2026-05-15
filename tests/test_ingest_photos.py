@@ -1,7 +1,7 @@
 import json
 from pathlib import Path
 
-from PIL import Image
+from PIL import Image, ImageCms
 
 from scripts import ingest_photos
 
@@ -95,6 +95,23 @@ def test_derivative_paths_use_expected_suffixes(tmp_path):
 
     assert display_file.name == "2024-01-01-photo-display.webp"
     assert thumbnail_file.name == "2024-01-01-photo-thumb.webp"
+
+
+def test_save_web_derivative_embeds_icc_profile(tmp_path):
+    source = tmp_path / "source.jpg"
+    destination = tmp_path / "display.webp"
+    icc_profile = ImageCms.ImageCmsProfile(ImageCms.createProfile("sRGB")).tobytes()
+
+    Image.new("RGB", (1200, 800), color="red").save(
+        source,
+        format="JPEG",
+        icc_profile=icc_profile,
+    )
+
+    ingest_photos.save_web_derivative(source, destination, max_edge=900)
+
+    with Image.open(destination) as image:
+        assert image.info.get("icc_profile")
 
 
 def test_main_writes_only_derivatives_and_metadata(tmp_path, monkeypatch):

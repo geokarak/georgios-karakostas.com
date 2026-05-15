@@ -2,11 +2,12 @@
 
 import argparse
 import datetime as dt
+import io
 import json
 import re
 from pathlib import Path
 
-from PIL import Image, ImageOps
+from PIL import Image, ImageCms, ImageOps
 
 SUPPORTED_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp"}
 EXIF_DATE_TAGS = (36867, 36868, 306)
@@ -16,6 +17,40 @@ THUMBNAIL_MAX_EDGE = 900
 DERIVATIVE_FORMAT = "WEBP"
 DERIVATIVE_EXTENSION = ".webp"
 DERIVATIVE_QUALITY = 82
+
+
+def srgb_profile_bytes() -> bytes:
+    profile = ImageCms.ImageCmsProfile(ImageCms.createProfile("sRGB"))
+    return profile.tobytes()
+
+
+def convert_to_srgb(image: Image.Image, icc_profile: bytes | None) -> tuple[Image.Image, bytes]:
+    srgb_bytes = srgb_profile_bytes()
+    if not icc_profile:
+        return image, srgb_bytes
+
+    try:
+        source_profile = ImageCms.ImageCmsProfile(io.BytesIO(icc_profile))
+        target_profile = ImageCms.ImageCmsProfile(io.BytesIO(srgb_bytes))
+        if image.mode == "RGBA":
+            rgb_image = ImageCms.profileToProfile(
+                image.convert("RGB"),
+                source_profile,
+                target_profile,
+                outputMode="RGB",
+            )
+            rgb_image.putalpha(image.getchannel("A"))
+            return rgb_image, srgb_bytes
+
+        converted = ImageCms.profileToProfile(
+            image,
+            source_profile,
+            target_profile,
+            outputMode=image.mode,
+        )
+        return converted, srgb_bytes
+    except Exception:
+        return image, icc_profile
 
 
 def slugify(value: str) -> str:
@@ -143,15 +178,19 @@ def derivative_paths(category_dir: Path, photo_id: str) -> tuple[Path, Path]:
 
 def save_web_derivative(source_file: Path, destination_file: Path, max_edge: int) -> None:
     with Image.open(source_file) as image:
+        icc_profile = image.info.get("icc_profile")
         rendered = ImageOps.exif_transpose(image)
         if rendered.mode not in {"RGB", "RGBA"}:
             rendered = rendered.convert("RGB")
+
+        rendered, derivative_icc_profile = convert_to_srgb(rendered, icc_profile)
 
         rendered.thumbnail((max_edge, max_edge), Image.Resampling.LANCZOS)
         save_options = {
             "format": DERIVATIVE_FORMAT,
             "quality": DERIVATIVE_QUALITY,
             "method": 6,
+            "icc_profile": derivative_icc_profile,
         }
         if rendered.mode == "RGBA":
             save_options["lossless"] = False
