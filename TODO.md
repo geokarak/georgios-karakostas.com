@@ -12,3 +12,7 @@
 ## Harden Dropbox photo sync workflow
 
 - [ ] Handle races between normal pushes and the scheduled Dropbox photo sync workflow, likely by rebasing on the latest `main` before the automation commits and pushes.
+
+## Template URL helpers
+
+- [ ] Add a shared Jinja macro for internal links so templates stop building root-relative and `SITEURL`-aware URLs ad hoc.

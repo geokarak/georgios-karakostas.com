@@ -5,7 +5,7 @@
         <div class="article-list nu">
             {% for article in articles | selectattr('category', '==', 'blog') %}
                 <div>
-                    <a href="{{ article.url }}">{{ article.title }}</a>
+                    <a href="{% if SITEURL %}{{ SITEURL }}/{{ article.url }}{% else %}/{{ article.url }}{% endif %}">{{ article.title }}</a>
                 </div>
                 <i><time>{{ article.date | strftime("%B %-d, %Y") }}</time></i>
             {% else %}
