@@ -1,3 +1,24 @@
+"""This file reads photo data from ``content/images/photos`` and hands it to the
+gallery templates so they can render the photography pages.
+
+What this plugin does
+---------------------
+1. Read every JSON file under ``content/images/photos``.
+2. Skip photos that are not published.
+3. Resolve the matching ``display`` and ``thumb`` WebP files.
+4. Build Python dictionaries for the published photos.
+5. Add those dictionaries to Pelican's shared template context.
+
+Here, "shared template context" simply means the data object that Pelican passes
+to the Jinja templates when rendering pages. If a value is added there, it can be
+used from template files under ``theme/templates/``.
+
+This plugin adds two values to that context:
+
+- ``photos``: all published photos in one flat list
+- ``photos_by_category``: the same photos grouped by category slug
+"""
+
 import datetime
 import json
 import logging
@@ -46,7 +67,9 @@ def load_photos_from_sidecars(path):
         try:
             metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
         except json.JSONDecodeError as error:
-            logger.warning("Skipping invalid JSON metadata in %s: %s", metadata_path, error)
+            logger.warning(
+                "Skipping invalid JSON metadata in %s: %s", metadata_path, error
+            )
             continue
 
         if metadata.get("published", True) is False:
@@ -66,7 +89,9 @@ def load_photos_from_sidecars(path):
             logger.warning("Skipping %s: %s", metadata_path, error)
             continue
 
-        display_file = find_image_by_filename(metadata_path, metadata.get("display_filename"))
+        display_file = find_image_by_filename(
+            metadata_path, metadata.get("display_filename")
+        )
         thumbnail_file = find_image_by_filename(
             metadata_path,
             metadata.get("thumbnail_filename"),

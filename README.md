@@ -1,18 +1,8 @@
 # georgios-karakostas.com
 
-My [personal website](https://www.georgios-karakostas.com) repository.
+Source for [georgios-karakostas.com](https://www.georgios-karakostas.com).
 
 Made with [Pelican](https://github.com/getpelican/pelican). Deployed using [Cloudflare Pages](https://pages.cloudflare.com/).
-
-## Development setup
-
-This project uses [uv](https://docs.astral.sh/uv/) for dependency management.
-
-```bash
-uv sync
-uv run pelican -s pelicanconf.py -t theme -o output -l -r
-uv run pytest
-```
 
 ## Photo workflow
 
@@ -22,36 +12,65 @@ Drop new photos into `inbox/<category>/` and run:
 make ingest
 ```
 
-By default, ingest moves files out of `inbox/` into `content/images/photos/...` so the same photos are not re-imported on the next run.
+`make ingest` uses `INGEST_SRC=inbox` unless another source is passed explicitly. It reads the uploaded images, writes the published files into `content/images/photos/...`, and removes the source files from the inbox so the same photos are not imported again on the next run. Using `--copy` keeps the source files in the inbox while still storing only the generated WebP derivatives and metadata in the repository.
 
-This creates:
+Each ingested photo creates:
 
 - `content/images/photos/<category>/<id>-display.webp`
 - `content/images/photos/<category>/<id>-thumb.webp`
 - `content/images/photos/<category>/<id>.json`
 
-Metadata JSON is auto-generated with date/category/id plus the generated derivative filenames, and can be edited later for `caption`, `location`, and `published`.
+The JSON file is generated automatically with the photo id, category, date, and derivative filenames. It can be edited later for `caption`, `location`, and `published`.
 
-Ingest stores only web-ready derivatives in the repository: a display image and a thumbnail, both as WebP.
-
-By default, ingest removes files from `inbox/` after processing. Using `--copy` keeps the source files in the inbox while still storing only the generated WebP derivatives and metadata in the repository.
+Only web-ready derivatives are stored in the repository: a display image and a thumbnail, both as WebP.
 
 Any new category folder under `inbox/` (for example `inbox/macro/`) is automatically available as a browsable gallery page at `/<category>/` after ingest + build.
+
+## How photo pages work
+
+The photo pipeline has two main steps:
+
+1. `scripts/ingest_photos.py` reads uploaded images from `inbox/<category>/` and writes web-ready files into `content/images/photos/<category>/`.
+2. `plugins/photos/photos.py` reads those generated files and passes the photo data to the templates that render the gallery pages.
+
+For each published photo, `content/images/photos/<category>/` contains:
+
+- `<id>.json`
+- `<id>-display.webp`
+- `<id>-thumb.webp`
+
+The JSON file stores the photo metadata and points to the display and thumbnail image filenames.
+
+The main template files involved are:
+
+- `theme/templates/gallery.html` for one gallery page such as `/iphone/`
+- `theme/templates/photography_index.html` for the page that links to the available galleries
 
 Useful options:
 
 ```bash
+# Use the default local inbox.
+# `--src` points to the folder that contains category subfolders.
 uv run python scripts/ingest_photos.py --src inbox
+
+# Keep the source files in the inbox after ingest.
+# `--copy` copies instead of removing the uploaded files.
 uv run python scripts/ingest_photos.py --src inbox --copy
+
+# Treat top-level files as belonging to one category.
+# `--category street` is only needed when files are directly under `--src`.
 uv run python scripts/ingest_photos.py --src inbox --category street
+
+# Preview what would be created without writing files.
+# `--dry-run` prints the planned output paths only.
 uv run python scripts/ingest_photos.py --src inbox --dry-run
 ```
 
 ## Dropbox uploads
 
-The local `inbox/` workflow can stay in place alongside a second Dropbox-based upload path.
+The local `inbox/` workflow can stay in place alongside a Dropbox-based upload path.
 
-The `.github/workflows/dropbox-photo-sync.yml` workflow runs every 15 minutes and can also be triggered manually from GitHub Actions.
+The `.github/workflows/dropbox-photo-sync.yml` workflow runs twice per day and can also be triggered manually from GitHub Actions.
 
 Dropbox app settings are available at `https://www.dropbox.com/developers/apps`.
 
@@ -81,11 +100,11 @@ Required GitHub secrets:
 
 Optional GitHub repository variables:
 
-- `DROPBOX_INBOX_PATH` default: `/site-photo-inbox`
-- `DROPBOX_ARCHIVE_PATH` default: `/site-photo-archive`
+- `DROPBOX_INBOX_PATH` default `/site-photo-inbox`
+- `DROPBOX_ARCHIVE_PATH` default `/site-photo-archive`
 
 Notes:
 
 - The Dropbox folder structure should match the existing category folders because category detection still comes from subdirectories.
 - If the workflow fails after downloading and archiving files, the originals will be in the Dropbox archive folder rather than the inbox.
-- GitHub's `GITHUB_TOKEN` can push the commit back to the repo; that push will still be visible to Cloudflare Pages for deployment.
+- GitHub's `GITHUB_TOKEN` can push the commit back to the repository; that push is still visible to Cloudflare Pages for deployment.
