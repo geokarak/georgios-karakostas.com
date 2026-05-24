@@ -18,10 +18,8 @@
   --secondary: var(--color-light-secondary);
   --background: var(--color-light-background);
   --image-filtering: var(--color-light-filtering);
-  --code-color: var(--color-light-code);
   --code-background: var(--color-light-code-background);
   --base-font: -apple-system, BlinkMacSystemFont, avenir next, avenir, segoe ui, helvetica neue, helvetica, Cantarell, Ubuntu, roboto, noto, arial, sans-serif;
-  --fancy-font: Iowan Old Style, Apple Garamond, Baskerville, Times New Roman, Droid Serif, Times, Source Serif Pro, serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol;
   --code-font: Menlo, Consolas, Monaco, Liberation Mono, Lucida Console,
     monospace;
   --link-color: #d5d8db;
@@ -61,17 +59,6 @@ h6 {
   padding-right: 20px;
   margin-left: auto;
   margin-right: auto;
-}
-
-.site-title {
-  line-height: 1.6;
-  font-size: 105%;
-  letter-spacing: 0.004rem;
-  margin: 0 0 0.25em 0;
-}
-
-.site-title a {
-  text-decoration: none;
 }
 
 .site-header {
@@ -204,10 +191,6 @@ pre code {
   border-radius: 6px;
 }
 
-.not-here {
-  background-color: var(--background);
-}
-
 footer {
   padding-top: 0px;
   padding-bottom: 20px;
@@ -311,40 +294,6 @@ canvas.marks {
     padding: 8px;
     min-width: 160px;
   }
-}
-
-.transcript details summary {
-  cursor: pointer;
-}
-
-.transcript details summary>* {
-  display: inline;
-}
-
-.transcript details summary::-webkit-details-marker,
-.transcript details summary::marker {
-  display: none;
-  content: "";
-}
-
-.talks {
-  line-height: 1.6;
-  font-weight: 550;
-}
-
-.talks ul {
-  padding-left: 0px;
-  margin-top: 0px;
-}
-
-.talks li {
-  list-style-type: none;
-  list-style-position: outside;
-}
-
-.talks a {
-  font-weight: 400;
-  opacity: 0.7;
 }
 
 img.rounded {
