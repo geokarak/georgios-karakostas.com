@@ -5,18 +5,20 @@ import datetime as dt
 import io
 import json
 import re
+import shutil
+import subprocess
 from pathlib import Path
 
 from PIL import Image, ImageCms, ImageOps
 
 SUPPORTED_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp"}
-EXIF_DATE_TAGS = (36867, 36868, 306)
 DISPLAY_TITLE_EXCEPTIONS = {"iphone": "iPhone"}
 DISPLAY_MAX_EDGE = 2200
 THUMBNAIL_MAX_EDGE = 900
 DERIVATIVE_FORMAT = "WEBP"
 DERIVATIVE_EXTENSION = ".webp"
 DERIVATIVE_QUALITY = 82
+EXIFTOOL_DATE_TAGS = ("ExifIFD:DateTimeOriginal", "ExifIFD:CreateDate")
 
 
 def srgb_profile_bytes() -> bytes:
@@ -91,24 +93,64 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def exif_datetime(path: Path) -> dt.datetime | None:
-    try:
-        with Image.open(path) as image:
-            exif_data = image.getexif()
-    except Exception:
+def require_exiftool() -> str:
+    exiftool_path = shutil.which("exiftool")
+    if exiftool_path:
+        return exiftool_path
+
+    raise RuntimeError(
+        "This project requires exiftool for photo ingestion. "
+        "Install exiftool and try again."
+    )
+
+
+def parse_exiftool_datetime(value: str) -> dt.datetime | None:
+    normalized = value.strip()
+    if not normalized:
         return None
 
-    if not exif_data:
-        return None
-
-    for tag in EXIF_DATE_TAGS:
-        value = exif_data.get(tag)
-        if not value:
-            continue
+    for date_format in ("%Y:%m:%d %H:%M:%S",):
         try:
-            return dt.datetime.strptime(value, "%Y:%m:%d %H:%M:%S")
+            return dt.datetime.strptime(normalized, date_format)
         except ValueError:
             continue
+    return None
+
+
+def exif_datetime(path: Path, exiftool_path: str) -> dt.datetime | None:
+    try:
+        result = subprocess.run(
+            [
+                exiftool_path,
+                "-j",
+                "-G1",
+                *(f"-{tag}" for tag in EXIFTOOL_DATE_TAGS),
+                str(path),
+            ],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+    except subprocess.CalledProcessError:
+        return None
+
+    try:
+        payload = json.loads(result.stdout)
+    except json.JSONDecodeError:
+        return None
+
+    if not payload:
+        return None
+
+    metadata = payload[0]
+    for tag in EXIFTOOL_DATE_TAGS:
+        value = metadata.get(tag)
+        if not value:
+            continue
+        parsed = parse_exiftool_datetime(value)
+        if parsed:
+            return parsed
+
     return None
 
 
@@ -209,6 +251,12 @@ def main() -> int:
         print(f"Source directory does not exist: {src_dir}")
         return 1
 
+    try:
+        exiftool_path = require_exiftool()
+    except RuntimeError as error:
+        print(error)
+        return 1
+
     images = source_images(src_dir)
     if not images:
         print(f"No images found in {src_dir}")
@@ -227,13 +275,19 @@ def main() -> int:
             skipped += 1
             continue
 
-        detected_dt = exif_datetime(source_file)
+        detected_dt = exif_datetime(source_file, exiftool_path)
         if not detected_dt:
-            detected_dt = dt.datetime.fromtimestamp(source_file.stat().st_mtime)
+            print(
+                "Skipping "
+                f"{source_file}: missing EXIF DateTimeOriginal. "
+                "This project requires capture dates in EXIF metadata."
+            )
+            skipped += 1
+            continue
 
         category_dir = dest_dir / category
         raw_stem = slugify(source_file.stem) or "photo"
-        base_id = f"{detected_dt.strftime('%Y-%m-%d')}-{raw_stem}"
+        base_id = f"{detected_dt.strftime('%Y-%m-%d-%H%M%S')}-{raw_stem}"
         photo_id = unique_id(category_dir, base_id)
 
         metadata_file = category_dir / f"{photo_id}.json"
@@ -242,7 +296,7 @@ def main() -> int:
         metadata = {
             "id": photo_id,
             "category": category,
-            "date": detected_dt.strftime("%Y-%m-%d"),
+            "DateTimeOriginal": detected_dt.strftime("%Y:%m:%d %H:%M:%S"),
             "location": "",
             "caption": "",
             "published": not args.draft,

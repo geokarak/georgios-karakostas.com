@@ -12,7 +12,7 @@ Drop new photos into `inbox/<category>/` and run:
 make ingest
 ```
 
-`make ingest` uses `INGEST_SRC=inbox` unless another source is passed explicitly. It reads the uploaded images, writes the published files into `content/images/photos/...`, and removes the source files from the inbox so the same photos are not imported again on the next run. Using `--copy` keeps the source files in the inbox while still storing only the generated WebP derivatives and metadata in the repository.
+`make ingest` uses `INGEST_SRC=inbox` unless another source is passed explicitly. It reads the uploaded images, writes the published files into `content/images/photos/...`, and removes the source files from the inbox so the same photos are not imported again on the next run. Using `--copy` keeps the source files in the inbox while still storing only the generated WebP derivatives and metadata in the repository. The project requires `exiftool`, and photos without `EXIF:DateTimeOriginal` are skipped.
 
 Each ingested photo creates:
 
@@ -20,7 +20,7 @@ Each ingested photo creates:
 - `content/images/photos/<category>/<id>-thumb.webp`
 - `content/images/photos/<category>/<id>.json`
 
-The JSON file is generated automatically with the photo id, category, date, and derivative filenames. It can be edited later for `caption`, `location`, and `published`.
+The JSON file is generated automatically with the photo id, category, `DateTimeOriginal`, and derivative filenames. It can be edited later for `caption`, `location`, and `published`.
 
 Only web-ready derivatives are stored in the repository: a display image and a thumbnail, both as WebP.
 

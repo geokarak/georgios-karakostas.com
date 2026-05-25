@@ -34,13 +34,11 @@ DISPLAY_TITLE_EXCEPTIONS = {"iphone": "iPhone"}
 logger = logging.getLogger(__name__)
 
 
-def parse_date(date_value):
-    for date_format in ("%Y-%m-%d", "%Y%m%d"):
-        try:
-            return datetime.datetime.strptime(date_value, date_format)
-        except ValueError:
-            continue
-    raise ValueError(f"Invalid date format: {date_value}")
+def parse_datetime_original(date_value):
+    try:
+        return datetime.datetime.strptime(date_value, "%Y:%m:%d %H:%M:%S")
+    except ValueError as error:
+        raise ValueError(f"Invalid DateTimeOriginal format: {date_value}") from error
 
 
 def relative_photo_url(image_file):
@@ -77,14 +75,14 @@ def load_photos_from_sidecars(path):
 
         category = metadata.get("category")
         photo_id = metadata.get("id")
-        date_value = metadata.get("date", "")
+        date_value = metadata.get("DateTimeOriginal", "")
 
         if not category or not photo_id:
             logger.warning("Skipping %s: missing 'category' or 'id'", metadata_path)
             continue
 
         try:
-            date_object = parse_date(date_value)
+            date_object = parse_datetime_original(date_value)
         except ValueError as error:
             logger.warning("Skipping %s: %s", metadata_path, error)
             continue

@@ -5,14 +5,13 @@ import pytest
 from plugins.photos import photos
 
 
-def test_parse_date_supports_multiple_formats():
-    assert photos.parse_date("2024-02-22").strftime("%Y-%m-%d") == "2024-02-22"
-    assert photos.parse_date("20240222").strftime("%Y-%m-%d") == "2024-02-22"
+def test_parse_datetime_original_supports_expected_format():
+    assert photos.parse_datetime_original("2024:02:22 13:15:39").strftime("%Y-%m-%d %H:%M:%S") == "2024-02-22 13:15:39"
 
 
-def test_parse_date_raises_for_invalid_format():
+def test_parse_datetime_original_raises_for_invalid_format():
     with pytest.raises(ValueError):
-        photos.parse_date("22/02/2024")
+        photos.parse_datetime_original("2024-02-22")
 
 
 def test_find_image_by_filename_returns_existing_file(tmp_path):
@@ -41,15 +40,15 @@ def test_load_photos_from_sidecars_builds_photo_entries(tmp_path):
     photos_dir.mkdir(parents=True, exist_ok=True)
 
     metadata = {
-        "id": "2024-02-22-champ-du-tordoir",
+        "id": "2024-02-22-131539-champ-du-tordoir",
         "category": "iphone",
-        "date": "2024-02-22",
+        "DateTimeOriginal": "2024:02:22 13:15:39",
         "caption": "In the park",
         "location": "Tubize",
-        "display_filename": "2024-02-22-champ-du-tordoir-display.webp",
-        "thumbnail_filename": "2024-02-22-champ-du-tordoir-thumb.webp",
+        "display_filename": "2024-02-22-131539-champ-du-tordoir-display.webp",
+        "thumbnail_filename": "2024-02-22-131539-champ-du-tordoir-thumb.webp",
     }
-    metadata_path = photos_dir / "2024-02-22-champ-du-tordoir.json"
+    metadata_path = photos_dir / "2024-02-22-131539-champ-du-tordoir.json"
     display_path = photos_dir / metadata["display_filename"]
     thumbnail_path = photos_dir / metadata["thumbnail_filename"]
 
@@ -67,8 +66,8 @@ def test_load_photos_from_sidecars_builds_photo_entries(tmp_path):
     assert len(loaded) == 1
     assert loaded[0]["photo_id"] == metadata["id"]
     assert loaded[0]["caption"] == "In the park"
-    assert loaded[0]["photo_url"] == "../images/photos/iphone/2024-02-22-champ-du-tordoir-display.webp"
-    assert loaded[0]["thumbnail_url"] == "../images/photos/iphone/2024-02-22-champ-du-tordoir-thumb.webp"
+    assert loaded[0]["photo_url"] == "../images/photos/iphone/2024-02-22-131539-champ-du-tordoir-display.webp"
+    assert loaded[0]["thumbnail_url"] == "../images/photos/iphone/2024-02-22-131539-champ-du-tordoir-thumb.webp"
 
 
 def test_load_photos_from_sidecars_prefers_generated_derivatives(tmp_path):
@@ -77,13 +76,13 @@ def test_load_photos_from_sidecars_prefers_generated_derivatives(tmp_path):
     photos_dir.mkdir(parents=True, exist_ok=True)
 
     metadata = {
-        "id": "2024-02-22-champ-du-tordoir",
+        "id": "2024-02-22-131539-champ-du-tordoir",
         "category": "iphone",
-        "date": "2024-02-22",
-        "display_filename": "2024-02-22-champ-du-tordoir-display.webp",
-        "thumbnail_filename": "2024-02-22-champ-du-tordoir-thumb.webp",
+        "DateTimeOriginal": "2024:02:22 13:15:39",
+        "display_filename": "2024-02-22-131539-champ-du-tordoir-display.webp",
+        "thumbnail_filename": "2024-02-22-131539-champ-du-tordoir-thumb.webp",
     }
-    metadata_path = photos_dir / "2024-02-22-champ-du-tordoir.json"
+    metadata_path = photos_dir / "2024-02-22-131539-champ-du-tordoir.json"
     metadata_path.write_text(json.dumps(metadata), encoding="utf-8")
     (photos_dir / metadata["display_filename"]).write_bytes(b"img")
     (photos_dir / metadata["thumbnail_filename"]).write_bytes(b"img")
@@ -95,8 +94,8 @@ def test_load_photos_from_sidecars_prefers_generated_derivatives(tmp_path):
     finally:
         photos.CONTENT_DIR = original_content_dir
 
-    assert loaded[0]["photo_url"] == "../images/photos/iphone/2024-02-22-champ-du-tordoir-display.webp"
-    assert loaded[0]["thumbnail_url"] == "../images/photos/iphone/2024-02-22-champ-du-tordoir-thumb.webp"
+    assert loaded[0]["photo_url"] == "../images/photos/iphone/2024-02-22-131539-champ-du-tordoir-display.webp"
+    assert loaded[0]["thumbnail_url"] == "../images/photos/iphone/2024-02-22-131539-champ-du-tordoir-thumb.webp"
 
 
 def test_load_photos_from_sidecars_skips_entries_missing_derivatives(tmp_path):
@@ -110,7 +109,7 @@ def test_load_photos_from_sidecars_skips_entries_missing_derivatives(tmp_path):
             {
                 "id": "broken",
                 "category": "iphone",
-                "date": "2024-02-22",
+                "DateTimeOriginal": "2024:02:22 13:15:39",
                 "display_filename": "broken-display.webp",
                 "thumbnail_filename": "broken-thumb.webp",
             }
@@ -139,7 +138,7 @@ def test_load_photos_from_sidecars_skips_unpublished(tmp_path):
             {
                 "id": "hidden",
                 "category": "iphone",
-                "date": "2024-02-22",
+                "DateTimeOriginal": "2024:02:22 13:15:39",
                 "published": False,
             }
         ),
@@ -192,7 +191,7 @@ def test_add_photos_to_context_populates_shared_context(monkeypatch):
             "photo_url": "../images/photos/iphone/sample-display.webp",
             "thumbnail_url": "../images/photos/iphone/sample-thumb.webp",
             "caption": "",
-            "date": photos.parse_date("2024-02-22"),
+            "date": photos.parse_datetime_original("2024:02:22 13:15:39"),
         }
     ]
     monkeypatch.setattr(photos, "load_photos_from_sidecars", lambda path: sample_photos)
