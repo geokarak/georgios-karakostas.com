@@ -5,6 +5,7 @@ import datetime as dt
 import io
 import json
 import re
+import secrets
 import shutil
 import subprocess
 from pathlib import Path
@@ -58,6 +59,10 @@ def convert_to_srgb(image: Image.Image, icc_profile: bytes | None) -> tuple[Imag
 def slugify(value: str) -> str:
     normalized = re.sub(r"[^a-zA-Z0-9]+", "-", value.strip().lower())
     return normalized.strip("-")
+
+
+def generated_photo_id(captured_at: dt.datetime) -> str:
+    return f"{captured_at.strftime('%Y-%m-%d-%H%M%S')}-{secrets.token_hex(4)}"
 
 
 def parse_args() -> argparse.Namespace:
@@ -163,17 +168,23 @@ def infer_category(source_file: Path, src_root: Path, fallback: str | None) -> s
     return None
 
 
-def unique_id(category_dir: Path, base_id: str) -> str:
-    candidate = base_id
-    counter = 2
+def reserve_photo_id(category_dir: Path, photo_id: str, reserved_ids: set[str] | None = None) -> bool:
+    metadata_exists = (category_dir / f"{photo_id}.json").exists()
+    display_file, thumbnail_file = derivative_paths(category_dir, photo_id)
+    image_exists = display_file.exists() or thumbnail_file.exists()
+    already_reserved = reserved_ids is not None and photo_id in reserved_ids
+    return not metadata_exists and not image_exists and not already_reserved
+
+
+def unique_id(
+    category_dir: Path,
+    captured_at: dt.datetime,
+    reserved_ids: set[str] | None = None,
+) -> str:
     while True:
-        metadata_exists = (category_dir / f"{candidate}.json").exists()
-        display_file, thumbnail_file = derivative_paths(category_dir, candidate)
-        image_exists = display_file.exists() or thumbnail_file.exists()
-        if not metadata_exists and not image_exists:
+        candidate = generated_photo_id(captured_at)
+        if reserve_photo_id(category_dir, candidate, reserved_ids=reserved_ids):
             return candidate
-        candidate = f"{base_id}-{counter}"
-        counter += 1
 
 
 def source_images(src_dir: Path) -> list[Path]:
@@ -286,9 +297,7 @@ def main() -> int:
             continue
 
         category_dir = dest_dir / category
-        raw_stem = slugify(source_file.stem) or "photo"
-        base_id = f"{detected_dt.strftime('%Y-%m-%d-%H%M%S')}-{raw_stem}"
-        photo_id = unique_id(category_dir, base_id)
+        photo_id = unique_id(category_dir, detected_dt)
 
         metadata_file = category_dir / f"{photo_id}.json"
         display_file, thumbnail_file = derivative_paths(category_dir, photo_id)

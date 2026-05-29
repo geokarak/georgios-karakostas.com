@@ -24,15 +24,22 @@ def test_infer_category():
     assert ingest_photos.infer_category(top_level, src_root, fallback=None) is None
 
 
-def test_unique_id_increments_when_files_exist(tmp_path):
+def test_unique_id_retries_when_files_exist(tmp_path, monkeypatch):
     category_dir = tmp_path
-    base_id = "2024-02-22-131500-sunset"
+    captured_at = ingest_photos.dt.datetime(2024, 2, 22, 13, 15, 0)
+    first_candidate = "2024-02-22-131500-deadbeef"
+    second_candidate = "2024-02-22-131500-feedface"
 
-    (category_dir / f"{base_id}.json").write_text("{}", encoding="utf-8")
-    (category_dir / f"{base_id}-display.webp").write_bytes(b"image")
+    (category_dir / f"{first_candidate}.json").write_text("{}", encoding="utf-8")
+    generated_ids = iter([first_candidate, second_candidate])
+    monkeypatch.setattr(
+        ingest_photos,
+        "generated_photo_id",
+        lambda dt_value: next(generated_ids),
+    )
 
-    candidate = ingest_photos.unique_id(category_dir, base_id)
-    assert candidate == f"{base_id}-2"
+    candidate = ingest_photos.unique_id(category_dir, captured_at)
+    assert candidate == second_candidate
 
 
 def test_require_exiftool_raises_when_missing(monkeypatch):
@@ -145,14 +152,14 @@ def test_source_images_filters_supported_extensions(tmp_path):
 
 def test_generated_metadata_schema_is_serializable():
     metadata = {
-        "id": "2024-01-01-132045-photo",
+        "id": "2024-01-01-132045-a1b2c3d4",
         "category": "street",
         "DateTimeOriginal": "2024:01:01 13:20:45",
         "location": "",
         "caption": "",
         "published": True,
-        "display_filename": "2024-01-01-132045-photo-display.webp",
-        "thumbnail_filename": "2024-01-01-132045-photo-thumb.webp",
+        "display_filename": "2024-01-01-132045-a1b2c3d4-display.webp",
+        "thumbnail_filename": "2024-01-01-132045-a1b2c3d4-thumb.webp",
     }
     serialized = json.dumps(metadata)
     assert isinstance(serialized, str)
@@ -172,10 +179,10 @@ def test_save_web_derivative_resizes_large_image(tmp_path):
 
 
 def test_derivative_paths_use_expected_suffixes(tmp_path):
-    display_file, thumbnail_file = ingest_photos.derivative_paths(tmp_path, "2024-01-01-132045-photo")
+    display_file, thumbnail_file = ingest_photos.derivative_paths(tmp_path, "2024-01-01-132045-a1b2c3d4")
 
-    assert display_file.name == "2024-01-01-132045-photo-display.webp"
-    assert thumbnail_file.name == "2024-01-01-132045-photo-thumb.webp"
+    assert display_file.name == "2024-01-01-132045-a1b2c3d4-display.webp"
+    assert thumbnail_file.name == "2024-01-01-132045-a1b2c3d4-thumb.webp"
 
 
 def test_save_web_derivative_embeds_icc_profile(tmp_path):
@@ -224,6 +231,11 @@ def test_main_writes_only_derivatives_and_metadata(tmp_path, monkeypatch):
         "exif_datetime",
         lambda path, exiftool_path: ingest_photos.dt.datetime(2024, 2, 22, 12, 0, 5),
     )
+    monkeypatch.setattr(
+        ingest_photos,
+        "generated_photo_id",
+        lambda captured_at: "2024-02-22-120005-a1b2c3d4",
+    )
     monkeypatch.setattr(ingest_photos, "ensure_gallery_page", lambda *args, **kwargs: None)
 
     assert ingest_photos.main() == 0
@@ -233,11 +245,13 @@ def test_main_writes_only_derivatives_and_metadata(tmp_path, monkeypatch):
     assert len(metadata_files) == 1
 
     metadata = json.loads(metadata_files[0].read_text(encoding="utf-8"))
+    assert metadata["id"] == "2024-02-22-120005-a1b2c3d4"
     assert metadata["display_filename"].endswith("-display.webp")
     assert metadata["thumbnail_filename"].endswith("-thumb.webp")
     assert "filename" not in metadata
     assert metadata["DateTimeOriginal"] == "2024:02:22 12:00:05"
-    assert metadata["id"].startswith("2024-02-22-120005-")
+    assert "test" not in metadata["display_filename"]
+    assert "test" not in metadata["thumbnail_filename"]
 
     assert (category_dir / metadata["display_filename"]).exists()
     assert (category_dir / metadata["thumbnail_filename"]).exists()
