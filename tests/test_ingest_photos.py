@@ -16,7 +16,9 @@ def test_infer_category():
     nested = src_root / "Street Shots" / "img.jpg"
     top_level = src_root / "img.jpg"
 
-    assert ingest_photos.infer_category(nested, src_root, fallback=None) == "street-shots"
+    assert (
+        ingest_photos.infer_category(nested, src_root, fallback=None) == "street-shots"
+    )
     assert (
         ingest_photos.infer_category(top_level, src_root, fallback="Travel Photos")
         == "travel-photos"
@@ -54,9 +56,12 @@ def test_require_exiftool_raises_when_missing(monkeypatch):
 
 
 def test_parse_exiftool_datetime_supports_common_formats():
-    assert ingest_photos.parse_exiftool_datetime("2021:08:01 13:15:39").strftime(
-        "%Y-%m-%d %H:%M:%S"
-    ) == "2021-08-01 13:15:39"
+    assert (
+        ingest_photos.parse_exiftool_datetime("2021:08:01 13:15:39").strftime(
+            "%Y-%m-%d %H:%M:%S"
+        )
+        == "2021-08-01 13:15:39"
+    )
 
 
 def test_exif_datetime_prefers_original_date_tags(monkeypatch, tmp_path):
@@ -73,7 +78,9 @@ def test_exif_datetime_prefers_original_date_tags(monkeypatch, tmp_path):
     monkeypatch.setattr(
         ingest_photos.subprocess,
         "run",
-        lambda *args, **kwargs: subprocess.CompletedProcess(args[0], 0, stdout=payload, stderr=""),
+        lambda *args, **kwargs: subprocess.CompletedProcess(
+            args[0], 0, stdout=payload, stderr=""
+        ),
     )
 
     detected = ingest_photos.exif_datetime(sample, "/usr/bin/exiftool")
@@ -95,7 +102,9 @@ def test_exif_datetime_returns_none_without_datetimeoriginal(monkeypatch, tmp_pa
     monkeypatch.setattr(
         ingest_photos.subprocess,
         "run",
-        lambda *args, **kwargs: subprocess.CompletedProcess(args[0], 0, stdout=payload, stderr=""),
+        lambda *args, **kwargs: subprocess.CompletedProcess(
+            args[0], 0, stdout=payload, stderr=""
+        ),
     )
 
     detected = ingest_photos.exif_datetime(sample, "/usr/bin/exiftool")
@@ -116,7 +125,9 @@ def test_exif_datetime_returns_none_without_supported_exif_tags(monkeypatch, tmp
     monkeypatch.setattr(
         ingest_photos.subprocess,
         "run",
-        lambda *args, **kwargs: subprocess.CompletedProcess(args[0], 0, stdout=payload, stderr=""),
+        lambda *args, **kwargs: subprocess.CompletedProcess(
+            args[0], 0, stdout=payload, stderr=""
+        ),
     )
 
     assert ingest_photos.exif_datetime(sample, "/usr/bin/exiftool") is None
@@ -179,7 +190,9 @@ def test_save_web_derivative_resizes_large_image(tmp_path):
 
 
 def test_derivative_paths_use_expected_suffixes(tmp_path):
-    display_file, thumbnail_file = ingest_photos.derivative_paths(tmp_path, "2024-01-01-132045-a1b2c3d4")
+    display_file, thumbnail_file = ingest_photos.derivative_paths(
+        tmp_path, "2024-01-01-132045-a1b2c3d4"
+    )
 
     assert display_file.name == "2024-01-01-132045-a1b2c3d4-display.webp"
     assert thumbnail_file.name == "2024-01-01-132045-a1b2c3d4-thumb.webp"
@@ -236,7 +249,9 @@ def test_main_writes_only_derivatives_and_metadata(tmp_path, monkeypatch):
         "generated_photo_id",
         lambda captured_at: "2024-02-22-120005-a1b2c3d4",
     )
-    monkeypatch.setattr(ingest_photos, "ensure_gallery_page", lambda *args, **kwargs: None)
+    monkeypatch.setattr(
+        ingest_photos, "ensure_gallery_page", lambda *args, **kwargs: None
+    )
 
     assert ingest_photos.main() == 0
 

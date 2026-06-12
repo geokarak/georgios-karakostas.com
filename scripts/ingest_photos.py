@@ -27,7 +27,9 @@ def srgb_profile_bytes() -> bytes:
     return profile.tobytes()
 
 
-def convert_to_srgb(image: Image.Image, icc_profile: bytes | None) -> tuple[Image.Image, bytes]:
+def convert_to_srgb(
+    image: Image.Image, icc_profile: bytes | None
+) -> tuple[Image.Image, bytes]:
     srgb_bytes = srgb_profile_bytes()
     if not icc_profile:
         return image, srgb_bytes
@@ -159,7 +161,9 @@ def exif_datetime(path: Path, exiftool_path: str) -> dt.datetime | None:
     return None
 
 
-def infer_category(source_file: Path, src_root: Path, fallback: str | None) -> str | None:
+def infer_category(
+    source_file: Path, src_root: Path, fallback: str | None
+) -> str | None:
     relative = source_file.relative_to(src_root)
     if len(relative.parts) > 1:
         return slugify(relative.parts[0])
@@ -168,7 +172,9 @@ def infer_category(source_file: Path, src_root: Path, fallback: str | None) -> s
     return None
 
 
-def reserve_photo_id(category_dir: Path, photo_id: str, reserved_ids: set[str] | None = None) -> bool:
+def reserve_photo_id(
+    category_dir: Path, photo_id: str, reserved_ids: set[str] | None = None
+) -> bool:
     metadata_exists = (category_dir / f"{photo_id}.json").exists()
     display_file, thumbnail_file = derivative_paths(category_dir, photo_id)
     image_exists = display_file.exists() or thumbnail_file.exists()
@@ -209,11 +215,7 @@ def ensure_gallery_page(category: str, project_root: Path, dry_run: bool) -> Non
         return
 
     title = title_from_slug(category)
-    page_content = (
-        f"title: {title}\n"
-        f"slug: {category}\n"
-        "template: gallery\n"
-    )
+    page_content = f"title: {title}\nslug: {category}\ntemplate: gallery\n"
 
     if dry_run:
         print(f"[DRY RUN] page -> {page_file}")
@@ -229,7 +231,9 @@ def derivative_paths(category_dir: Path, photo_id: str) -> tuple[Path, Path]:
     return display_file, thumbnail_file
 
 
-def save_web_derivative(source_file: Path, destination_file: Path, max_edge: int) -> None:
+def save_web_derivative(
+    source_file: Path, destination_file: Path, max_edge: int
+) -> None:
     with Image.open(source_file) as image:
         icc_profile = image.info.get("icc_profile")
         rendered = ImageOps.exif_transpose(image)
@@ -328,7 +332,9 @@ def main() -> int:
         if not args.copy:
             source_file.unlink()
 
-        metadata_file.write_text(json.dumps(metadata, indent=2) + "\n", encoding="utf-8")
+        metadata_file.write_text(
+            json.dumps(metadata, indent=2) + "\n", encoding="utf-8"
+        )
         ensure_gallery_page(category, project_root, dry_run=False)
 
         copied += 1

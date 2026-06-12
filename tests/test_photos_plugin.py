@@ -6,7 +6,12 @@ from plugins.photos import photos
 
 
 def test_parse_datetime_original_supports_expected_format():
-    assert photos.parse_datetime_original("2024:02:22 13:15:39").strftime("%Y-%m-%d %H:%M:%S") == "2024-02-22 13:15:39"
+    assert (
+        photos.parse_datetime_original("2024:02:22 13:15:39").strftime(
+            "%Y-%m-%d %H:%M:%S"
+        )
+        == "2024-02-22 13:15:39"
+    )
 
 
 def test_parse_datetime_original_raises_for_invalid_format():
@@ -66,8 +71,14 @@ def test_load_photos_from_sidecars_builds_photo_entries(tmp_path):
     assert len(loaded) == 1
     assert loaded[0]["photo_id"] == metadata["id"]
     assert loaded[0]["caption"] == "In the park"
-    assert loaded[0]["photo_url"] == "../images/photos/iphone/2024-02-22-131539-champ-du-tordoir-display.webp"
-    assert loaded[0]["thumbnail_url"] == "../images/photos/iphone/2024-02-22-131539-champ-du-tordoir-thumb.webp"
+    assert (
+        loaded[0]["photo_url"]
+        == "../images/photos/iphone/2024-02-22-131539-champ-du-tordoir-display.webp"
+    )
+    assert (
+        loaded[0]["thumbnail_url"]
+        == "../images/photos/iphone/2024-02-22-131539-champ-du-tordoir-thumb.webp"
+    )
 
 
 def test_load_photos_from_sidecars_prefers_generated_derivatives(tmp_path):
@@ -94,8 +105,14 @@ def test_load_photos_from_sidecars_prefers_generated_derivatives(tmp_path):
     finally:
         photos.CONTENT_DIR = original_content_dir
 
-    assert loaded[0]["photo_url"] == "../images/photos/iphone/2024-02-22-131539-champ-du-tordoir-display.webp"
-    assert loaded[0]["thumbnail_url"] == "../images/photos/iphone/2024-02-22-131539-champ-du-tordoir-thumb.webp"
+    assert (
+        loaded[0]["photo_url"]
+        == "../images/photos/iphone/2024-02-22-131539-champ-du-tordoir-display.webp"
+    )
+    assert (
+        loaded[0]["thumbnail_url"]
+        == "../images/photos/iphone/2024-02-22-131539-champ-du-tordoir-thumb.webp"
+    )
 
 
 def test_load_photos_from_sidecars_skips_entries_missing_derivatives(tmp_path):

@@ -129,7 +129,9 @@ def ensure_remote_folder(token: str, folder: PurePosixPath) -> None:
     if folder in {PurePosixPath("/"), PurePosixPath(".")}:
         return
 
-    parents = [parent for parent in reversed(folder.parents) if parent != PurePosixPath("/")]
+    parents = [
+        parent for parent in reversed(folder.parents) if parent != PurePosixPath("/")
+    ]
     for parent in parents:
         create_remote_folder(token, parent)
     create_remote_folder(token, folder)
@@ -167,7 +169,8 @@ def list_remote_images(token: str, inbox_root: PurePosixPath) -> list[dict]:
     files = [
         entry
         for entry in entries
-        if entry.get(".tag") == "file" and is_supported_image(entry.get("path_display", ""))
+        if entry.get(".tag") == "file"
+        and is_supported_image(entry.get("path_display", ""))
     ]
     return sorted(files, key=lambda entry: entry["path_lower"])
 
@@ -194,7 +197,9 @@ def download_remote_file(token: str, source_path: str, destination: Path) -> Non
     destination.write_bytes(contents)
 
 
-def move_remote_file(token: str, source_path: str, destination_path: PurePosixPath) -> None:
+def move_remote_file(
+    token: str, source_path: str, destination_path: PurePosixPath
+) -> None:
     ensure_remote_folder(token, destination_path.parent)
     dropbox_api_json(
         token,

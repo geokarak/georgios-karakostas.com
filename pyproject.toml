@@ -35,5 +35,14 @@ dependencies = [
     "pytest==9.0.3",
 ]
 
+[dependency-groups]
+dev = [
+    "ruff==0.15.17",
+]
+
+[tool.ruff.lint.per-file-ignores]
+"plugins/photos/__init__.py" = ["F403"]
+"publishconf.py" = ["F403"]
+
 [tool.setuptools]
 py-modules = []
