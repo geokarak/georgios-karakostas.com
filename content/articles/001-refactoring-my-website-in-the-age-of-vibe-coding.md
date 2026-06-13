@@ -8,11 +8,13 @@ I recently gave my website a fairly substantial refactor.
 
 All of this was done alongside GPT-5.4.
 
-That was genuinely useful. A lot of the HTML and CSS work would have been much slower without it, simply because that part of the stack is less familiar territory for me. Having a fast back-and-forth for layout changes, template tweaks, and frontend cleanup made it much easier to move through the parts of the refactor that would otherwise have involved a lot more trial and error.
+That was genuinely useful. A lot of the HTML and CSS work would have been much harder without it, simply because that part of the stack is less familiar territory for me. Having a rapid iteration loop for frontend development and layout changes made it much easier to tackle areas of the refactor that would otherwise have involved a lot more trial and error.
 
-At the same time, it was also a good reminder that LLM-assisted development needs a brake pedal. Once a feature is implemented, the model is almost always happy to suggest one more abstraction, one more cleanup, one more enhancement, one more "while we're here" improvement. Sometimes that is genuinely helpful. Sometimes that is how a small refactor quietly turns into a much larger and more complicated system than the project ever needed.
+At the same time, it was also a good reminder that LLM-assisted development needs a brake pedal. Once a feature is implemented, the model is almost always happy to suggest one more abstraction, one more cleanup, one more enhancement, one more "while we're here" improvement. That is how a small refactor quietly turns into a much larger and more complicated system than the project ever needed.
 
 That ended up being the main lesson from the whole exercise: with LLMs, it is very easy to keep going just because more is possible. The harder and more important skill is deciding when the code is already good enough.
+
+Every now and then, I also make a point of going through the process of implementing a new idea myself and then let the agent roast me afterwards. There is real value in wrestling with the problem on your own first.
 
 *Vibe, but not too close to the sun.*
 
