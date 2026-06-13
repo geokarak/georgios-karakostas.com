@@ -87,7 +87,6 @@ dev = [
     { name = "livereload" },
     { name = "pytest" },
     { name = "ruff" },
-    { name = "watchfiles" },
 ]
 
 [package.metadata]
@@ -120,7 +119,6 @@ dev = [
     { name = "livereload", specifier = "==2.7.1" },
     { name = "pytest", specifier = "==9.0.3" },
     { name = "ruff", specifier = "==0.15.17" },
-    { name = "watchfiles", specifier = "==1.2.0" },
 ]
 
 [[package]]
