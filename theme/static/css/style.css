@@ -1,17 +1,17 @@
 :root {
   color-scheme: dark;
-  --color-light-primary: #ebe7e4;
-  --color-light-secondary: #d5d8db;
-  --color-light-background: #161d27;
-  --color-light-code: #ebe7e4;
-  --color-light-code-background: #212730;
+  --color-light-primary: rgb(226, 231, 239);
+  --color-light-secondary: rgb(226, 231, 239);
+  --color-light-background: rgb(32, 37, 47);
+  --color-light-code: rgb(226, 231, 239);
+  --color-light-code-background: rgb(41, 47, 59);
   --color-light-filtering: 100%;
 
-  --color-dark-primary: #fff;
-  --color-dark-secondary: #ccc;
-  --color-dark-background: #000;
-  --color-dark-code: #161b22;
-  --color-dark-code-background: #171b21;
+  --color-dark-primary: rgb(255, 255, 255);
+  --color-dark-secondary: rgb(204, 204, 204);
+  --color-dark-background: rgb(0, 0, 0);
+  --color-dark-code: rgb(22, 27, 34);
+  --color-dark-code-background: rgb(23, 27, 33);
   --color-dark-filtering: 100%;
 
   --primary: var(--color-light-primary);
@@ -19,11 +19,16 @@
   --background: var(--color-light-background);
   --image-filtering: var(--color-light-filtering);
   --code-background: var(--color-light-code-background);
+  --accent: rgb(114, 175, 232);
   --base-font: -apple-system, BlinkMacSystemFont, avenir next, avenir, segoe ui, helvetica neue, helvetica, Cantarell, Ubuntu, roboto, noto, arial, sans-serif;
   --code-font: Menlo, Consolas, Monaco, Liberation Mono, Lucida Console,
     monospace;
-  --link-color: #d5d8db;
-  --link-color-visited: #d5d8db;
+  --link-color: rgb(226, 231, 239);
+  --link-color-visited: rgb(226, 231, 239);
+}
+
+html {
+  background-color: var(--background);
 }
 
 body {
@@ -49,8 +54,38 @@ h6 {
 }
 
 .article-title {
+  color: var(--accent);
   font-weight: 600;
   overflow-wrap: break-word;
+}
+
+.article-date {
+  color: rgb(169, 172, 189);
+  margin-top: -0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.article-content a,
+.article-content a:visited {
+  color: var(--accent);
+}
+
+blockquote {
+  margin: 1.5rem 0;
+  padding: 1rem 1.25rem;
+  border-left: 4px solid var(--accent);
+  background-color: rgb(44, 51, 63);
+  color: rgb(214, 220, 228);
+  font-style: italic;
+  border-radius: 0 6px 6px 0;
+}
+
+blockquote > :first-child {
+  margin-top: 0;
+}
+
+blockquote > :last-child {
+  margin-bottom: 0;
 }
 
 .container {
@@ -127,7 +162,7 @@ header {
 
 .article-list time {
   padding-right: 0.25em;
-  color: var(--secondary);
+  color: rgb(169, 172, 189);
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.012em;
   white-space: pre;
@@ -141,8 +176,13 @@ header {
 }
 
 .article-list a {
+  color: var(--accent);
   font-weight: 500;
   letter-spacing: -0.015em;
+}
+
+.article-list a:visited {
+  color: var(--accent);
 }
 
 a {
@@ -189,6 +229,11 @@ pre code {
   padding-left: 10px;
   padding-right: 10px;
   border-radius: 6px;
+}
+
+.highlight {
+  background-color: var(--code-background);
+  color: var(--secondary);
 }
 
 footer {
@@ -321,11 +366,21 @@ img.rounded {
   padding-left: 18px;
 }
 
+.photography-index a,
+.photography-index a:visited {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.photography-index a:hover {
+  text-decoration: underline;
+}
+
 /* hr {
   display: block;
   height: 1px;
   border: 0;
-  border-top: 1px solid #ccc;
+  border-top: 1px solid rgb(204, 204, 204);
   margin: 1em 0;
   padding: 0;
 } */

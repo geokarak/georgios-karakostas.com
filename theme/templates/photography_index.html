@@ -2,7 +2,7 @@
 {% block title %}{{ page.title }} - {{ SITENAME }}{% endblock %}
 {% block content %}
     <p>Browse categories:</p>
-    <ul class="gallery-index">
+    <ul class="gallery-index photography-index">
         {% for gallery_page in pages | sort(attribute='title') %}
             {% if gallery_page.template == 'gallery' %}
                 <li>

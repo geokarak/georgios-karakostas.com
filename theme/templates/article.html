@@ -3,9 +3,9 @@
 {% block content %}
     {% if article.category == 'blog' %}
         <h1 class="article-title">{{ article.title }}</h1>
-        {{ article.content }}
-        <p>
-            <i><time>{{ article.date | strftime("%B %-d, %Y") }}</time></i>
+        <p class="article-date">
+            <time>{{ article.date | strftime("%B %-d, %Y") }}</time>
         </p>
+        <div class="article-content">{{ article.content }}</div>
     {% endif %}
 {% endblock %}

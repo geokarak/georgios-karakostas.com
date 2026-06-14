@@ -7,7 +7,7 @@
                 <div>
                     <a href="{% if SITEURL %}{{ SITEURL }}/{{ article.url }}{% else %}/{{ article.url }}{% endif %}">{{ article.title }}</a>
                 </div>
-                <i><time>{{ article.date | strftime("%B %-d, %Y") }}</time></i>
+                <time>{{ article.date | strftime("%B %-d, %Y") }}</time>
             {% else %}
                 No posts yet!
             {% endfor %}
