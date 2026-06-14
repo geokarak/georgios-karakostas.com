@@ -61,7 +61,7 @@ h6 {
 
 .article-title {
   color: var(--accent);
-  font-size: 1.75rem;
+  font-size: 1.9rem;
   font-weight: 600;
   line-height: 1.15;
   margin-bottom: 0.5rem;
@@ -100,9 +100,9 @@ blockquote > :last-child {
 }
 
 .container {
-  max-width: 640px;
-  padding-left: 20px;
-  padding-right: 20px;
+  max-width: 650px;
+  padding-left: 2rem;
+  padding-right: 2rem;
   margin-left: auto;
   margin-right: auto;
 }
@@ -113,6 +113,8 @@ blockquote > :last-child {
   justify-content: flex-start;
   gap: 14px;
   flex-wrap: wrap;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
 }
 
 .primary-nav {
@@ -158,8 +160,8 @@ blockquote > :last-child {
 }
 
 .vertical-spacing {
-  padding-top: 20px;
-  padding-bottom: 20px;
+  padding-top: 3rem;
+  padding-bottom: 3rem;
 }
 
 header {
@@ -253,8 +255,8 @@ pre code {
 }
 
 footer {
-  padding-top: 0px;
-  padding-bottom: 20px;
+  padding-top: 2rem;
+  padding-bottom: 3rem;
 }
 
 .footer-links {
