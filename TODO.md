@@ -16,3 +16,11 @@
 ## Template URL helpers
 
 - [ ] Add a shared Jinja macro for internal links so templates stop building root-relative and `SITEURL`-aware URLs ad hoc.
+
+## Performance optimizations
+
+- [ ] Batch EXIF extraction in `scripts/ingest_photos.py` so ingestion does one `exiftool` call per run instead of one call per image.
+- [ ] Refactor derivative generation in `scripts/ingest_photos.py` to decode/normalize each source image once, then write display + thumbnail variants from that single pass.
+- [ ] Add `loading="lazy"` and `decoding="async"` on gallery thumbnails in `theme/templates/gallery.html`.
+- [ ] Stream Dropbox file downloads in `scripts/sync_dropbox_inbox.py` (chunked write) instead of reading full responses into memory.
+- [ ] Cache already-created remote archive folders in `scripts/sync_dropbox_inbox.py` to avoid repeated Dropbox folder-create API calls.
