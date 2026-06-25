@@ -16,6 +16,10 @@ STATIC_PATHS = [
     "images",
 ]
 
+# Photo metadata sidecars and generated image derivatives live under the
+# content tree so the plugin can resolve them from Pelican settings.
+PHOTOS_PATH = "images/photos"
+
 
 EXTRA_PATH_METADATA = {
     "extra/CNAME": {"path": "CNAME"},

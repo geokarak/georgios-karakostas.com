@@ -33,6 +33,8 @@ The photo pipeline has two main steps:
 1. `scripts/ingest_photos.py` reads uploaded images from `inbox/<category>/` and writes web-ready files into `content/images/photos/<category>/`.
 2. `plugins/photos/photos.py` reads those generated files and passes the photo data to the templates that render the gallery pages.
 
+The plugin reads the photo location from Pelican settings via `PHOTOS_PATH`, which currently points to `content/images/photos/`.
+
 For each published photo, `content/images/photos/<category>/` contains:
 
 - `<id>.json`

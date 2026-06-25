@@ -19,6 +19,44 @@ def test_parse_datetime_original_raises_for_invalid_format():
         photos.parse_datetime_original("2024-02-22")
 
 
+def test_content_dir_from_settings_resolves_absolute_path(tmp_path):
+    settings = {"PATH": str(tmp_path / "content")}
+
+    assert (
+        photos.content_dir_from_settings(settings) == (tmp_path / "content").resolve()
+    )
+
+
+def test_photos_dir_from_settings_uses_configured_subpath(tmp_path):
+    content_dir = (tmp_path / "content").resolve()
+    settings = {"PHOTOS_PATH": "images/travel"}
+
+    assert (
+        photos.photos_dir_from_settings(settings, content_dir)
+        == content_dir / "images/travel"
+    )
+
+
+def test_photo_url_uses_site_root_when_siteurl_is_empty(tmp_path):
+    content_dir = tmp_path / "content"
+    image_file = content_dir / "images" / "photos" / "iphone" / "sample-display.webp"
+
+    assert (
+        photos.photo_url(image_file, content_dir, "")
+        == "/images/photos/iphone/sample-display.webp"
+    )
+
+
+def test_photo_url_uses_siteurl_when_available(tmp_path):
+    content_dir = tmp_path / "content"
+    image_file = content_dir / "images" / "photos" / "iphone" / "sample-display.webp"
+
+    assert (
+        photos.photo_url(image_file, content_dir, "https://georgios-karakostas.com")
+        == "https://georgios-karakostas.com/images/photos/iphone/sample-display.webp"
+    )
+
+
 def test_find_image_by_filename_returns_existing_file(tmp_path):
     metadata_path = tmp_path / "photo.json"
     metadata_path.write_text("{}", encoding="utf-8")
@@ -61,23 +99,22 @@ def test_load_photos_from_sidecars_builds_photo_entries(tmp_path):
     display_path.write_bytes(b"img")
     thumbnail_path.write_bytes(b"img")
 
-    original_content_dir = photos.CONTENT_DIR
-    try:
-        photos.CONTENT_DIR = content_dir
-        loaded = photos.load_photos_from_sidecars(content_dir / "images" / "photos")
-    finally:
-        photos.CONTENT_DIR = original_content_dir
+    loaded = photos.load_photos_from_sidecars(
+        content_dir / "images" / "photos",
+        content_dir,
+        "",
+    )
 
     assert len(loaded) == 1
     assert loaded[0]["photo_id"] == metadata["id"]
     assert loaded[0]["caption"] == "In the park"
     assert (
         loaded[0]["photo_url"]
-        == "../images/photos/iphone/2024-02-22-131539-champ-du-tordoir-display.webp"
+        == "/images/photos/iphone/2024-02-22-131539-champ-du-tordoir-display.webp"
     )
     assert (
         loaded[0]["thumbnail_url"]
-        == "../images/photos/iphone/2024-02-22-131539-champ-du-tordoir-thumb.webp"
+        == "/images/photos/iphone/2024-02-22-131539-champ-du-tordoir-thumb.webp"
     )
 
 
@@ -98,20 +135,19 @@ def test_load_photos_from_sidecars_prefers_generated_derivatives(tmp_path):
     (photos_dir / metadata["display_filename"]).write_bytes(b"img")
     (photos_dir / metadata["thumbnail_filename"]).write_bytes(b"img")
 
-    original_content_dir = photos.CONTENT_DIR
-    try:
-        photos.CONTENT_DIR = content_dir
-        loaded = photos.load_photos_from_sidecars(content_dir / "images" / "photos")
-    finally:
-        photos.CONTENT_DIR = original_content_dir
+    loaded = photos.load_photos_from_sidecars(
+        content_dir / "images" / "photos",
+        content_dir,
+        "",
+    )
 
     assert (
         loaded[0]["photo_url"]
-        == "../images/photos/iphone/2024-02-22-131539-champ-du-tordoir-display.webp"
+        == "/images/photos/iphone/2024-02-22-131539-champ-du-tordoir-display.webp"
     )
     assert (
         loaded[0]["thumbnail_url"]
-        == "../images/photos/iphone/2024-02-22-131539-champ-du-tordoir-thumb.webp"
+        == "/images/photos/iphone/2024-02-22-131539-champ-du-tordoir-thumb.webp"
     )
 
 
@@ -134,12 +170,11 @@ def test_load_photos_from_sidecars_skips_entries_missing_derivatives(tmp_path):
         encoding="utf-8",
     )
 
-    original_content_dir = photos.CONTENT_DIR
-    try:
-        photos.CONTENT_DIR = content_dir
-        loaded = photos.load_photos_from_sidecars(content_dir / "images" / "photos")
-    finally:
-        photos.CONTENT_DIR = original_content_dir
+    loaded = photos.load_photos_from_sidecars(
+        content_dir / "images" / "photos",
+        content_dir,
+        "",
+    )
 
     assert loaded == []
 
@@ -162,12 +197,11 @@ def test_load_photos_from_sidecars_skips_unpublished(tmp_path):
         encoding="utf-8",
     )
 
-    original_content_dir = photos.CONTENT_DIR
-    try:
-        photos.CONTENT_DIR = content_dir
-        loaded = photos.load_photos_from_sidecars(content_dir / "images" / "photos")
-    finally:
-        photos.CONTENT_DIR = original_content_dir
+    loaded = photos.load_photos_from_sidecars(
+        content_dir / "images" / "photos",
+        content_dir,
+        "",
+    )
 
     assert loaded == []
 
@@ -205,16 +239,27 @@ def test_add_photos_to_context_populates_shared_context(monkeypatch):
         {
             "category": "iphone",
             "photo_id": "sample",
-            "photo_url": "../images/photos/iphone/sample-display.webp",
-            "thumbnail_url": "../images/photos/iphone/sample-thumb.webp",
+            "photo_url": "/images/photos/iphone/sample-display.webp",
+            "thumbnail_url": "/images/photos/iphone/sample-thumb.webp",
             "caption": "",
             "date": photos.parse_datetime_original("2024:02:22 13:15:39"),
         }
     ]
-    monkeypatch.setattr(photos, "load_photos_from_sidecars", lambda path: sample_photos)
+    monkeypatch.setattr(
+        photos,
+        "load_photos_from_sidecars",
+        lambda path, content_dir, siteurl: sample_photos,
+    )
 
     shared_context = {}
-    generator = type("Generator", (), {"context": shared_context})()
+    generator = type(
+        "Generator",
+        (),
+        {
+            "context": shared_context,
+            "settings": {"PATH": "/tmp/content", "SITEURL": ""},
+        },
+    )()
 
     photos.add_photos_to_context([generator])
 
