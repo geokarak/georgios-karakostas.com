@@ -125,32 +125,7 @@ def parse_exiftool_datetime(value: str) -> dt.datetime | None:
     return None
 
 
-def exif_datetime(path: Path, exiftool_path: str) -> dt.datetime | None:
-    try:
-        result = subprocess.run(
-            [
-                exiftool_path,
-                "-j",
-                "-G1",
-                *(f"-{tag}" for tag in EXIFTOOL_DATE_TAGS),
-                str(path),
-            ],
-            capture_output=True,
-            text=True,
-            check=True,
-        )
-    except subprocess.CalledProcessError:
-        return None
-
-    try:
-        payload = json.loads(result.stdout)
-    except json.JSONDecodeError:
-        return None
-
-    if not payload:
-        return None
-
-    metadata = payload[0]
+def exiftool_datetime_from_metadata(metadata: dict[str, str]) -> dt.datetime | None:
     for tag in EXIFTOOL_DATE_TAGS:
         value = metadata.get(tag)
         if not value:
@@ -160,6 +135,57 @@ def exif_datetime(path: Path, exiftool_path: str) -> dt.datetime | None:
             return parsed
 
     return None
+
+
+def exif_datetimes(
+    paths: list[Path], exiftool_path: str
+) -> dict[Path, dt.datetime | None]:
+    if not paths:
+        return {}
+
+    try:
+        result = subprocess.run(
+            [
+                exiftool_path,
+                "-j",
+                "-G1",
+                *(f"-{tag}" for tag in EXIFTOOL_DATE_TAGS),
+                *(str(path) for path in paths),
+            ],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+    except subprocess.CalledProcessError:
+        return {path: None for path in paths}
+
+    try:
+        payload = json.loads(result.stdout)
+    except json.JSONDecodeError:
+        return {path: None for path in paths}
+
+    datetimes_by_path = {path: None for path in paths}
+    path_lookup = {str(path.resolve()): path for path in paths}
+
+    for metadata in payload:
+        source_file = metadata.get("SourceFile")
+        if not source_file and len(paths) == 1:
+            datetimes_by_path[paths[0]] = exiftool_datetime_from_metadata(metadata)
+            continue
+        if not source_file:
+            continue
+
+        source_path = path_lookup.get(str(Path(source_file).resolve()))
+        if not source_path:
+            continue
+
+        datetimes_by_path[source_path] = exiftool_datetime_from_metadata(metadata)
+
+    return datetimes_by_path
+
+
+def exif_datetime(path: Path, exiftool_path: str) -> dt.datetime | None:
+    return exif_datetimes([path], exiftool_path).get(path)
 
 
 def infer_category(
@@ -380,6 +406,16 @@ def main() -> int:
         print(f"No images found in {src_dir}")
         return 0
 
+    # Step 4a: read the EXIF capture dates for the full batch in one go.
+    #
+    # We still process photos one by one below, but asking `exiftool` for every
+    # single file would repeat the same external process startup over and over.
+    #
+    # Instead, we ask for all candidate files in one batch here and keep the
+    # results in memory. The rest of the pipeline can then reuse those parsed
+    # dates without paying that startup cost again.
+    detected_datetimes = exif_datetimes(images, exiftool_path)
+
     # Step 5: prepare some simple counters for the final summary.
     #
     # `copied` counts photos that were successfully processed.
@@ -422,7 +458,7 @@ def main() -> int:
             skipped += 1
             continue
 
-        # Step 7b: read the capture date from the image metadata.
+        # Step 7b: read the capture date from the already-loaded EXIF results.
         #
         # The site expects every imported photo to have a real capture timestamp.
         # We use it for the `DateTimeOriginal` field in the JSON metadata, and it
@@ -430,7 +466,7 @@ def main() -> int:
         #
         # If a photo does not have a supported EXIF capture date, we skip it
         # instead of inventing one. That keeps the stored metadata trustworthy.
-        detected_dt = exif_datetime(source_file, exiftool_path)
+        detected_dt = detected_datetimes.get(source_file)
         if not detected_dt:
             print(
                 "Skipping "

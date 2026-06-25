@@ -19,7 +19,7 @@
 
 ## Performance optimizations
 
-- [ ] Batch EXIF extraction in `scripts/ingest_photos.py` so ingestion does one `exiftool` call per run instead of one call per image.
+- [ ] Chunk batched EXIF extraction in `scripts/ingest_photos.py` if very large imports ever make the current in-memory batch lookup too heavy.
 - [ ] Refactor derivative generation in `scripts/ingest_photos.py` to decode/normalize each source image once, then write display + thumbnail variants from that single pass.
 - [ ] Add `loading="lazy"` and `decoding="async"` on gallery thumbnails in `theme/templates/gallery.html`.
 - [ ] Stream Dropbox file downloads in `scripts/sync_dropbox_inbox.py` (chunked write) instead of reading full responses into memory.

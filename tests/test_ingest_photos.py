@@ -65,6 +65,16 @@ def test_parse_exiftool_datetime_supports_common_formats():
     )
 
 
+def test_exiftool_datetime_from_metadata_prefers_supported_tags():
+    metadata = {
+        "ExifIFD:CreateDate": "2015:04:16 13:01:15",
+        "ExifIFD:DateTimeOriginal": "2015:04:16 12:59:59",
+    }
+
+    detected = ingest_photos.exiftool_datetime_from_metadata(metadata)
+    assert detected.strftime("%Y-%m-%d %H:%M:%S") == "2015-04-16 12:59:59"
+
+
 def test_exif_datetime_prefers_original_date_tags(monkeypatch, tmp_path):
     sample = tmp_path / "sample.jpg"
     sample.write_bytes(b"x")
@@ -86,6 +96,38 @@ def test_exif_datetime_prefers_original_date_tags(monkeypatch, tmp_path):
 
     detected = ingest_photos.exif_datetime(sample, "/usr/bin/exiftool")
     assert detected.strftime("%Y-%m-%d") == "2015-04-16"
+
+
+def test_exif_datetimes_reads_multiple_files_in_one_call(monkeypatch, tmp_path):
+    first = tmp_path / "first.jpg"
+    second = tmp_path / "second.jpg"
+    first.write_bytes(b"x")
+    second.write_bytes(b"y")
+    payload = json.dumps(
+        [
+            {
+                "SourceFile": str(first.resolve()),
+                "ExifIFD:DateTimeOriginal": "2015:04:16 13:01:15",
+            },
+            {
+                "SourceFile": str(second.resolve()),
+                "ExifIFD:CreateDate": "2016:05:17 14:02:16",
+            },
+        ]
+    )
+
+    monkeypatch.setattr(
+        ingest_photos.subprocess,
+        "run",
+        lambda *args, **kwargs: subprocess.CompletedProcess(
+            args[0], 0, stdout=payload, stderr=""
+        ),
+    )
+
+    detected = ingest_photos.exif_datetimes([first, second], "/usr/bin/exiftool")
+
+    assert detected[first].strftime("%Y-%m-%d %H:%M:%S") == "2015-04-16 13:01:15"
+    assert detected[second].strftime("%Y-%m-%d %H:%M:%S") == "2016-05-17 14:02:16"
 
 
 def test_exif_datetime_returns_none_without_datetimeoriginal(monkeypatch, tmp_path):
@@ -242,8 +284,10 @@ def test_main_writes_only_derivatives_and_metadata(tmp_path, monkeypatch):
     monkeypatch.setattr(ingest_photos, "require_exiftool", lambda: "/usr/bin/exiftool")
     monkeypatch.setattr(
         ingest_photos,
-        "exif_datetime",
-        lambda path, exiftool_path: ingest_photos.dt.datetime(2024, 2, 22, 12, 0, 5),
+        "exif_datetimes",
+        lambda paths, exiftool_path: {
+            path: ingest_photos.dt.datetime(2024, 2, 22, 12, 0, 5) for path in paths
+        },
     )
     monkeypatch.setattr(
         ingest_photos,
@@ -301,8 +345,10 @@ def test_main_rolls_back_outputs_when_source_removal_fails(tmp_path, monkeypatch
     monkeypatch.setattr(ingest_photos, "require_exiftool", lambda: "/usr/bin/exiftool")
     monkeypatch.setattr(
         ingest_photos,
-        "exif_datetime",
-        lambda path, exiftool_path: ingest_photos.dt.datetime(2024, 2, 22, 12, 0, 5),
+        "exif_datetimes",
+        lambda paths, exiftool_path: {
+            path: ingest_photos.dt.datetime(2024, 2, 22, 12, 0, 5) for path in paths
+        },
     )
     monkeypatch.setattr(
         ingest_photos,
