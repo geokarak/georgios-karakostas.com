@@ -98,6 +98,11 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         help="Print planned changes without writing files",
     )
+    parser.add_argument(
+        "--result-manifest",
+        default=None,
+        help="Optional JSON file that records which source files were ingested or skipped",
+    )
     return parser.parse_args()
 
 
@@ -186,6 +191,16 @@ def exif_datetimes(
 
 def exif_datetime(path: Path, exiftool_path: str) -> dt.datetime | None:
     return exif_datetimes([path], exiftool_path).get(path)
+
+
+def write_result_manifest(
+    manifest_file: Path | None, entries: list[dict[str, str]]
+) -> None:
+    if manifest_file is None:
+        return
+
+    manifest_file.parent.mkdir(parents=True, exist_ok=True)
+    manifest_file.write_text(json.dumps(entries, indent=2) + "\n", encoding="utf-8")
 
 
 def infer_category(
@@ -360,6 +375,10 @@ def ingest_photo_atomically(
 
 def main() -> int:
     args = parse_args()
+    result_manifest = (
+        Path(args.result_manifest).resolve() if args.result_manifest else None
+    )
+    ingest_results: list[dict[str, str]] = []
 
     # Step 1: figure out the main folders we are going to work with.
     #
@@ -403,6 +422,7 @@ def main() -> int:
     # so we exit cleanly.
     images = source_images(src_dir)
     if not images:
+        write_result_manifest(result_manifest, ingest_results)
         print(f"No images found in {src_dir}")
         return 0
 
@@ -451,6 +471,13 @@ def main() -> int:
         # site would not know which gallery page should show it.
         category = infer_category(source_file, src_dir, args.category)
         if not category:
+            ingest_results.append(
+                {
+                    "source_file": str(source_file.resolve()),
+                    "status": "skipped",
+                    "reason": "missing-category",
+                }
+            )
             print(
                 "Skipping "
                 f"{source_file}: no category found. Use subfolders or pass --category."
@@ -468,6 +495,13 @@ def main() -> int:
         # instead of inventing one. That keeps the stored metadata trustworthy.
         detected_dt = detected_datetimes.get(source_file)
         if not detected_dt:
+            ingest_results.append(
+                {
+                    "source_file": str(source_file.resolve()),
+                    "status": "skipped",
+                    "reason": "missing-exif-datetimeoriginal",
+                }
+            )
             print(
                 "Skipping "
                 f"{source_file}: missing EXIF DateTimeOriginal. "
@@ -545,6 +579,12 @@ def main() -> int:
         # to see which file was processed most recently if something goes wrong on
         # a later image.
         copied += 1
+        ingest_results.append(
+            {
+                "source_file": str(source_file.resolve()),
+                "status": "ingested",
+            }
+        )
         print(
             f"Ingested {source_file.name} -> {display_file.relative_to(dest_dir.parent)}"
         )
@@ -557,6 +597,7 @@ def main() -> int:
     # If `--copy` was used, we also print a reminder that keeping the original
     # inbox files around makes it easier to import the same photo again by
     # accident on the next run.
+    write_result_manifest(result_manifest, ingest_results)
     print(f"Done. Ingested: {copied}, Skipped: {skipped}")
     if not args.dry_run and args.copy:
         print("Tip: avoid --copy to prevent re-ingesting the same inbox files.")

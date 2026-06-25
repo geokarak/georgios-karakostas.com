@@ -29,6 +29,16 @@ def test_archive_destination_mirrors_inbox_structure():
     assert archive_path == PurePosixPath("/site-photo-archive/street/frame.webp")
 
 
+def test_quarantine_destination_mirrors_inbox_structure():
+    quarantine_path = sync_dropbox_inbox.quarantine_destination(
+        "/site-photo-inbox/street/frame.webp",
+        PurePosixPath("/site-photo-inbox"),
+        PurePosixPath("/site-photo-quarantine"),
+    )
+
+    assert quarantine_path == PurePosixPath("/site-photo-quarantine/street/frame.webp")
+
+
 def test_is_supported_image_filters_extensions():
     assert sync_dropbox_inbox.is_supported_image("/site-photo-inbox/a.JPG") is True
     assert sync_dropbox_inbox.is_supported_image("/site-photo-inbox/a.heic") is False
@@ -47,7 +57,6 @@ def test_download_dropbox_inbox_creates_staging_dir_when_inbox_is_empty(
     downloaded = sync_dropbox_inbox.download_dropbox_inbox(
         staging_dir=staging_dir,
         inbox_root=PurePosixPath("/site-photo-inbox"),
-        archive_root=PurePosixPath("/site-photo-archive"),
         manifest_file=manifest_file,
     )
 
@@ -84,7 +93,6 @@ def test_download_dropbox_inbox_writes_manifest_for_later_archive(
     downloaded = sync_dropbox_inbox.download_dropbox_inbox(
         staging_dir=staging_dir,
         inbox_root=PurePosixPath("/site-photo-inbox"),
-        archive_root=PurePosixPath("/site-photo-archive"),
         manifest_file=manifest_file,
     )
 
@@ -95,20 +103,44 @@ def test_download_dropbox_inbox_writes_manifest_for_later_archive(
     assert manifest == [
         {
             "source_path": "/site-photo-inbox/iphone/a.jpg",
-            "archive_path": "/site-photo-archive/iphone/a.jpg",
+            "staging_path": str((staging_dir / "iphone" / "a.jpg").resolve()),
         }
     ]
 
 
-def test_archive_dropbox_inbox_moves_manifest_entries(monkeypatch, tmp_path):
-    manifest_file = tmp_path / "archive-manifest.json"
-    manifest_file.write_text(
+def test_finalize_dropbox_inbox_archives_ingested_and_quarantines_skipped(
+    monkeypatch, tmp_path
+):
+    download_manifest = tmp_path / "download-manifest.json"
+    download_manifest.write_text(
         json.dumps(
             [
                 {
                     "source_path": "/site-photo-inbox/street/frame.webp",
-                    "archive_path": "/site-photo-archive/street/frame.webp",
-                }
+                    "staging_path": "/tmp/dropbox-inbox/street/frame.webp",
+                },
+                {
+                    "source_path": "/site-photo-inbox/iphone/bad.jpg",
+                    "staging_path": "/tmp/dropbox-inbox/iphone/bad.jpg",
+                },
+            ]
+        ),
+        encoding="utf-8",
+    )
+
+    ingest_results = tmp_path / "ingest-results.json"
+    ingest_results.write_text(
+        json.dumps(
+            [
+                {
+                    "source_file": "/tmp/dropbox-inbox/street/frame.webp",
+                    "status": "ingested",
+                },
+                {
+                    "source_file": "/tmp/dropbox-inbox/iphone/bad.jpg",
+                    "status": "skipped",
+                    "reason": "missing-exif-datetimeoriginal",
+                },
             ]
         ),
         encoding="utf-8",
@@ -124,13 +156,24 @@ def test_archive_dropbox_inbox_moves_manifest_entries(monkeypatch, tmp_path):
         ),
     )
 
-    archived = sync_dropbox_inbox.archive_dropbox_inbox(manifest_file)
+    finalized = sync_dropbox_inbox.finalize_dropbox_inbox(
+        download_manifest_file=download_manifest,
+        ingest_results_file=ingest_results,
+        inbox_root=PurePosixPath("/site-photo-inbox"),
+        archive_root=PurePosixPath("/site-photo-archive"),
+        quarantine_root=PurePosixPath("/site-photo-quarantine"),
+    )
 
-    assert archived == 1
+    assert finalized == 2
     assert moved_paths == [
         (
             "token",
             "/site-photo-inbox/street/frame.webp",
             PurePosixPath("/site-photo-archive/street/frame.webp"),
-        )
+        ),
+        (
+            "token",
+            "/site-photo-inbox/iphone/bad.jpg",
+            PurePosixPath("/site-photo-quarantine/iphone/bad.jpg"),
+        ),
     ]

@@ -93,7 +93,8 @@ The workflow will:
 - run the existing ingest flow unchanged
 - run tests and build the site
 - commit and push any generated photo files and gallery pages
-- move processed Dropbox files into an archive folder only after the workflow succeeds
+- move successfully processed Dropbox files into an archive folder only after the workflow succeeds
+- move rejected Dropbox files into a quarantine folder for manual review
 
 Required GitHub secrets:
 
@@ -104,9 +105,10 @@ Optional GitHub repository variables:
 
 - `DROPBOX_INBOX_PATH` default `/site-photo-inbox`
 - `DROPBOX_ARCHIVE_PATH` default `/site-photo-archive`
+- `DROPBOX_QUARANTINE_PATH` default `/site-photo-quarantine`
 
 Notes:
 
 - The Dropbox folder structure should match the existing category folders because category detection still comes from subdirectories.
-- If the workflow fails after downloading and archiving files, the originals will be in the Dropbox archive folder rather than the inbox.
+- Files only leave the Dropbox inbox after a successful workflow run. Accepted files go to the archive folder; rejected files go to the quarantine folder.
 - GitHub's `GITHUB_TOKEN` can push the commit back to the repository; that push is still visible to Cloudflare Pages for deployment.

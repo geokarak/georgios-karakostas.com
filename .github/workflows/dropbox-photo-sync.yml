@@ -18,6 +18,7 @@ jobs:
     env:
       DROPBOX_INBOX_PATH: ${{ vars.DROPBOX_INBOX_PATH }}
       DROPBOX_ARCHIVE_PATH: ${{ vars.DROPBOX_ARCHIVE_PATH }}
+      DROPBOX_QUARANTINE_PATH: ${{ vars.DROPBOX_QUARANTINE_PATH }}
 
     steps:
       - name: Checkout
@@ -39,9 +40,9 @@ jobs:
       - name: Install dependencies
         run: uv sync --frozen
 
-      # Phase 1 only downloads files and records where they should be archived.
-      # The Dropbox move happens at the end of the workflow, after everything
-      # else has succeeded.
+      # Phase 1 only downloads files and records which Dropbox file became which
+      # local staged file. The workflow decides archive vs quarantine later,
+      # after ingest has classified each file.
       - name: Download Dropbox inbox
         env:
           DROPBOX_ACCESS_TOKEN: ${{ secrets.DROPBOX_ACCESS_TOKEN }}
@@ -53,11 +54,13 @@ jobs:
           download
           --staging-dir "$RUNNER_TEMP/dropbox-inbox"
           --dropbox-root "${DROPBOX_INBOX_PATH:-/site-photo-inbox}"
-          --archive-root "${DROPBOX_ARCHIVE_PATH:-/site-photo-archive}"
-          --manifest "$RUNNER_TEMP/dropbox-archive-manifest.json"
+          --manifest "$RUNNER_TEMP/dropbox-download-manifest.json"
 
       - name: Ingest staged photos
-        run: make ingest INGEST_SRC="$RUNNER_TEMP/dropbox-inbox"
+        run: >-
+          uv run python scripts/ingest_photos.py
+          --src "$RUNNER_TEMP/dropbox-inbox"
+          --result-manifest "$RUNNER_TEMP/dropbox-ingest-results.json"
 
       - name: Detect repository changes
         id: changes
@@ -88,9 +91,9 @@ jobs:
           git commit -m "Sync photos from Dropbox"
           git push
 
-      # Phase 2 archives the Dropbox inbox files only after the workflow has
-      # succeeded, so failed ingest/build/push steps do not move files too early.
-      - name: Archive processed Dropbox files
+      # Phase 2 finalizes Dropbox files only after the workflow has succeeded.
+      # Accepted files go to archive; rejected files go to quarantine.
+      - name: Finalize processed Dropbox files
         env:
           DROPBOX_ACCESS_TOKEN: ${{ secrets.DROPBOX_ACCESS_TOKEN }}
           DROPBOX_REFRESH_TOKEN: ${{ secrets.DROPBOX_REFRESH_TOKEN }}
@@ -98,5 +101,9 @@ jobs:
           DROPBOX_APP_SECRET: ${{ secrets.DROPBOX_APP_SECRET }}
         run: >-
           uv run python scripts/sync_dropbox_inbox.py
-          archive
-          --manifest "$RUNNER_TEMP/dropbox-archive-manifest.json"
+          finalize
+          --download-manifest "$RUNNER_TEMP/dropbox-download-manifest.json"
+          --ingest-results "$RUNNER_TEMP/dropbox-ingest-results.json"
+          --dropbox-root "${DROPBOX_INBOX_PATH:-/site-photo-inbox}"
+          --archive-root "${DROPBOX_ARCHIVE_PATH:-/site-photo-archive}"
+          --quarantine-root "${DROPBOX_QUARANTINE_PATH:-/site-photo-quarantine}"

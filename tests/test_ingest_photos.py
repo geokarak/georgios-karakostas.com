@@ -263,6 +263,7 @@ def test_save_web_derivative_embeds_icc_profile(tmp_path):
 def test_main_writes_only_derivatives_and_metadata(tmp_path, monkeypatch):
     src_dir = tmp_path / "inbox" / "iphone"
     dest_dir = tmp_path / "content" / "images" / "photos"
+    result_manifest = tmp_path / "ingest-results.json"
     src_dir.mkdir(parents=True)
     source = src_dir / "test.jpg"
     Image.new("RGB", (1600, 1200), color="green").save(source, format="JPEG")
@@ -280,6 +281,7 @@ def test_main_writes_only_derivatives_and_metadata(tmp_path, monkeypatch):
                 "copy": False,
                 "draft": False,
                 "dry_run": False,
+                "result_manifest": str(result_manifest),
             },
         )(),
     )
@@ -319,6 +321,55 @@ def test_main_writes_only_derivatives_and_metadata(tmp_path, monkeypatch):
     assert (category_dir / metadata["thumbnail_filename"]).exists()
     assert list(category_dir.glob("*.jpg")) == []
     assert not source.exists()
+    assert json.loads(result_manifest.read_text(encoding="utf-8")) == [
+        {
+            "source_file": str(source.resolve()),
+            "status": "ingested",
+        }
+    ]
+
+
+def test_main_writes_skip_results_to_manifest(tmp_path, monkeypatch):
+    src_dir = tmp_path / "inbox" / "iphone"
+    dest_dir = tmp_path / "content" / "images" / "photos"
+    result_manifest = tmp_path / "ingest-results.json"
+    src_dir.mkdir(parents=True)
+    skipped_source = src_dir / "skipped.jpg"
+    Image.new("RGB", (1600, 1200), color="orange").save(skipped_source, format="JPEG")
+
+    monkeypatch.setattr(
+        ingest_photos,
+        "parse_args",
+        lambda: type(
+            "Args",
+            (),
+            {
+                "src": str(tmp_path / "inbox"),
+                "dest": str(dest_dir),
+                "category": None,
+                "copy": False,
+                "draft": False,
+                "dry_run": False,
+                "result_manifest": str(result_manifest),
+            },
+        )(),
+    )
+    monkeypatch.setattr(ingest_photos, "require_exiftool", lambda: "/usr/bin/exiftool")
+    monkeypatch.setattr(
+        ingest_photos,
+        "exif_datetimes",
+        lambda paths, exiftool_path: {path: None for path in paths},
+    )
+
+    assert ingest_photos.main() == 0
+
+    assert json.loads(result_manifest.read_text(encoding="utf-8")) == [
+        {
+            "source_file": str(skipped_source.resolve()),
+            "status": "skipped",
+            "reason": "missing-exif-datetimeoriginal",
+        }
+    ]
 
 
 def test_main_rolls_back_outputs_when_source_removal_fails(tmp_path, monkeypatch):
@@ -341,6 +392,7 @@ def test_main_rolls_back_outputs_when_source_removal_fails(tmp_path, monkeypatch
                 "copy": False,
                 "draft": False,
                 "dry_run": False,
+                "result_manifest": None,
             },
         )(),
     )
