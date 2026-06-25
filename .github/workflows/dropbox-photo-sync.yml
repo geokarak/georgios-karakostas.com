@@ -17,7 +17,6 @@ jobs:
     runs-on: ubuntu-latest
     env:
       DROPBOX_INBOX_PATH: ${{ vars.DROPBOX_INBOX_PATH }}
-      DROPBOX_ARCHIVE_PATH: ${{ vars.DROPBOX_ARCHIVE_PATH }}
       DROPBOX_QUARANTINE_PATH: ${{ vars.DROPBOX_QUARANTINE_PATH }}
 
     steps:
@@ -42,8 +41,8 @@ jobs:
         run: uv sync --frozen
 
       # Phase 1 only downloads files and records which Dropbox file became which
-      # local staged file. The workflow decides archive vs quarantine later,
-      # after ingest has classified each file.
+      # local staged file. The workflow decides remove-from-inbox vs quarantine
+      # later, after ingest has classified each file.
       - name: Download Dropbox inbox
         env:
           DROPBOX_ACCESS_TOKEN: ${{ secrets.DROPBOX_ACCESS_TOKEN }}
@@ -94,9 +93,9 @@ jobs:
           git rebase origin/main
           git push
 
-      # Phase 2 finalizes Dropbox files only after the workflow has succeeded.
-      # Accepted files go to archive; rejected files go to quarantine.
-      - name: Finalize processed Dropbox files
+      # Phase 2 reconciles the Dropbox inbox only after the workflow succeeds.
+      # Accepted files are removed from the inbox; rejected files go to quarantine.
+      - name: Reconcile Dropbox inbox
         env:
           DROPBOX_ACCESS_TOKEN: ${{ secrets.DROPBOX_ACCESS_TOKEN }}
           DROPBOX_REFRESH_TOKEN: ${{ secrets.DROPBOX_REFRESH_TOKEN }}
@@ -104,9 +103,8 @@ jobs:
           DROPBOX_APP_SECRET: ${{ secrets.DROPBOX_APP_SECRET }}
         run: >-
           uv run python -m tooling.sync_dropbox_inbox
-          finalize
+          reconcile
           --download-manifest "$RUNNER_TEMP/dropbox-download-manifest.json"
           --ingest-results "$RUNNER_TEMP/dropbox-ingest-results.json"
           --dropbox-root "${DROPBOX_INBOX_PATH:-/site-photo-inbox}"
-          --archive-root "${DROPBOX_ARCHIVE_PATH:-/site-photo-archive}"
           --quarantine-root "${DROPBOX_QUARANTINE_PATH:-/site-photo-quarantine}"

@@ -2,7 +2,7 @@
 
 This module covers the small path-related rules used by the Dropbox sync flow:
 normalizing Dropbox paths, recognizing supported image files, and deciding where
-accepted or rejected files should end up.
+rejected files should end up.
 """
 
 from pathlib import PurePosixPath
@@ -30,15 +30,6 @@ def is_supported_image(path: str) -> bool:
 def relative_dropbox_path(path: str, root: PurePosixPath) -> PurePosixPath:
     """Return the path of a Dropbox file relative to a chosen root."""
     return normalize_dropbox_path(path).relative_to(root)
-
-
-def archive_destination(
-    source_path: str,
-    inbox_root: PurePosixPath,
-    archive_root: PurePosixPath,
-) -> PurePosixPath:
-    """Build the archive destination for one accepted Dropbox file."""
-    return archive_root / relative_dropbox_path(source_path, inbox_root)
 
 
 def quarantine_destination(

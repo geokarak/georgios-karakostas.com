@@ -44,7 +44,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--result-manifest",
         default=None,
-        help="Optional JSON file that records which source files were ingested or skipped",
+        help="Optional JSON file that records which local source files were ingested or skipped",
     )
     return parser.parse_args()
 
@@ -55,6 +55,12 @@ def main() -> int:
         Path(args.result_manifest).resolve() if args.result_manifest else None
     )
     ingest_results: list[dict[str, str]] = []
+
+    # When this script is used in the Dropbox workflow, `src_dir` points at the
+    # temporary staging directory created by `tooling.sync_dropbox_inbox download`.
+    # In that case the result manifest records decisions against staged local
+    # files, not Dropbox paths. The later reconcile step joins those staged paths
+    # back to the original Dropbox inbox files using the download manifest.
 
     # Step 1: figure out the main folders we are going to work with.
     #

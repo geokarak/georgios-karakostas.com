@@ -93,8 +93,26 @@ The workflow will:
 - run the existing ingest flow unchanged
 - run tests and build the site
 - commit and push any generated photo files and gallery pages
-- move successfully processed Dropbox files into an archive folder only after the workflow succeeds
+- remove successfully processed Dropbox files from the Dropbox inbox only after the workflow succeeds
 - move rejected Dropbox files into a quarantine folder for manual review
+
+Dropbox file lifecycle:
+
+- Naming convention in the Dropbox sync code: `dropbox_*` means Dropbox-specific paths or operations, and `staged_*` means local temporary files created during the download step.
+- Pending: the file is still sitting in `site-photo-inbox/<category>/` and has not been processed yet. This is an implied state in Dropbox, not a manifest status.
+- `ingested`: the file was imported successfully into the site. During reconcile, it is removed from the Dropbox inbox.
+- `skipped`: the file was rejected by ingest. During reconcile, it is moved to the quarantine folder instead of being removed.
+
+Reconcile rules:
+
+- if a staged file was `ingested`, remove the original Dropbox file from the inbox
+- if a staged file was `skipped`, move the original Dropbox file to quarantine
+- if the manifests do not line up, stop instead of guessing
+
+Current skip reasons written to the ingest results manifest:
+
+- `missing-category`: the file was not inside a category folder and no `--category` fallback was provided.
+- `missing-exif-datetimeoriginal`: the file does not have the required `EXIF:DateTimeOriginal` capture timestamp.
 
 Required GitHub secrets:
 
@@ -104,11 +122,10 @@ Required GitHub secrets:
 Optional GitHub repository variables:
 
 - `DROPBOX_INBOX_PATH` default `/site-photo-inbox`
-- `DROPBOX_ARCHIVE_PATH` default `/site-photo-archive`
 - `DROPBOX_QUARANTINE_PATH` default `/site-photo-quarantine`
 
 Notes:
 
 - The Dropbox folder structure should match the existing category folders because category detection still comes from subdirectories.
-- Files only leave the Dropbox inbox after a successful workflow run. Accepted files go to the archive folder; rejected files go to the quarantine folder.
+- Files only leave the Dropbox inbox after a successful workflow run. Accepted files are removed from the Dropbox inbox; rejected files go to the quarantine folder.
 - GitHub's `GITHUB_TOKEN` can push the commit back to the repository; that push is still visible to Cloudflare Pages for deployment.

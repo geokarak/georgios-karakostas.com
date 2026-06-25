@@ -1,8 +1,8 @@
 """Helpers for Dropbox HTTP requests and file operations.
 
 This module owns the low-level communication with Dropbox: JSON API calls,
-folder creation, listing remote files, downloading file contents, and moving
-files between Dropbox folders.
+folder creation, listing Dropbox files, downloading file contents, removing
+files from the inbox, and moving files between Dropbox folders.
 """
 
 import json
@@ -71,7 +71,7 @@ def ensure_remote_folder(token: str, folder: PurePosixPath) -> None:
     create_remote_folder(token, folder)
 
 
-def list_remote_images(token: str, inbox_root: PurePosixPath) -> list[dict]:
+def list_dropbox_images(token: str, inbox_root: PurePosixPath) -> list[dict]:
     """List supported image files under a Dropbox inbox root."""
     payload = {
         "path": "" if inbox_root == PurePosixPath("/") else inbox_root.as_posix(),
@@ -89,22 +89,24 @@ def list_remote_images(token: str, inbox_root: PurePosixPath) -> list[dict]:
         )
         entries.extend(response.get("entries", []))
 
-    files = [
-        entry
-        for entry in entries
-        if entry.get(".tag") == "file"
-        and is_supported_image(entry.get("path_display", ""))
+    dropbox_files = [
+        dropbox_file
+        for dropbox_file in entries
+        if dropbox_file.get(".tag") == "file"
+        and is_supported_image(dropbox_file.get("path_display", ""))
     ]
-    return sorted(files, key=lambda entry: entry["path_lower"])
+    return sorted(dropbox_files, key=lambda dropbox_file: dropbox_file["path_lower"])
 
 
-def download_remote_file(token: str, source_path: str, destination: Path) -> None:
+def download_dropbox_file(
+    token: str, dropbox_source_path: str, staged_file_path: Path
+) -> None:
     """Download one Dropbox file into a local destination path."""
     request = Request(
         f"{CONTENT_BASE_URL}/files/download",
         headers={
             "Authorization": f"Bearer {token}",
-            "Dropbox-API-Arg": json.dumps({"path": source_path}),
+            "Dropbox-API-Arg": json.dumps({"path": dropbox_source_path}),
         },
         method="POST",
     )
@@ -114,15 +116,15 @@ def download_remote_file(token: str, source_path: str, destination: Path) -> Non
             contents = response.read()
     except HTTPError as error:
         raise RuntimeError(
-            f"Dropbox download failed for {source_path}: {read_error_payload(error)}"
+            f"Dropbox download failed for {dropbox_source_path}: {read_error_payload(error)}"
         ) from error
 
-    destination.parent.mkdir(parents=True, exist_ok=True)
-    destination.write_bytes(contents)
+    staged_file_path.parent.mkdir(parents=True, exist_ok=True)
+    staged_file_path.write_bytes(contents)
 
 
-def move_remote_file(
-    token: str, source_path: str, destination_path: PurePosixPath
+def move_dropbox_file(
+    token: str, dropbox_source_path: str, destination_path: PurePosixPath
 ) -> None:
     """Move one Dropbox file into another Dropbox folder."""
     ensure_remote_folder(token, destination_path.parent)
@@ -130,8 +132,17 @@ def move_remote_file(
         token,
         "files/move_v2",
         {
-            "from_path": source_path,
+            "from_path": dropbox_source_path,
             "to_path": destination_path.as_posix(),
             "autorename": True,
         },
+    )
+
+
+def remove_dropbox_file(token: str, dropbox_source_path: str) -> None:
+    """Remove one Dropbox file from the inbox."""
+    dropbox_api_json(
+        token,
+        "files/delete_v2",
+        {"path": dropbox_source_path},
     )

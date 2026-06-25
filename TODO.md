@@ -21,4 +21,4 @@
 - [ ] Refactor derivative generation in `tooling/ingest_photos.py` to decode/normalize each source image once, then write display + thumbnail variants from that single pass.
 - [ ] Add `loading="lazy"` and `decoding="async"` on gallery thumbnails in `theme/templates/gallery.html`.
 - [ ] Stream Dropbox file downloads in `tooling/sync_dropbox_inbox.py` (chunked write) instead of reading full responses into memory.
-- [ ] Cache already-created remote archive folders in `tooling/sync_dropbox_inbox.py` to avoid repeated Dropbox folder-create API calls.
+- [ ] Cache already-created remote quarantine folders in `tooling/dropbox_sync/api.py` to avoid repeated Dropbox folder-create API calls.

@@ -4,8 +4,8 @@ from pathlib import PurePosixPath
 import pytest
 
 from tooling.dropbox_sync import download as download_helpers
-from tooling.dropbox_sync import finalize as finalize_helpers
 from tooling.dropbox_sync import paths as path_helpers
+from tooling.dropbox_sync import reconcile as reconcile_helpers
 
 
 def test_normalize_dropbox_path_adds_leading_slash():
@@ -21,16 +21,6 @@ def test_relative_dropbox_path_preserves_category_structure():
     )
 
     assert relative == PurePosixPath("iphone/2024-02-22-photo.jpg")
-
-
-def test_archive_destination_mirrors_inbox_structure():
-    archive_path = path_helpers.archive_destination(
-        "/site-photo-inbox/street/frame.webp",
-        PurePosixPath("/site-photo-inbox"),
-        PurePosixPath("/site-photo-archive"),
-    )
-
-    assert archive_path == PurePosixPath("/site-photo-archive/street/frame.webp")
 
 
 def test_quarantine_destination_mirrors_inbox_structure():
@@ -52,7 +42,7 @@ def test_download_dropbox_inbox_creates_staging_dir_when_inbox_is_empty(
     tmp_path, monkeypatch
 ):
     monkeypatch.setattr(download_helpers, "require_access_token", lambda: "token")
-    monkeypatch.setattr(download_helpers, "list_remote_images", lambda token, root: [])
+    monkeypatch.setattr(download_helpers, "list_dropbox_images", lambda token, root: [])
 
     staging_dir = tmp_path / "dropbox-inbox"
     manifest_file = tmp_path / "archive-manifest.json"
@@ -67,13 +57,13 @@ def test_download_dropbox_inbox_creates_staging_dir_when_inbox_is_empty(
     assert json.loads(manifest_file.read_text(encoding="utf-8")) == []
 
 
-def test_download_dropbox_inbox_writes_manifest_for_later_archive(
+def test_download_dropbox_inbox_writes_manifest_for_later_reconcile(
     tmp_path, monkeypatch
 ):
     monkeypatch.setattr(download_helpers, "require_access_token", lambda: "token")
     monkeypatch.setattr(
         download_helpers,
-        "list_remote_images",
+        "list_dropbox_images",
         lambda token, root: [
             {"path_display": "/site-photo-inbox/iphone/a.jpg", "path_lower": "a"}
         ],
@@ -85,7 +75,7 @@ def test_download_dropbox_inbox_writes_manifest_for_later_archive(
 
     monkeypatch.setattr(
         download_helpers,
-        "download_remote_file",
+        "download_dropbox_file",
         fake_download,
     )
 
@@ -110,7 +100,7 @@ def test_download_dropbox_inbox_writes_manifest_for_later_archive(
     ]
 
 
-def test_finalize_dropbox_inbox_archives_ingested_and_quarantines_skipped(
+def test_reconcile_dropbox_inbox_removes_ingested_and_quarantines_skipped(
     monkeypatch, tmp_path
 ):
     download_manifest = tmp_path / "download-manifest.json"
@@ -148,31 +138,37 @@ def test_finalize_dropbox_inbox_archives_ingested_and_quarantines_skipped(
         encoding="utf-8",
     )
 
+    removed_paths = []
     moved_paths = []
-    monkeypatch.setattr(finalize_helpers, "require_access_token", lambda: "token")
+    monkeypatch.setattr(reconcile_helpers, "require_access_token", lambda: "token")
     monkeypatch.setattr(
-        finalize_helpers,
-        "move_remote_file",
+        reconcile_helpers,
+        "remove_dropbox_file",
+        lambda token, source_path: removed_paths.append((token, source_path)),
+    )
+    monkeypatch.setattr(
+        reconcile_helpers,
+        "move_dropbox_file",
         lambda token, source_path, destination_path: moved_paths.append(
             (token, source_path, destination_path)
         ),
     )
 
-    finalized = finalize_helpers.finalize_dropbox_inbox(
+    reconciled = reconcile_helpers.reconcile_dropbox_inbox(
         download_manifest_file=download_manifest,
         ingest_results_file=ingest_results,
         inbox_root=PurePosixPath("/site-photo-inbox"),
-        archive_root=PurePosixPath("/site-photo-archive"),
         quarantine_root=PurePosixPath("/site-photo-quarantine"),
     )
 
-    assert finalized == 2
-    assert moved_paths == [
+    assert reconciled == 2
+    assert removed_paths == [
         (
             "token",
             "/site-photo-inbox/street/frame.webp",
-            PurePosixPath("/site-photo-archive/street/frame.webp"),
-        ),
+        )
+    ]
+    assert moved_paths == [
         (
             "token",
             "/site-photo-inbox/iphone/bad.jpg",
@@ -181,7 +177,7 @@ def test_finalize_dropbox_inbox_archives_ingested_and_quarantines_skipped(
     ]
 
 
-def test_finalize_dropbox_inbox_fails_on_manifest_mismatch(monkeypatch, tmp_path):
+def test_reconcile_dropbox_inbox_fails_on_manifest_mismatch(monkeypatch, tmp_path):
     download_manifest = tmp_path / "download-manifest.json"
     download_manifest.write_text(
         json.dumps(
@@ -208,23 +204,29 @@ def test_finalize_dropbox_inbox_fails_on_manifest_mismatch(monkeypatch, tmp_path
         encoding="utf-8",
     )
 
+    removed_paths = []
     moved_paths = []
-    monkeypatch.setattr(finalize_helpers, "require_access_token", lambda: "token")
+    monkeypatch.setattr(reconcile_helpers, "require_access_token", lambda: "token")
     monkeypatch.setattr(
-        finalize_helpers,
-        "move_remote_file",
+        reconcile_helpers,
+        "remove_dropbox_file",
+        lambda token, source_path: removed_paths.append((token, source_path)),
+    )
+    monkeypatch.setattr(
+        reconcile_helpers,
+        "move_dropbox_file",
         lambda token, source_path, destination_path: moved_paths.append(
             (token, source_path, destination_path)
         ),
     )
 
     with pytest.raises(RuntimeError):
-        finalize_helpers.finalize_dropbox_inbox(
+        reconcile_helpers.reconcile_dropbox_inbox(
             download_manifest_file=download_manifest,
             ingest_results_file=ingest_results,
             inbox_root=PurePosixPath("/site-photo-inbox"),
-            archive_root=PurePosixPath("/site-photo-archive"),
             quarantine_root=PurePosixPath("/site-photo-quarantine"),
         )
 
+    assert removed_paths == []
     assert moved_paths == []
