@@ -2,16 +2,21 @@ import json
 import subprocess
 import sys
 import textwrap
+import datetime as dt
 from pathlib import Path
 
 import pytest
 from PIL import Image, ImageCms
 
+from photo_ingest import exif as exif_helpers
+from photo_ingest import images as image_helpers
+from photo_ingest import pages as page_helpers
+from photo_ingest import source as source_helpers
 from scripts import ingest_photos
 
 
 def test_slugify():
-    assert ingest_photos.slugify("  Hello, World!  ") == "hello-world"
+    assert source_helpers.slugify("  Hello, World!  ") == "hello-world"
 
 
 def test_infer_category():
@@ -20,38 +25,42 @@ def test_infer_category():
     top_level = src_root / "img.jpg"
 
     assert (
-        ingest_photos.infer_category(nested, src_root, fallback=None) == "street-shots"
+        source_helpers.infer_category(nested, src_root, fallback=None) == "street-shots"
     )
     assert (
-        ingest_photos.infer_category(top_level, src_root, fallback="Travel Photos")
+        source_helpers.infer_category(top_level, src_root, fallback="Travel Photos")
         == "travel-photos"
     )
-    assert ingest_photos.infer_category(top_level, src_root, fallback=None) is None
+    assert source_helpers.infer_category(top_level, src_root, fallback=None) is None
 
 
 def test_unique_id_retries_when_files_exist(tmp_path, monkeypatch):
     category_dir = tmp_path
-    captured_at = ingest_photos.dt.datetime(2024, 2, 22, 13, 15, 0)
+    captured_at = dt.datetime(2024, 2, 22, 13, 15, 0)
     first_candidate = "2024-02-22-131500-deadbeef"
     second_candidate = "2024-02-22-131500-feedface"
 
     (category_dir / f"{first_candidate}.json").write_text("{}", encoding="utf-8")
     generated_ids = iter([first_candidate, second_candidate])
     monkeypatch.setattr(
-        ingest_photos,
+        source_helpers,
         "generated_photo_id",
         lambda dt_value: next(generated_ids),
     )
 
-    candidate = ingest_photos.unique_id(category_dir, captured_at)
+    candidate = source_helpers.unique_id(
+        category_dir,
+        captured_at,
+        image_helpers.derivative_paths,
+    )
     assert candidate == second_candidate
 
 
 def test_require_exiftool_raises_when_missing(monkeypatch):
-    monkeypatch.setattr(ingest_photos.shutil, "which", lambda name: None)
+    monkeypatch.setattr(exif_helpers.shutil, "which", lambda name: None)
 
     try:
-        ingest_photos.require_exiftool()
+        exif_helpers.require_exiftool()
     except RuntimeError as error:
         assert "requires exiftool" in str(error)
     else:
@@ -60,7 +69,7 @@ def test_require_exiftool_raises_when_missing(monkeypatch):
 
 def test_parse_exiftool_datetime_supports_common_formats():
     assert (
-        ingest_photos.parse_exiftool_datetime("2021:08:01 13:15:39").strftime(
+        exif_helpers.parse_exiftool_datetime("2021:08:01 13:15:39").strftime(
             "%Y-%m-%d %H:%M:%S"
         )
         == "2021-08-01 13:15:39"
@@ -73,7 +82,7 @@ def test_exiftool_datetime_from_metadata_prefers_supported_tags():
         "ExifIFD:DateTimeOriginal": "2015:04:16 12:59:59",
     }
 
-    detected = ingest_photos.exiftool_datetime_from_metadata(metadata)
+    detected = exif_helpers.exiftool_datetime_from_metadata(metadata)
     assert detected.strftime("%Y-%m-%d %H:%M:%S") == "2015-04-16 12:59:59"
 
 
@@ -90,14 +99,14 @@ def test_exif_datetimes_prefers_original_date_tags(monkeypatch, tmp_path):
     )
 
     monkeypatch.setattr(
-        ingest_photos.subprocess,
+        exif_helpers.subprocess,
         "run",
         lambda *args, **kwargs: subprocess.CompletedProcess(
             args[0], 0, stdout=payload, stderr=""
         ),
     )
 
-    detected = ingest_photos.exif_datetimes([sample], "/usr/bin/exiftool")[sample]
+    detected = exif_helpers.exif_datetimes([sample], "/usr/bin/exiftool")[sample]
     assert detected.strftime("%Y-%m-%d") == "2015-04-16"
 
 
@@ -120,14 +129,14 @@ def test_exif_datetimes_reads_multiple_files_in_one_call(monkeypatch, tmp_path):
     )
 
     monkeypatch.setattr(
-        ingest_photos.subprocess,
+        exif_helpers.subprocess,
         "run",
         lambda *args, **kwargs: subprocess.CompletedProcess(
             args[0], 0, stdout=payload, stderr=""
         ),
     )
 
-    detected = ingest_photos.exif_datetimes([first, second], "/usr/bin/exiftool")
+    detected = exif_helpers.exif_datetimes([first, second], "/usr/bin/exiftool")
 
     assert detected[first].strftime("%Y-%m-%d %H:%M:%S") == "2015-04-16 13:01:15"
     assert detected[second].strftime("%Y-%m-%d %H:%M:%S") == "2016-05-17 14:02:16"
@@ -145,12 +154,12 @@ def test_exif_datetimes_falls_back_to_single_file_lookups_when_chunk_fails(
         if len(paths) == 2:
             return {path: None for path in paths}
         if paths[0] == first:
-            return {first: ingest_photos.dt.datetime(2015, 4, 16, 13, 1, 15)}
-        return {second: ingest_photos.dt.datetime(2016, 5, 17, 14, 2, 16)}
+            return {first: dt.datetime(2015, 4, 16, 13, 1, 15)}
+        return {second: dt.datetime(2016, 5, 17, 14, 2, 16)}
 
-    monkeypatch.setattr(ingest_photos, "exif_datetimes_batch", fake_batch)
+    monkeypatch.setattr(exif_helpers, "exif_datetimes_batch", fake_batch)
 
-    detected = ingest_photos.exif_datetimes([first, second], "/usr/bin/exiftool")
+    detected = exif_helpers.exif_datetimes([first, second], "/usr/bin/exiftool")
 
     assert detected[first].strftime("%Y-%m-%d %H:%M:%S") == "2015-04-16 13:01:15"
     assert detected[second].strftime("%Y-%m-%d %H:%M:%S") == "2016-05-17 14:02:16"
@@ -165,15 +174,15 @@ def test_exif_datetimes_processes_multiple_chunks(monkeypatch, tmp_path):
     third.write_bytes(b"z")
 
     seen_chunks = []
-    monkeypatch.setattr(ingest_photos, "EXIFTOOL_BATCH_SIZE", 2)
+    monkeypatch.setattr(exif_helpers, "EXIFTOOL_BATCH_SIZE", 2)
 
     def fake_batch(paths, exiftool_path):
         seen_chunks.append(paths)
-        return {path: ingest_photos.dt.datetime(2024, 1, 1, 12, 0, 0) for path in paths}
+        return {path: dt.datetime(2024, 1, 1, 12, 0, 0) for path in paths}
 
-    monkeypatch.setattr(ingest_photos, "exif_datetimes_batch", fake_batch)
+    monkeypatch.setattr(exif_helpers, "exif_datetimes_batch", fake_batch)
 
-    detected = ingest_photos.exif_datetimes([first, second, third], "/usr/bin/exiftool")
+    detected = exif_helpers.exif_datetimes([first, second, third], "/usr/bin/exiftool")
 
     assert seen_chunks == [[first, second], [third]]
     assert all(value is not None for value in detected.values())
@@ -195,14 +204,14 @@ def test_exif_datetimes_returns_createdate_when_datetimeoriginal_missing(
     )
 
     monkeypatch.setattr(
-        ingest_photos.subprocess,
+        exif_helpers.subprocess,
         "run",
         lambda *args, **kwargs: subprocess.CompletedProcess(
             args[0], 0, stdout=payload, stderr=""
         ),
     )
 
-    detected = ingest_photos.exif_datetimes([sample], "/usr/bin/exiftool")[sample]
+    detected = exif_helpers.exif_datetimes([sample], "/usr/bin/exiftool")[sample]
     assert detected.strftime("%Y-%m-%d %H:%M:%S") == "2015-04-16 13:01:15"
 
 
@@ -219,18 +228,18 @@ def test_exif_datetimes_returns_none_without_supported_exif_tags(monkeypatch, tm
     )
 
     monkeypatch.setattr(
-        ingest_photos.subprocess,
+        exif_helpers.subprocess,
         "run",
         lambda *args, **kwargs: subprocess.CompletedProcess(
             args[0], 0, stdout=payload, stderr=""
         ),
     )
 
-    assert ingest_photos.exif_datetimes([sample], "/usr/bin/exiftool")[sample] is None
+    assert exif_helpers.exif_datetimes([sample], "/usr/bin/exiftool")[sample] is None
 
 
 def test_ensure_gallery_page_creates_page(tmp_path):
-    ingest_photos.ensure_gallery_page("macro", tmp_path, dry_run=False)
+    page_helpers.ensure_gallery_page("macro", tmp_path, dry_run=False)
 
     page_file = tmp_path / "content" / "pages" / "macro.md"
     assert page_file.exists()
@@ -241,7 +250,7 @@ def test_ensure_gallery_page_creates_page(tmp_path):
 
 
 def test_ensure_gallery_page_handles_iphone_exception(tmp_path):
-    ingest_photos.ensure_gallery_page("iphone", tmp_path, dry_run=False)
+    page_helpers.ensure_gallery_page("iphone", tmp_path, dry_run=False)
 
     page_file = tmp_path / "content" / "pages" / "iphone.md"
     text = page_file.read_text(encoding="utf-8")
@@ -253,7 +262,7 @@ def test_source_images_filters_supported_extensions(tmp_path):
     (tmp_path / "b.txt").write_text("x", encoding="utf-8")
     (tmp_path / "c.PNG").write_bytes(b"x")
 
-    found = ingest_photos.source_images(tmp_path)
+    found = source_helpers.source_images(tmp_path)
     assert [path.name for path in found] == ["a.jpg", "c.PNG"]
 
 
@@ -278,7 +287,7 @@ def test_save_web_derivative_resizes_large_image(tmp_path):
 
     Image.new("RGB", (4032, 3024), color="navy").save(source, format="JPEG")
 
-    ingest_photos.save_web_derivative(source, destination, max_edge=900)
+    image_helpers.save_web_derivative(source, destination, max_edge=900)
 
     assert destination.exists()
     with Image.open(destination) as image:
@@ -286,7 +295,7 @@ def test_save_web_derivative_resizes_large_image(tmp_path):
 
 
 def test_derivative_paths_use_expected_suffixes(tmp_path):
-    display_file, thumbnail_file = ingest_photos.derivative_paths(
+    display_file, thumbnail_file = image_helpers.derivative_paths(
         tmp_path, "2024-01-01-132045-a1b2c3d4"
     )
 
@@ -305,7 +314,7 @@ def test_save_web_derivative_embeds_icc_profile(tmp_path):
         icc_profile=icc_profile,
     )
 
-    ingest_photos.save_web_derivative(source, destination, max_edge=900)
+    image_helpers.save_web_derivative(source, destination, max_edge=900)
 
     with Image.open(destination) as image:
         assert image.info.get("icc_profile")
@@ -336,21 +345,21 @@ def test_main_writes_only_derivatives_and_metadata(tmp_path, monkeypatch):
             },
         )(),
     )
-    monkeypatch.setattr(ingest_photos, "require_exiftool", lambda: "/usr/bin/exiftool")
+    monkeypatch.setattr(exif_helpers, "require_exiftool", lambda: "/usr/bin/exiftool")
     monkeypatch.setattr(
-        ingest_photos,
+        exif_helpers,
         "exif_datetimes",
         lambda paths, exiftool_path: {
-            path: ingest_photos.dt.datetime(2024, 2, 22, 12, 0, 5) for path in paths
+            path: dt.datetime(2024, 2, 22, 12, 0, 5) for path in paths
         },
     )
     monkeypatch.setattr(
-        ingest_photos,
+        source_helpers,
         "generated_photo_id",
         lambda captured_at: "2024-02-22-120005-a1b2c3d4",
     )
     monkeypatch.setattr(
-        ingest_photos, "ensure_gallery_page", lambda *args, **kwargs: None
+        page_helpers, "ensure_gallery_page", lambda *args, **kwargs: None
     )
 
     assert ingest_photos.main() == 0
@@ -405,9 +414,9 @@ def test_main_writes_skip_results_to_manifest(tmp_path, monkeypatch):
             },
         )(),
     )
-    monkeypatch.setattr(ingest_photos, "require_exiftool", lambda: "/usr/bin/exiftool")
+    monkeypatch.setattr(exif_helpers, "require_exiftool", lambda: "/usr/bin/exiftool")
     monkeypatch.setattr(
-        ingest_photos,
+        exif_helpers,
         "exif_datetimes",
         lambda paths, exiftool_path: {path: None for path in paths},
     )
@@ -447,16 +456,16 @@ def test_main_rolls_back_outputs_when_source_removal_fails(tmp_path, monkeypatch
             },
         )(),
     )
-    monkeypatch.setattr(ingest_photos, "require_exiftool", lambda: "/usr/bin/exiftool")
+    monkeypatch.setattr(exif_helpers, "require_exiftool", lambda: "/usr/bin/exiftool")
     monkeypatch.setattr(
-        ingest_photos,
+        exif_helpers,
         "exif_datetimes",
         lambda paths, exiftool_path: {
-            path: ingest_photos.dt.datetime(2024, 2, 22, 12, 0, 5) for path in paths
+            path: dt.datetime(2024, 2, 22, 12, 0, 5) for path in paths
         },
     )
     monkeypatch.setattr(
-        ingest_photos,
+        source_helpers,
         "generated_photo_id",
         lambda captured_at: "2024-02-22-120005-a1b2c3d4",
     )

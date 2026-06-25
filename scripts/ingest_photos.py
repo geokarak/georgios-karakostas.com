@@ -1,72 +1,14 @@
 #!/usr/bin/env python3
 
 import argparse
-import datetime as dt
-import io
-import json
-import re
-import secrets
-import shutil
-import subprocess
-import tempfile
 from pathlib import Path
 
-from PIL import Image, ImageCms, ImageOps
-
-SUPPORTED_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp"}
-DISPLAY_TITLE_EXCEPTIONS = {"iphone": "iPhone"}
-DISPLAY_MAX_EDGE = 2200
-THUMBNAIL_MAX_EDGE = 900
-DERIVATIVE_FORMAT = "WEBP"
-DERIVATIVE_EXTENSION = ".webp"
-DERIVATIVE_QUALITY = 82
-EXIFTOOL_DATE_TAGS = ("ExifIFD:DateTimeOriginal", "ExifIFD:CreateDate")
-EXIFTOOL_BATCH_SIZE = 200
-
-
-def srgb_profile_bytes() -> bytes:
-    profile = ImageCms.ImageCmsProfile(ImageCms.createProfile("sRGB"))
-    return profile.tobytes()
-
-
-def convert_to_srgb(
-    image: Image.Image, icc_profile: bytes | None
-) -> tuple[Image.Image, bytes]:
-    srgb_bytes = srgb_profile_bytes()
-    if not icc_profile:
-        return image, srgb_bytes
-
-    try:
-        source_profile = ImageCms.ImageCmsProfile(io.BytesIO(icc_profile))
-        target_profile = ImageCms.ImageCmsProfile(io.BytesIO(srgb_bytes))
-        if image.mode == "RGBA":
-            rgb_image = ImageCms.profileToProfile(
-                image.convert("RGB"),
-                source_profile,
-                target_profile,
-                outputMode="RGB",
-            )
-            rgb_image.putalpha(image.getchannel("A"))
-            return rgb_image, srgb_bytes
-
-        converted = ImageCms.profileToProfile(
-            image,
-            source_profile,
-            target_profile,
-            outputMode=image.mode,
-        )
-        return converted, srgb_bytes
-    except Exception:
-        return image, icc_profile
-
-
-def slugify(value: str) -> str:
-    normalized = re.sub(r"[^a-zA-Z0-9]+", "-", value.strip().lower())
-    return normalized.strip("-")
-
-
-def generated_photo_id(captured_at: dt.datetime) -> str:
-    return f"{captured_at.strftime('%Y-%m-%d-%H%M%S')}-{secrets.token_hex(4)}"
+from photo_ingest import exif as exif_helpers
+from photo_ingest import images as image_helpers
+from photo_ingest import pages as page_helpers
+from photo_ingest import results as result_helpers
+from photo_ingest import source as source_helpers
+from photo_ingest.transaction import ingest_photo_atomically
 
 
 def parse_args() -> argparse.Namespace:
@@ -107,294 +49,6 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def require_exiftool() -> str:
-    exiftool_path = shutil.which("exiftool")
-    if exiftool_path:
-        return exiftool_path
-
-    raise RuntimeError(
-        "This project requires exiftool for photo ingestion. "
-        "Install exiftool and try again."
-    )
-
-
-def parse_exiftool_datetime(value: str) -> dt.datetime | None:
-    normalized = value.strip()
-    if not normalized:
-        return None
-
-    for date_format in ("%Y:%m:%d %H:%M:%S",):
-        try:
-            return dt.datetime.strptime(normalized, date_format)
-        except ValueError:
-            continue
-    return None
-
-
-def exiftool_datetime_from_metadata(metadata: dict[str, str]) -> dt.datetime | None:
-    for tag in EXIFTOOL_DATE_TAGS:
-        value = metadata.get(tag)
-        if not value:
-            continue
-        parsed = parse_exiftool_datetime(value)
-        if parsed:
-            return parsed
-
-    return None
-
-
-def exif_datetimes_batch(
-    paths: list[Path], exiftool_path: str
-) -> dict[Path, dt.datetime | None]:
-    if not paths:
-        return {}
-
-    try:
-        result = subprocess.run(
-            [
-                exiftool_path,
-                "-j",
-                "-G1",
-                *(f"-{tag}" for tag in EXIFTOOL_DATE_TAGS),
-                *(str(path) for path in paths),
-            ],
-            capture_output=True,
-            text=True,
-            check=True,
-        )
-    except subprocess.CalledProcessError:
-        return {path: None for path in paths}
-
-    try:
-        payload = json.loads(result.stdout)
-    except json.JSONDecodeError:
-        return {path: None for path in paths}
-
-    datetimes_by_path = {path: None for path in paths}
-    path_lookup = {str(path.resolve()): path for path in paths}
-
-    for metadata in payload:
-        source_file = metadata.get("SourceFile")
-        if not source_file:
-            continue
-
-        source_path = path_lookup.get(str(Path(source_file).resolve()))
-        if not source_path:
-            continue
-
-        datetimes_by_path[source_path] = exiftool_datetime_from_metadata(metadata)
-
-    return datetimes_by_path
-
-
-def chunked_paths(paths: list[Path], chunk_size: int) -> list[list[Path]]:
-    return [
-        paths[index : index + chunk_size] for index in range(0, len(paths), chunk_size)
-    ]
-
-
-def exif_datetimes(
-    paths: list[Path], exiftool_path: str
-) -> dict[Path, dt.datetime | None]:
-    datetimes_by_path: dict[Path, dt.datetime | None] = {}
-
-    for chunk in chunked_paths(paths, EXIFTOOL_BATCH_SIZE):
-        chunk_results = exif_datetimes_batch(chunk, exiftool_path)
-        # If a whole chunk comes back empty, retry each file on its own so one
-        # bad file or one bad exiftool response cannot make every photo in that
-        # chunk look invalid.
-        if chunk and all(value is None for value in chunk_results.values()):
-            for path in chunk:
-                datetimes_by_path[path] = exif_datetimes_batch(
-                    [path], exiftool_path
-                ).get(path)
-            continue
-
-        datetimes_by_path.update(chunk_results)
-
-    return datetimes_by_path
-
-
-def write_result_manifest(
-    manifest_file: Path | None, entries: list[dict[str, str]]
-) -> None:
-    if manifest_file is None:
-        return
-
-    manifest_file.parent.mkdir(parents=True, exist_ok=True)
-    manifest_file.write_text(json.dumps(entries, indent=2) + "\n", encoding="utf-8")
-
-
-def infer_category(
-    source_file: Path, src_root: Path, fallback: str | None
-) -> str | None:
-    relative = source_file.relative_to(src_root)
-    if len(relative.parts) > 1:
-        return slugify(relative.parts[0])
-    if fallback:
-        return slugify(fallback)
-    return None
-
-
-def reserve_photo_id(
-    category_dir: Path, photo_id: str, reserved_ids: set[str] | None = None
-) -> bool:
-    metadata_exists = (category_dir / f"{photo_id}.json").exists()
-    display_file, thumbnail_file = derivative_paths(category_dir, photo_id)
-    image_exists = display_file.exists() or thumbnail_file.exists()
-    already_reserved = reserved_ids is not None and photo_id in reserved_ids
-    return not metadata_exists and not image_exists and not already_reserved
-
-
-def unique_id(
-    category_dir: Path,
-    captured_at: dt.datetime,
-    reserved_ids: set[str] | None = None,
-) -> str:
-    while True:
-        candidate = generated_photo_id(captured_at)
-        if reserve_photo_id(category_dir, candidate, reserved_ids=reserved_ids):
-            return candidate
-
-
-def source_images(src_dir: Path) -> list[Path]:
-    files = [
-        path
-        for path in src_dir.rglob("*")
-        if path.is_file() and path.suffix.lower() in SUPPORTED_EXTENSIONS
-    ]
-    return sorted(files)
-
-
-def title_from_slug(slug: str) -> str:
-    if slug in DISPLAY_TITLE_EXCEPTIONS:
-        return DISPLAY_TITLE_EXCEPTIONS[slug]
-    return " ".join(part.capitalize() for part in slug.split("-") if part)
-
-
-def gallery_page_path(category: str, project_root: Path) -> Path:
-    return project_root / "content" / "pages" / f"{category}.md"
-
-
-def gallery_page_content(category: str) -> str:
-    title = title_from_slug(category)
-    return f"title: {title}\nslug: {category}\ntemplate: gallery\n"
-
-
-def ensure_gallery_page(category: str, project_root: Path, dry_run: bool) -> None:
-    pages_dir = project_root / "content" / "pages"
-    page_file = gallery_page_path(category, project_root)
-    if page_file.exists():
-        return
-
-    page_content = gallery_page_content(category)
-
-    if dry_run:
-        print(f"[DRY RUN] page -> {page_file}")
-        return
-
-    pages_dir.mkdir(parents=True, exist_ok=True)
-    page_file.write_text(page_content, encoding="utf-8")
-
-
-def derivative_paths(category_dir: Path, photo_id: str) -> tuple[Path, Path]:
-    display_file = category_dir / f"{photo_id}-display{DERIVATIVE_EXTENSION}"
-    thumbnail_file = category_dir / f"{photo_id}-thumb{DERIVATIVE_EXTENSION}"
-    return display_file, thumbnail_file
-
-
-def save_web_derivative(
-    source_file: Path, destination_file: Path, max_edge: int
-) -> None:
-    with Image.open(source_file) as image:
-        icc_profile = image.info.get("icc_profile")
-        rendered = ImageOps.exif_transpose(image)
-        if rendered.mode not in {"RGB", "RGBA"}:
-            rendered = rendered.convert("RGB")
-
-        rendered, derivative_icc_profile = convert_to_srgb(rendered, icc_profile)
-
-        rendered.thumbnail((max_edge, max_edge), Image.Resampling.LANCZOS)
-        save_options = {
-            "format": DERIVATIVE_FORMAT,
-            "quality": DERIVATIVE_QUALITY,
-            "method": 6,
-            "icc_profile": derivative_icc_profile,
-        }
-        if rendered.mode == "RGBA":
-            save_options["lossless"] = False
-
-        rendered.save(destination_file, **save_options)
-
-
-def commit_staged_file(staged_file: Path, destination_file: Path) -> None:
-    if destination_file.exists():
-        raise FileExistsError(f"Destination already exists: {destination_file}")
-    staged_file.replace(destination_file)
-
-
-def ingest_photo_atomically(
-    source_file: Path,
-    category: str,
-    project_root: Path,
-    category_dir: Path,
-    metadata_file: Path,
-    display_file: Path,
-    thumbnail_file: Path,
-    metadata: dict[str, str | bool],
-    copy_source: bool,
-) -> None:
-    staging_root = Path(
-        tempfile.mkdtemp(prefix=f".ingest-{metadata['id']}-", dir=category_dir.parent)
-    )
-    staged_category_dir = staging_root / category
-    staged_display_file = staged_category_dir / display_file.name
-    staged_thumbnail_file = staged_category_dir / thumbnail_file.name
-    staged_metadata_file = staged_category_dir / metadata_file.name
-    page_file = gallery_page_path(category, project_root)
-    staged_page_file = staging_root / page_file.name
-    should_create_page = not page_file.exists()
-    committed_paths: list[Path] = []
-    created_page = False
-
-    try:
-        staged_category_dir.mkdir(parents=True, exist_ok=True)
-        save_web_derivative(source_file, staged_display_file, DISPLAY_MAX_EDGE)
-        save_web_derivative(source_file, staged_thumbnail_file, THUMBNAIL_MAX_EDGE)
-        staged_metadata_file.write_text(
-            json.dumps(metadata, indent=2) + "\n", encoding="utf-8"
-        )
-
-        if should_create_page:
-            staged_page_file.write_text(
-                gallery_page_content(category), encoding="utf-8"
-            )
-
-        category_dir.mkdir(parents=True, exist_ok=True)
-        commit_staged_file(staged_display_file, display_file)
-        committed_paths.append(display_file)
-        commit_staged_file(staged_thumbnail_file, thumbnail_file)
-        committed_paths.append(thumbnail_file)
-        commit_staged_file(staged_metadata_file, metadata_file)
-        committed_paths.append(metadata_file)
-
-        if should_create_page and not page_file.exists():
-            page_file.parent.mkdir(parents=True, exist_ok=True)
-            commit_staged_file(staged_page_file, page_file)
-            created_page = True
-
-        if not copy_source:
-            source_file.unlink()
-    except Exception:
-        for committed_path in reversed(committed_paths):
-            committed_path.unlink(missing_ok=True)
-        if created_page:
-            page_file.unlink(missing_ok=True)
-        raise
-    finally:
-        shutil.rmtree(staging_root, ignore_errors=True)
-
-
 def main() -> int:
     args = parse_args()
     result_manifest = (
@@ -430,7 +84,7 @@ def main() -> int:
     # also helps build the final photo id. We rely on `exiftool` to read that
     # metadata, so the whole ingest process depends on it being available.
     try:
-        exiftool_path = require_exiftool()
+        exiftool_path = exif_helpers.require_exiftool()
     except RuntimeError as error:
         print(error)
         return 1
@@ -442,9 +96,9 @@ def main() -> int:
     #
     # An empty inbox is not an error. It simply means there is nothing new to do,
     # so we exit cleanly.
-    images = source_images(src_dir)
+    images = source_helpers.source_images(src_dir)
     if not images:
-        write_result_manifest(result_manifest, ingest_results)
+        result_helpers.write_result_manifest(result_manifest, ingest_results)
         print(f"No images found in {src_dir}")
         return 0
 
@@ -456,7 +110,7 @@ def main() -> int:
     # Instead, we ask for all candidate files in one batch here and keep the
     # results in memory. The rest of the pipeline can then reuse those parsed
     # dates without paying that startup cost again.
-    detected_datetimes = exif_datetimes(images, exiftool_path)
+    detected_datetimes = exif_helpers.exif_datetimes(images, exiftool_path)
 
     # Step 5: prepare some simple counters for the final summary.
     #
@@ -491,7 +145,7 @@ def main() -> int:
         #
         # If we still cannot decide on a category, we skip the file because the
         # site would not know which gallery page should show it.
-        category = infer_category(source_file, src_dir, args.category)
+        category = source_helpers.infer_category(source_file, src_dir, args.category)
         if not category:
             ingest_results.append(
                 {
@@ -544,10 +198,16 @@ def main() -> int:
         # We also create the metadata dictionary that will later be written to
         # disk. This is the record the site reads when building the photo pages.
         category_dir = dest_dir / category
-        photo_id = unique_id(category_dir, detected_dt)
+        photo_id = source_helpers.unique_id(
+            category_dir,
+            detected_dt,
+            image_helpers.derivative_paths,
+        )
 
         metadata_file = category_dir / f"{photo_id}.json"
-        display_file, thumbnail_file = derivative_paths(category_dir, photo_id)
+        display_file, thumbnail_file = image_helpers.derivative_paths(
+            category_dir, photo_id
+        )
 
         metadata = {
             "id": photo_id,
@@ -571,7 +231,7 @@ def main() -> int:
             print(f"[DRY RUN] display -> {display_file}")
             print(f"[DRY RUN] thumbnail -> {thumbnail_file}")
             print(f"[DRY RUN] metadata -> {metadata_file}")
-            ensure_gallery_page(category, project_root, dry_run=True)
+            page_helpers.ensure_gallery_page(category, project_root, dry_run=True)
             copied += 1
             continue
 
@@ -619,7 +279,7 @@ def main() -> int:
     # If `--copy` was used, we also print a reminder that keeping the original
     # inbox files around makes it easier to import the same photo again by
     # accident on the next run.
-    write_result_manifest(result_manifest, ingest_results)
+    result_helpers.write_result_manifest(result_manifest, ingest_results)
     print(f"Done. Ingested: {copied}, Skipped: {skipped}")
     if not args.dry_run and args.copy:
         print("Tip: avoid --copy to prevent re-ingesting the same inbox files.")
