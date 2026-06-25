@@ -17,19 +17,43 @@ OAUTH_TOKEN_URL = "https://api.dropboxapi.com/oauth2/token"
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Download new Dropbox photos into a local staging inbox.",
+        description="Download Dropbox photos for ingest, then archive them later.",
     )
-    parser.add_argument("--staging-dir", required=True, help="Local staging directory")
-    parser.add_argument(
+    subparsers = parser.add_subparsers(dest="command", required=True)
+
+    download_parser = subparsers.add_parser(
+        "download",
+        help="Download Dropbox inbox files into a local staging directory.",
+    )
+    download_parser.add_argument(
+        "--staging-dir", required=True, help="Local staging directory"
+    )
+    download_parser.add_argument(
         "--dropbox-root",
         required=True,
         help="Dropbox inbox directory, for example /site-photo-inbox",
     )
-    parser.add_argument(
+    download_parser.add_argument(
         "--archive-root",
         default="/site-photo-archive",
         help="Dropbox archive directory for processed files",
     )
+    download_parser.add_argument(
+        "--manifest",
+        required=True,
+        help="JSON file that records which Dropbox files should be archived later",
+    )
+
+    archive_parser = subparsers.add_parser(
+        "archive",
+        help="Archive Dropbox files listed in a manifest created earlier.",
+    )
+    archive_parser.add_argument(
+        "--manifest",
+        required=True,
+        help="JSON file created by the download step",
+    )
+
     return parser.parse_args()
 
 
@@ -58,6 +82,13 @@ def archive_destination(
     archive_root: PurePosixPath,
 ) -> PurePosixPath:
     return archive_root / relative_dropbox_path(source_path, inbox_root)
+
+
+def validate_archive_root(
+    inbox_root: PurePosixPath, archive_root: PurePosixPath
+) -> None:
+    if archive_root == inbox_root or archive_root.is_relative_to(inbox_root):
+        raise ValueError("Archive path must live outside the Dropbox inbox path")
 
 
 def require_access_token() -> str:
@@ -212,13 +243,30 @@ def move_remote_file(
     )
 
 
-def sync_dropbox_inbox(
+def write_archive_manifest(manifest_file: Path, entries: list[dict[str, str]]) -> None:
+    manifest_file.parent.mkdir(parents=True, exist_ok=True)
+    manifest_file.write_text(json.dumps(entries, indent=2) + "\n", encoding="utf-8")
+
+
+def read_archive_manifest(manifest_file: Path) -> list[dict[str, str]]:
+    if not manifest_file.exists():
+        return []
+
+    payload = json.loads(manifest_file.read_text(encoding="utf-8"))
+    if not isinstance(payload, list):
+        raise ValueError(f"Invalid archive manifest format: {manifest_file}")
+    return payload
+
+
+def download_dropbox_inbox(
     staging_dir: Path,
     inbox_root: PurePosixPath,
     archive_root: PurePosixPath,
+    manifest_file: Path,
 ) -> int:
-    if archive_root == inbox_root or archive_root.is_relative_to(inbox_root):
-        raise ValueError("Archive path must live outside the Dropbox inbox path")
+    # The archive folder must sit outside the inbox so files do not get picked up
+    # again on the next Dropbox scan.
+    validate_archive_root(inbox_root, archive_root)
 
     staging_dir.mkdir(parents=True, exist_ok=True)
 
@@ -226,38 +274,114 @@ def sync_dropbox_inbox(
     files = list_remote_images(token, inbox_root)
 
     if not files:
+        write_archive_manifest(manifest_file, [])
         print(f"No Dropbox images found in {inbox_root.as_posix()}")
         return 0
 
     downloaded = 0
+    manifest_entries = []
     for entry in files:
         source_path = entry["path_display"]
         relative_path = relative_dropbox_path(source_path, inbox_root)
         destination = staging_dir.joinpath(*relative_path.parts)
         archived_path = archive_destination(source_path, inbox_root, archive_root)
 
+        # Phase 1 only stages files locally and records where they should be
+        # archived later. The actual Dropbox move is delayed until the whole
+        # workflow has succeeded.
         download_remote_file(token, source_path, destination)
-        move_remote_file(token, source_path, archived_path)
+        manifest_entries.append(
+            {
+                "source_path": source_path,
+                "archive_path": archived_path.as_posix(),
+            }
+        )
 
         downloaded += 1
         print(f"Staged {source_path} -> {destination}")
-        print(f"Archived {source_path} -> {archived_path.as_posix()}")
+
+    write_archive_manifest(manifest_file, manifest_entries)
+    print(f"Wrote archive manifest -> {manifest_file}")
 
     print(f"Done. Downloaded: {downloaded}")
     return downloaded
 
 
+def archive_dropbox_inbox(manifest_file: Path) -> int:
+    manifest_entries = read_archive_manifest(manifest_file)
+    if not manifest_entries:
+        print(f"No Dropbox files to archive from {manifest_file}")
+        return 0
+
+    token = require_access_token()
+
+    archived = 0
+    for entry in manifest_entries:
+        source_path = entry["source_path"]
+        archive_path = normalize_dropbox_path(entry["archive_path"])
+
+        move_remote_file(token, source_path, archive_path)
+
+        archived += 1
+        print(f"Archived {source_path} -> {archive_path.as_posix()}")
+
+    print(f"Done. Archived: {archived}")
+    return archived
+
+
 def main() -> int:
     args = parse_args()
-    staging_dir = Path(args.staging_dir).resolve()
-    inbox_root = normalize_dropbox_path(args.dropbox_root)
-    archive_root = normalize_dropbox_path(args.archive_root)
 
-    sync_dropbox_inbox(
-        staging_dir=staging_dir,
-        inbox_root=inbox_root,
-        archive_root=archive_root,
-    )
+    # Step 1: decide which phase of the Dropbox workflow we are running.
+    #
+    # This script has two separate jobs:
+    # - `download`: fetch files from the Dropbox inbox into a local staging folder
+    # - `archive`: move already-processed Dropbox files into the archive folder
+    #
+    # Keeping these phases separate makes the overall workflow safer because the
+    # Dropbox move only happens after the rest of the pipeline has succeeded.
+    if args.command == "download":
+        # Step 2: resolve the download inputs.
+        #
+        # `staging_dir` is the temporary local folder that will receive the files.
+        # `inbox_root` is the Dropbox folder we scan for new uploads.
+        # `archive_root` is where those files should eventually be moved.
+        # `manifest_file` is the small JSON file that remembers what should be
+        # archived later if the workflow reaches the end successfully.
+        staging_dir = Path(args.staging_dir).resolve()
+        inbox_root = normalize_dropbox_path(args.dropbox_root)
+        archive_root = normalize_dropbox_path(args.archive_root)
+        manifest_file = Path(args.manifest).resolve()
+
+        # Step 3: run the download phase.
+        #
+        # This only stages files locally and writes the manifest. It does not
+        # archive anything in Dropbox yet.
+        download_dropbox_inbox(
+            staging_dir=staging_dir,
+            inbox_root=inbox_root,
+            archive_root=archive_root,
+            manifest_file=manifest_file,
+        )
+        return 0
+
+    if args.command == "archive":
+        # Step 4: resolve the manifest path for the archive phase.
+        #
+        # By the time we reach this branch, the rest of the workflow has already
+        # completed successfully, so it is now safe to move the processed Dropbox
+        # files out of the inbox.
+        manifest_file = Path(args.manifest).resolve()
+
+        # Step 5: run the archive phase.
+        #
+        # This reads the manifest created earlier and moves each recorded Dropbox
+        # file into the archive folder.
+        archive_dropbox_inbox(manifest_file)
+        return 0
+
+    # This is a fallback return. In normal use we should never reach it because
+    # argparse requires one of the known commands above.
     return 0
 
 

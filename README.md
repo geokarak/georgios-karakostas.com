@@ -93,7 +93,7 @@ The workflow will:
 - run the existing ingest flow unchanged
 - run tests and build the site
 - commit and push any generated photo files and gallery pages
-- move processed Dropbox files into an archive folder so they are not imported twice
+- move processed Dropbox files into an archive folder only after the workflow succeeds
 
 Required GitHub secrets:
 
