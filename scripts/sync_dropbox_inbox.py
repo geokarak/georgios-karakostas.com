@@ -345,23 +345,59 @@ def finalize_dropbox_inbox(
         print("No Dropbox files to finalize")
         return 0
 
+    download_staging_paths = []
     download_by_staging_path = {
         entry["staging_path"]: entry
         for entry in download_entries
         if "staging_path" in entry
     }
+    download_staging_paths = list(download_by_staging_path)
+
+    known_statuses = {"ingested", "skipped"}
+    unknown_statuses = sorted(
+        {
+            result.get("status", "")
+            for result in ingest_results
+            if result.get("status") not in known_statuses
+        }
+    )
+    if unknown_statuses:
+        raise RuntimeError(
+            "Unsupported ingest result statuses in finalize step: "
+            + ", ".join(unknown_statuses)
+        )
+
+    result_source_paths = [result["source_file"] for result in ingest_results]
+    unmatched_results = sorted(
+        path for path in result_source_paths if path not in download_by_staging_path
+    )
+    unmatched_downloads = sorted(
+        path for path in download_staging_paths if path not in set(result_source_paths)
+    )
+
+    if unmatched_results or unmatched_downloads:
+        mismatch_parts = []
+        if unmatched_results:
+            mismatch_parts.append(
+                "ingest results without matching downloads: "
+                + ", ".join(unmatched_results)
+            )
+        if unmatched_downloads:
+            mismatch_parts.append(
+                "downloads without matching ingest results: "
+                + ", ".join(unmatched_downloads)
+            )
+        raise RuntimeError(
+            "Manifest mismatch during Dropbox finalization: "
+            + " | ".join(mismatch_parts)
+        )
 
     token = require_access_token()
 
     archived = 0
     quarantined = 0
     for result in ingest_results:
-        if result.get("status") not in {"ingested", "skipped"}:
-            continue
-
-        download_entry = download_by_staging_path.get(result.get("source_file", ""))
-        if not download_entry:
-            continue
+        download_entry = download_by_staging_path[result["source_file"]]
 
         source_path = download_entry["source_path"]
         if result["status"] == "ingested":

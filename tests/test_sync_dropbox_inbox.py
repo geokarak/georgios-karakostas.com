@@ -1,6 +1,8 @@
 import json
 from pathlib import PurePosixPath
 
+import pytest
+
 from scripts import sync_dropbox_inbox
 
 
@@ -177,3 +179,52 @@ def test_finalize_dropbox_inbox_archives_ingested_and_quarantines_skipped(
             PurePosixPath("/site-photo-quarantine/iphone/bad.jpg"),
         ),
     ]
+
+
+def test_finalize_dropbox_inbox_fails_on_manifest_mismatch(monkeypatch, tmp_path):
+    download_manifest = tmp_path / "download-manifest.json"
+    download_manifest.write_text(
+        json.dumps(
+            [
+                {
+                    "source_path": "/site-photo-inbox/street/frame.webp",
+                    "staging_path": "/tmp/dropbox-inbox/street/frame.webp",
+                }
+            ]
+        ),
+        encoding="utf-8",
+    )
+
+    ingest_results = tmp_path / "ingest-results.json"
+    ingest_results.write_text(
+        json.dumps(
+            [
+                {
+                    "source_file": "/tmp/dropbox-inbox/other/frame.webp",
+                    "status": "ingested",
+                }
+            ]
+        ),
+        encoding="utf-8",
+    )
+
+    moved_paths = []
+    monkeypatch.setattr(sync_dropbox_inbox, "require_access_token", lambda: "token")
+    monkeypatch.setattr(
+        sync_dropbox_inbox,
+        "move_remote_file",
+        lambda token, source_path, destination_path: moved_paths.append(
+            (token, source_path, destination_path)
+        ),
+    )
+
+    with pytest.raises(RuntimeError):
+        sync_dropbox_inbox.finalize_dropbox_inbox(
+            download_manifest_file=download_manifest,
+            ingest_results_file=ingest_results,
+            inbox_root=PurePosixPath("/site-photo-inbox"),
+            archive_root=PurePosixPath("/site-photo-archive"),
+            quarantine_root=PurePosixPath("/site-photo-quarantine"),
+        )
+
+    assert moved_paths == []
