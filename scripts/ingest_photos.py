@@ -21,6 +21,7 @@ DERIVATIVE_FORMAT = "WEBP"
 DERIVATIVE_EXTENSION = ".webp"
 DERIVATIVE_QUALITY = 82
 EXIFTOOL_DATE_TAGS = ("ExifIFD:DateTimeOriginal", "ExifIFD:CreateDate")
+EXIFTOOL_BATCH_SIZE = 200
 
 
 def srgb_profile_bytes() -> bytes:
@@ -142,7 +143,7 @@ def exiftool_datetime_from_metadata(metadata: dict[str, str]) -> dt.datetime | N
     return None
 
 
-def exif_datetimes(
+def exif_datetimes_batch(
     paths: list[Path], exiftool_path: str
 ) -> dict[Path, dt.datetime | None]:
     if not paths:
@@ -174,9 +175,6 @@ def exif_datetimes(
 
     for metadata in payload:
         source_file = metadata.get("SourceFile")
-        if not source_file and len(paths) == 1:
-            datetimes_by_path[paths[0]] = exiftool_datetime_from_metadata(metadata)
-            continue
         if not source_file:
             continue
 
@@ -189,8 +187,32 @@ def exif_datetimes(
     return datetimes_by_path
 
 
-def exif_datetime(path: Path, exiftool_path: str) -> dt.datetime | None:
-    return exif_datetimes([path], exiftool_path).get(path)
+def chunked_paths(paths: list[Path], chunk_size: int) -> list[list[Path]]:
+    return [
+        paths[index : index + chunk_size] for index in range(0, len(paths), chunk_size)
+    ]
+
+
+def exif_datetimes(
+    paths: list[Path], exiftool_path: str
+) -> dict[Path, dt.datetime | None]:
+    datetimes_by_path: dict[Path, dt.datetime | None] = {}
+
+    for chunk in chunked_paths(paths, EXIFTOOL_BATCH_SIZE):
+        chunk_results = exif_datetimes_batch(chunk, exiftool_path)
+        # If a whole chunk comes back empty, retry each file on its own so one
+        # bad file or one bad exiftool response cannot make every photo in that
+        # chunk look invalid.
+        if chunk and all(value is None for value in chunk_results.values()):
+            for path in chunk:
+                datetimes_by_path[path] = exif_datetimes_batch(
+                    [path], exiftool_path
+                ).get(path)
+            continue
+
+        datetimes_by_path.update(chunk_results)
+
+    return datetimes_by_path
 
 
 def write_result_manifest(

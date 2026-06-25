@@ -77,12 +77,13 @@ def test_exiftool_datetime_from_metadata_prefers_supported_tags():
     assert detected.strftime("%Y-%m-%d %H:%M:%S") == "2015-04-16 12:59:59"
 
 
-def test_exif_datetime_prefers_original_date_tags(monkeypatch, tmp_path):
+def test_exif_datetimes_prefers_original_date_tags(monkeypatch, tmp_path):
     sample = tmp_path / "sample.jpg"
     sample.write_bytes(b"x")
     payload = json.dumps(
         [
             {
+                "SourceFile": str(sample.resolve()),
                 "ExifIFD:DateTimeOriginal": "2015:04:16 13:01:15",
             }
         ]
@@ -96,7 +97,7 @@ def test_exif_datetime_prefers_original_date_tags(monkeypatch, tmp_path):
         ),
     )
 
-    detected = ingest_photos.exif_datetime(sample, "/usr/bin/exiftool")
+    detected = ingest_photos.exif_datetimes([sample], "/usr/bin/exiftool")[sample]
     assert detected.strftime("%Y-%m-%d") == "2015-04-16"
 
 
@@ -132,12 +133,61 @@ def test_exif_datetimes_reads_multiple_files_in_one_call(monkeypatch, tmp_path):
     assert detected[second].strftime("%Y-%m-%d %H:%M:%S") == "2016-05-17 14:02:16"
 
 
-def test_exif_datetime_returns_none_without_datetimeoriginal(monkeypatch, tmp_path):
+def test_exif_datetimes_falls_back_to_single_file_lookups_when_chunk_fails(
+    monkeypatch, tmp_path
+):
+    first = tmp_path / "first.jpg"
+    second = tmp_path / "second.jpg"
+    first.write_bytes(b"x")
+    second.write_bytes(b"y")
+
+    def fake_batch(paths, exiftool_path):
+        if len(paths) == 2:
+            return {path: None for path in paths}
+        if paths[0] == first:
+            return {first: ingest_photos.dt.datetime(2015, 4, 16, 13, 1, 15)}
+        return {second: ingest_photos.dt.datetime(2016, 5, 17, 14, 2, 16)}
+
+    monkeypatch.setattr(ingest_photos, "exif_datetimes_batch", fake_batch)
+
+    detected = ingest_photos.exif_datetimes([first, second], "/usr/bin/exiftool")
+
+    assert detected[first].strftime("%Y-%m-%d %H:%M:%S") == "2015-04-16 13:01:15"
+    assert detected[second].strftime("%Y-%m-%d %H:%M:%S") == "2016-05-17 14:02:16"
+
+
+def test_exif_datetimes_processes_multiple_chunks(monkeypatch, tmp_path):
+    first = tmp_path / "first.jpg"
+    second = tmp_path / "second.jpg"
+    third = tmp_path / "third.jpg"
+    first.write_bytes(b"x")
+    second.write_bytes(b"y")
+    third.write_bytes(b"z")
+
+    seen_chunks = []
+    monkeypatch.setattr(ingest_photos, "EXIFTOOL_BATCH_SIZE", 2)
+
+    def fake_batch(paths, exiftool_path):
+        seen_chunks.append(paths)
+        return {path: ingest_photos.dt.datetime(2024, 1, 1, 12, 0, 0) for path in paths}
+
+    monkeypatch.setattr(ingest_photos, "exif_datetimes_batch", fake_batch)
+
+    detected = ingest_photos.exif_datetimes([first, second, third], "/usr/bin/exiftool")
+
+    assert seen_chunks == [[first, second], [third]]
+    assert all(value is not None for value in detected.values())
+
+
+def test_exif_datetimes_returns_createdate_when_datetimeoriginal_missing(
+    monkeypatch, tmp_path
+):
     sample = tmp_path / "sample.jpg"
     sample.write_bytes(b"x")
     payload = json.dumps(
         [
             {
+                "SourceFile": str(sample.resolve()),
                 "ExifIFD:CreateDate": "2015:04:16 13:01:15",
                 "XMP:CreateDate": "2015:04:16 13:01:15",
             }
@@ -152,16 +202,17 @@ def test_exif_datetime_returns_none_without_datetimeoriginal(monkeypatch, tmp_pa
         ),
     )
 
-    detected = ingest_photos.exif_datetime(sample, "/usr/bin/exiftool")
+    detected = ingest_photos.exif_datetimes([sample], "/usr/bin/exiftool")[sample]
     assert detected.strftime("%Y-%m-%d %H:%M:%S") == "2015-04-16 13:01:15"
 
 
-def test_exif_datetime_returns_none_without_supported_exif_tags(monkeypatch, tmp_path):
+def test_exif_datetimes_returns_none_without_supported_exif_tags(monkeypatch, tmp_path):
     sample = tmp_path / "sample.jpg"
     sample.write_bytes(b"x")
     payload = json.dumps(
         [
             {
+                "SourceFile": str(sample.resolve()),
                 "XMP:CreateDate": "2015:04:16 13:01:15",
             }
         ]
@@ -175,7 +226,7 @@ def test_exif_datetime_returns_none_without_supported_exif_tags(monkeypatch, tmp
         ),
     )
 
-    assert ingest_photos.exif_datetime(sample, "/usr/bin/exiftool") is None
+    assert ingest_photos.exif_datetimes([sample], "/usr/bin/exiftool")[sample] is None
 
 
 def test_ensure_gallery_page_creates_page(tmp_path):
