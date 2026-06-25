@@ -67,9 +67,11 @@ jobs:
         if: steps.changes.outputs.has_changes == 'true'
         run: uv run pytest
 
-      - name: Build site
+      # This workflow publishes real content, so it should validate the
+      # production site configuration before committing generated files.
+      - name: Build production site
         if: steps.changes.outputs.has_changes == 'true'
-        run: uv run pelican -s pelicanconf.py -t theme -o output
+        run: uv run pelican -s publishconf.py -t theme -o output
 
       - name: Commit synced photos
         if: steps.changes.outputs.has_changes == 'true'
