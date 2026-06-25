@@ -3,17 +3,19 @@ from pathlib import PurePosixPath
 
 import pytest
 
-from scripts import sync_dropbox_inbox
+from dropbox_sync import download as download_helpers
+from dropbox_sync import finalize as finalize_helpers
+from dropbox_sync import paths as path_helpers
 
 
 def test_normalize_dropbox_path_adds_leading_slash():
-    assert sync_dropbox_inbox.normalize_dropbox_path(
-        "site-photo-inbox"
-    ) == PurePosixPath("/site-photo-inbox")
+    assert path_helpers.normalize_dropbox_path("site-photo-inbox") == PurePosixPath(
+        "/site-photo-inbox"
+    )
 
 
 def test_relative_dropbox_path_preserves_category_structure():
-    relative = sync_dropbox_inbox.relative_dropbox_path(
+    relative = path_helpers.relative_dropbox_path(
         "/site-photo-inbox/iphone/2024-02-22-photo.jpg",
         PurePosixPath("/site-photo-inbox"),
     )
@@ -22,7 +24,7 @@ def test_relative_dropbox_path_preserves_category_structure():
 
 
 def test_archive_destination_mirrors_inbox_structure():
-    archive_path = sync_dropbox_inbox.archive_destination(
+    archive_path = path_helpers.archive_destination(
         "/site-photo-inbox/street/frame.webp",
         PurePosixPath("/site-photo-inbox"),
         PurePosixPath("/site-photo-archive"),
@@ -32,7 +34,7 @@ def test_archive_destination_mirrors_inbox_structure():
 
 
 def test_quarantine_destination_mirrors_inbox_structure():
-    quarantine_path = sync_dropbox_inbox.quarantine_destination(
+    quarantine_path = path_helpers.quarantine_destination(
         "/site-photo-inbox/street/frame.webp",
         PurePosixPath("/site-photo-inbox"),
         PurePosixPath("/site-photo-quarantine"),
@@ -42,21 +44,19 @@ def test_quarantine_destination_mirrors_inbox_structure():
 
 
 def test_is_supported_image_filters_extensions():
-    assert sync_dropbox_inbox.is_supported_image("/site-photo-inbox/a.JPG") is True
-    assert sync_dropbox_inbox.is_supported_image("/site-photo-inbox/a.heic") is False
+    assert path_helpers.is_supported_image("/site-photo-inbox/a.JPG") is True
+    assert path_helpers.is_supported_image("/site-photo-inbox/a.heic") is False
 
 
 def test_download_dropbox_inbox_creates_staging_dir_when_inbox_is_empty(
     tmp_path, monkeypatch
 ):
-    monkeypatch.setattr(sync_dropbox_inbox, "require_access_token", lambda: "token")
-    monkeypatch.setattr(
-        sync_dropbox_inbox, "list_remote_images", lambda token, root: []
-    )
+    monkeypatch.setattr(download_helpers, "require_access_token", lambda: "token")
+    monkeypatch.setattr(download_helpers, "list_remote_images", lambda token, root: [])
 
     staging_dir = tmp_path / "dropbox-inbox"
     manifest_file = tmp_path / "archive-manifest.json"
-    downloaded = sync_dropbox_inbox.download_dropbox_inbox(
+    downloaded = download_helpers.download_dropbox_inbox(
         staging_dir=staging_dir,
         inbox_root=PurePosixPath("/site-photo-inbox"),
         manifest_file=manifest_file,
@@ -70,9 +70,9 @@ def test_download_dropbox_inbox_creates_staging_dir_when_inbox_is_empty(
 def test_download_dropbox_inbox_writes_manifest_for_later_archive(
     tmp_path, monkeypatch
 ):
-    monkeypatch.setattr(sync_dropbox_inbox, "require_access_token", lambda: "token")
+    monkeypatch.setattr(download_helpers, "require_access_token", lambda: "token")
     monkeypatch.setattr(
-        sync_dropbox_inbox,
+        download_helpers,
         "list_remote_images",
         lambda token, root: [
             {"path_display": "/site-photo-inbox/iphone/a.jpg", "path_lower": "a"}
@@ -84,7 +84,7 @@ def test_download_dropbox_inbox_writes_manifest_for_later_archive(
         destination.write_bytes(b"img")
 
     monkeypatch.setattr(
-        sync_dropbox_inbox,
+        download_helpers,
         "download_remote_file",
         fake_download,
     )
@@ -92,7 +92,7 @@ def test_download_dropbox_inbox_writes_manifest_for_later_archive(
     staging_dir = tmp_path / "dropbox-inbox"
     manifest_file = tmp_path / "archive-manifest.json"
 
-    downloaded = sync_dropbox_inbox.download_dropbox_inbox(
+    downloaded = download_helpers.download_dropbox_inbox(
         staging_dir=staging_dir,
         inbox_root=PurePosixPath("/site-photo-inbox"),
         manifest_file=manifest_file,
@@ -149,16 +149,16 @@ def test_finalize_dropbox_inbox_archives_ingested_and_quarantines_skipped(
     )
 
     moved_paths = []
-    monkeypatch.setattr(sync_dropbox_inbox, "require_access_token", lambda: "token")
+    monkeypatch.setattr(finalize_helpers, "require_access_token", lambda: "token")
     monkeypatch.setattr(
-        sync_dropbox_inbox,
+        finalize_helpers,
         "move_remote_file",
         lambda token, source_path, destination_path: moved_paths.append(
             (token, source_path, destination_path)
         ),
     )
 
-    finalized = sync_dropbox_inbox.finalize_dropbox_inbox(
+    finalized = finalize_helpers.finalize_dropbox_inbox(
         download_manifest_file=download_manifest,
         ingest_results_file=ingest_results,
         inbox_root=PurePosixPath("/site-photo-inbox"),
@@ -209,9 +209,9 @@ def test_finalize_dropbox_inbox_fails_on_manifest_mismatch(monkeypatch, tmp_path
     )
 
     moved_paths = []
-    monkeypatch.setattr(sync_dropbox_inbox, "require_access_token", lambda: "token")
+    monkeypatch.setattr(finalize_helpers, "require_access_token", lambda: "token")
     monkeypatch.setattr(
-        sync_dropbox_inbox,
+        finalize_helpers,
         "move_remote_file",
         lambda token, source_path, destination_path: moved_paths.append(
             (token, source_path, destination_path)
@@ -219,7 +219,7 @@ def test_finalize_dropbox_inbox_fails_on_manifest_mismatch(monkeypatch, tmp_path
     )
 
     with pytest.raises(RuntimeError):
-        sync_dropbox_inbox.finalize_dropbox_inbox(
+        finalize_helpers.finalize_dropbox_inbox(
             download_manifest_file=download_manifest,
             ingest_results_file=ingest_results,
             inbox_root=PurePosixPath("/site-photo-inbox"),
