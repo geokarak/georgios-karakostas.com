@@ -1,5 +1,7 @@
 import json
 import subprocess
+import sys
+import textwrap
 from pathlib import Path
 
 import pytest
@@ -374,3 +376,124 @@ def test_main_rolls_back_outputs_when_source_removal_fails(tmp_path, monkeypatch
     assert not (category_dir / "2024-02-22-120005-a1b2c3d4-thumb.webp").exists()
     assert not (category_dir / "2024-02-22-120005-a1b2c3d4.json").exists()
     assert not (tmp_path / "content" / "pages" / "macro.md").exists()
+
+
+def test_gallery_build_smoke_renders_published_photos_in_order(tmp_path):
+    repo_root = Path(__file__).resolve().parents[1]
+    content_dir = tmp_path / "content"
+    output_dir = tmp_path / "output"
+    photos_dir = content_dir / "images" / "photos" / "iphone"
+    pages_dir = content_dir / "pages"
+    photos_dir.mkdir(parents=True, exist_ok=True)
+    pages_dir.mkdir(parents=True, exist_ok=True)
+
+    (pages_dir / "iphone.md").write_text(
+        "title: iPhone\nslug: iphone\ntemplate: gallery\n",
+        encoding="utf-8",
+    )
+
+    published_new = {
+        "id": "2024-02-22-180931-new",
+        "category": "iphone",
+        "DateTimeOriginal": "2024:02:22 18:09:31",
+        "caption": "Newest",
+        "location": "",
+        "published": True,
+        "display_filename": "2024-02-22-180931-new-display.webp",
+        "thumbnail_filename": "2024-02-22-180931-new-thumb.webp",
+    }
+    published_old = {
+        "id": "2023-02-16-190509-old",
+        "category": "iphone",
+        "DateTimeOriginal": "2023:02:16 19:05:09",
+        "caption": "Older",
+        "location": "",
+        "published": True,
+        "display_filename": "2023-02-16-190509-old-display.webp",
+        "thumbnail_filename": "2023-02-16-190509-old-thumb.webp",
+    }
+    unpublished = {
+        "id": "2022-10-17-082933-hidden",
+        "category": "iphone",
+        "DateTimeOriginal": "2022:10:17 08:29:33",
+        "caption": "Hidden",
+        "location": "",
+        "published": False,
+        "display_filename": "2022-10-17-082933-hidden-display.webp",
+        "thumbnail_filename": "2022-10-17-082933-hidden-thumb.webp",
+    }
+
+    for metadata in (published_new, published_old, unpublished):
+        (photos_dir / f"{metadata['id']}.json").write_text(
+            json.dumps(metadata) + "\n",
+            encoding="utf-8",
+        )
+        (photos_dir / metadata["display_filename"]).write_bytes(b"img")
+        (photos_dir / metadata["thumbnail_filename"]).write_bytes(b"img")
+
+    config_file = tmp_path / "pelicanconf.py"
+    config_file.write_text(
+        textwrap.dedent(
+            f"""
+            import sys
+
+            sys.path.insert(0, {str(repo_root)!r})
+
+            AUTHOR = "Test Author"
+            SITENAME = "Test Site"
+            SITEURL = "https://example.com"
+            SITE_DESCRIPTION = "Test description"
+            SITELOGO = ""
+            TWITTER_HANDLE = ""
+            PATH = {str(content_dir)!r}
+            PAGE_PATHS = ["pages"]
+            PAGE_URL = "{{slug}}/"
+            PAGE_SAVE_AS = "{{slug}}.html"
+            ARTICLE_PATHS = []
+            STATIC_PATHS = ["images"]
+            PHOTOS_PATH = "images/photos"
+            DEFAULT_PAGINATION = False
+            FEED_ALL_ATOM = None
+            CATEGORY_FEED_ATOM = None
+            TRANSLATION_FEED_ATOM = None
+            AUTHOR_FEED_ATOM = None
+            AUTHOR_FEED_RSS = None
+            THEME = {str(repo_root / "theme")!r}
+            PLUGINS = ["plugins.photos"]
+            """
+        ).strip()
+        + "\n",
+        encoding="utf-8",
+    )
+
+    subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "pelican",
+            "-s",
+            str(config_file),
+            "-o",
+            str(output_dir),
+        ],
+        capture_output=True,
+        text=True,
+        check=True,
+        cwd=tmp_path,
+    )
+
+    rendered = (output_dir / "iphone.html").read_text(encoding="utf-8")
+
+    newest_index = rendered.index(published_new["display_filename"])
+    older_index = rendered.index(published_old["display_filename"])
+
+    assert (
+        "https://example.com/images/photos/iphone/2024-02-22-180931-new-display.webp"
+        in rendered
+    )
+    assert (
+        "https://example.com/images/photos/iphone/2023-02-16-190509-old-display.webp"
+        in rendered
+    )
+    assert unpublished["display_filename"] not in rendered
+    assert newest_index < older_index
