@@ -8,6 +8,7 @@ import re
 import secrets
 import shutil
 import subprocess
+import tempfile
 from pathlib import Path
 
 from PIL import Image, ImageCms, ImageOps
@@ -208,14 +209,22 @@ def title_from_slug(slug: str) -> str:
     return " ".join(part.capitalize() for part in slug.split("-") if part)
 
 
+def gallery_page_path(category: str, project_root: Path) -> Path:
+    return project_root / "content" / "pages" / f"{category}.md"
+
+
+def gallery_page_content(category: str) -> str:
+    title = title_from_slug(category)
+    return f"title: {title}\nslug: {category}\ntemplate: gallery\n"
+
+
 def ensure_gallery_page(category: str, project_root: Path, dry_run: bool) -> None:
     pages_dir = project_root / "content" / "pages"
-    page_file = pages_dir / f"{category}.md"
+    page_file = gallery_page_path(category, project_root)
     if page_file.exists():
         return
 
-    title = title_from_slug(category)
-    page_content = f"title: {title}\nslug: {category}\ntemplate: gallery\n"
+    page_content = gallery_page_content(category)
 
     if dry_run:
         print(f"[DRY RUN] page -> {page_file}")
@@ -255,32 +264,155 @@ def save_web_derivative(
         rendered.save(destination_file, **save_options)
 
 
+def commit_staged_file(staged_file: Path, destination_file: Path) -> None:
+    if destination_file.exists():
+        raise FileExistsError(f"Destination already exists: {destination_file}")
+    staged_file.replace(destination_file)
+
+
+def ingest_photo_atomically(
+    source_file: Path,
+    category: str,
+    project_root: Path,
+    category_dir: Path,
+    metadata_file: Path,
+    display_file: Path,
+    thumbnail_file: Path,
+    metadata: dict[str, str | bool],
+    copy_source: bool,
+) -> None:
+    staging_root = Path(
+        tempfile.mkdtemp(prefix=f".ingest-{metadata['id']}-", dir=category_dir.parent)
+    )
+    staged_category_dir = staging_root / category
+    staged_display_file = staged_category_dir / display_file.name
+    staged_thumbnail_file = staged_category_dir / thumbnail_file.name
+    staged_metadata_file = staged_category_dir / metadata_file.name
+    page_file = gallery_page_path(category, project_root)
+    staged_page_file = staging_root / page_file.name
+    should_create_page = not page_file.exists()
+    committed_paths: list[Path] = []
+    created_page = False
+
+    try:
+        staged_category_dir.mkdir(parents=True, exist_ok=True)
+        save_web_derivative(source_file, staged_display_file, DISPLAY_MAX_EDGE)
+        save_web_derivative(source_file, staged_thumbnail_file, THUMBNAIL_MAX_EDGE)
+        staged_metadata_file.write_text(
+            json.dumps(metadata, indent=2) + "\n", encoding="utf-8"
+        )
+
+        if should_create_page:
+            staged_page_file.write_text(
+                gallery_page_content(category), encoding="utf-8"
+            )
+
+        category_dir.mkdir(parents=True, exist_ok=True)
+        commit_staged_file(staged_display_file, display_file)
+        committed_paths.append(display_file)
+        commit_staged_file(staged_thumbnail_file, thumbnail_file)
+        committed_paths.append(thumbnail_file)
+        commit_staged_file(staged_metadata_file, metadata_file)
+        committed_paths.append(metadata_file)
+
+        if should_create_page and not page_file.exists():
+            page_file.parent.mkdir(parents=True, exist_ok=True)
+            commit_staged_file(staged_page_file, page_file)
+            created_page = True
+
+        if not copy_source:
+            source_file.unlink()
+    except Exception:
+        for committed_path in reversed(committed_paths):
+            committed_path.unlink(missing_ok=True)
+        if created_page:
+            page_file.unlink(missing_ok=True)
+        raise
+    finally:
+        shutil.rmtree(staging_root, ignore_errors=True)
+
+
 def main() -> int:
     args = parse_args()
 
+    # Step 1: figure out the main folders we are going to work with.
+    #
+    # `project_root` is the root of this repository.
+    # `src_dir` is the inbox folder that contains the uploaded photos.
+    # `dest_dir` is where the generated website photo files will be written.
+    #
+    # We convert the input paths to absolute paths up front so the rest of the
+    # script does not have to guess where files live.
     project_root = Path(__file__).resolve().parents[1]
     src_dir = Path(args.src).resolve()
     dest_dir = Path(args.dest).resolve()
 
+    # Step 2: make sure the source inbox actually exists.
+    #
+    # If the user points to a folder that is missing, there is no point in
+    # continuing. We stop immediately and print a clear message instead of
+    # failing later with a more confusing error.
     if not src_dir.exists():
         print(f"Source directory does not exist: {src_dir}")
         return 1
 
+    # Step 3: make sure `exiftool` is installed.
+    #
+    # This project uses the capture date stored in the photo metadata. That date
+    # is important because it becomes part of the generated JSON metadata and it
+    # also helps build the final photo id. We rely on `exiftool` to read that
+    # metadata, so the whole ingest process depends on it being available.
     try:
         exiftool_path = require_exiftool()
     except RuntimeError as error:
         print(error)
         return 1
 
+    # Step 4: collect the photos that are candidates for ingest.
+    #
+    # `source_images()` walks through the inbox and keeps only the file types we
+    # know how to process, such as JPG, PNG, and WebP.
+    #
+    # An empty inbox is not an error. It simply means there is nothing new to do,
+    # so we exit cleanly.
     images = source_images(src_dir)
     if not images:
         print(f"No images found in {src_dir}")
         return 0
 
+    # Step 5: prepare some simple counters for the final summary.
+    #
+    # `copied` counts photos that were successfully processed.
+    # `skipped` counts photos that we deliberately ignored, for example because
+    # they did not have enough metadata or we could not work out a category.
     copied = 0
     skipped = 0
 
+    # Step 6: ensure the destination root exists before real work starts.
+    #
+    # We only do this in normal mode. In `--dry-run` mode, the whole point is to
+    # preview what would happen without changing the filesystem.
+    #
+    # Individual category folders such as `content/images/photos/iphone/` are
+    # still created later only if we actually ingest a photo into them.
+    if not args.dry_run:
+        dest_dir.mkdir(parents=True, exist_ok=True)
+
+    # Step 7: process each discovered source image one by one.
+    #
+    # We go photo-by-photo so each file gets its own category lookup, metadata
+    # lookup, generated filenames, and final success or skip message.
     for source_file in images:
+        # Step 7a: decide which gallery category this photo belongs to.
+        #
+        # Normally the category comes from the inbox folder name. For example:
+        # `inbox/street/picture.jpg` becomes category `street`.
+        #
+        # If the file sits directly under the source root instead of inside a
+        # category folder, we can fall back to `--category`.
+        #
+        # If we still cannot decide on a category, we skip the file because the
+        # site would not know which gallery page should show it.
         category = infer_category(source_file, src_dir, args.category)
         if not category:
             print(
@@ -290,6 +422,14 @@ def main() -> int:
             skipped += 1
             continue
 
+        # Step 7b: read the capture date from the image metadata.
+        #
+        # The site expects every imported photo to have a real capture timestamp.
+        # We use it for the `DateTimeOriginal` field in the JSON metadata, and it
+        # also feeds into the generated photo id.
+        #
+        # If a photo does not have a supported EXIF capture date, we skip it
+        # instead of inventing one. That keeps the stored metadata trustworthy.
         detected_dt = exif_datetime(source_file, exiftool_path)
         if not detected_dt:
             print(
@@ -300,6 +440,17 @@ def main() -> int:
             skipped += 1
             continue
 
+        # Step 7c: decide the final output paths and build the metadata payload.
+        #
+        # At this point we know enough to plan the import:
+        # - which category folder the photo belongs to
+        # - the unique id that will identify this photo on disk
+        # - the final display image path
+        # - the final thumbnail image path
+        # - the JSON metadata file path
+        #
+        # We also create the metadata dictionary that will later be written to
+        # disk. This is the record the site reads when building the photo pages.
         category_dir = dest_dir / category
         photo_id = unique_id(category_dir, detected_dt)
 
@@ -317,6 +468,13 @@ def main() -> int:
             "thumbnail_filename": thumbnail_file.name,
         }
 
+        # Step 7d: handle `--dry-run` mode.
+        #
+        # In dry-run mode we do not write, move, or delete anything. We only show
+        # which files would be created if this were a real ingest.
+        #
+        # This is helpful when you want to sanity-check a batch before letting the
+        # script actually change the repository contents.
         if args.dry_run:
             print(f"[DRY RUN] display -> {display_file}")
             print(f"[DRY RUN] thumbnail -> {thumbnail_file}")
@@ -325,23 +483,44 @@ def main() -> int:
             copied += 1
             continue
 
-        category_dir.mkdir(parents=True, exist_ok=True)
-        save_web_derivative(source_file, display_file, DISPLAY_MAX_EDGE)
-        save_web_derivative(source_file, thumbnail_file, THUMBNAIL_MAX_EDGE)
-
-        if not args.copy:
-            source_file.unlink()
-
-        metadata_file.write_text(
-            json.dumps(metadata, indent=2) + "\n", encoding="utf-8"
+        # Step 7e: run the real import.
+        #
+        # This is the point where files are actually created.
+        #
+        # We hand off to `ingest_photo_atomically()` so the related outputs for
+        # one photo stay in sync. That helper stages the generated files first and
+        # only commits them when the full set is ready. The source file is removed
+        # only after the import has succeeded.
+        ingest_photo_atomically(
+            source_file=source_file,
+            category=category,
+            project_root=project_root,
+            category_dir=category_dir,
+            metadata_file=metadata_file,
+            display_file=display_file,
+            thumbnail_file=thumbnail_file,
+            metadata=metadata,
+            copy_source=args.copy,
         )
-        ensure_gallery_page(category, project_root, dry_run=False)
 
+        # Step 7f: record and report success for this one photo.
+        #
+        # This gives immediate feedback during larger imports and makes it easier
+        # to see which file was processed most recently if something goes wrong on
+        # a later image.
         copied += 1
         print(
             f"Ingested {source_file.name} -> {display_file.relative_to(dest_dir.parent)}"
         )
 
+    # Step 8: print a final summary for the whole batch.
+    #
+    # This gives the user one simple overview at the end: how many files were
+    # ingested successfully and how many were skipped.
+    #
+    # If `--copy` was used, we also print a reminder that keeping the original
+    # inbox files around makes it easier to import the same photo again by
+    # accident on the next run.
     print(f"Done. Ingested: {copied}, Skipped: {skipped}")
     if not args.dry_run and args.copy:
         print("Tip: avoid --copy to prevent re-ingesting the same inbox files.")

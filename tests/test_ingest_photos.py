@@ -2,6 +2,7 @@ import json
 import subprocess
 from pathlib import Path
 
+import pytest
 from PIL import Image, ImageCms
 
 from scripts import ingest_photos
@@ -272,3 +273,58 @@ def test_main_writes_only_derivatives_and_metadata(tmp_path, monkeypatch):
     assert (category_dir / metadata["thumbnail_filename"]).exists()
     assert list(category_dir.glob("*.jpg")) == []
     assert not source.exists()
+
+
+def test_main_rolls_back_outputs_when_source_removal_fails(tmp_path, monkeypatch):
+    src_dir = tmp_path / "inbox" / "macro"
+    dest_dir = tmp_path / "content" / "images" / "photos"
+    src_dir.mkdir(parents=True)
+    source = src_dir / "test.jpg"
+    Image.new("RGB", (1600, 1200), color="purple").save(source, format="JPEG")
+
+    monkeypatch.setattr(
+        ingest_photos,
+        "parse_args",
+        lambda: type(
+            "Args",
+            (),
+            {
+                "src": str(tmp_path / "inbox"),
+                "dest": str(dest_dir),
+                "category": None,
+                "copy": False,
+                "draft": False,
+                "dry_run": False,
+            },
+        )(),
+    )
+    monkeypatch.setattr(ingest_photos, "require_exiftool", lambda: "/usr/bin/exiftool")
+    monkeypatch.setattr(
+        ingest_photos,
+        "exif_datetime",
+        lambda path, exiftool_path: ingest_photos.dt.datetime(2024, 2, 22, 12, 0, 5),
+    )
+    monkeypatch.setattr(
+        ingest_photos,
+        "generated_photo_id",
+        lambda captured_at: "2024-02-22-120005-a1b2c3d4",
+    )
+
+    original_unlink = Path.unlink
+
+    def fail_when_removing_source(self: Path, missing_ok: bool = False) -> None:
+        if self == source and not missing_ok:
+            raise PermissionError("cannot remove source file")
+        return original_unlink(self, missing_ok=missing_ok)
+
+    monkeypatch.setattr(Path, "unlink", fail_when_removing_source)
+
+    with pytest.raises(PermissionError):
+        ingest_photos.main()
+
+    category_dir = dest_dir / "macro"
+    assert source.exists()
+    assert not (category_dir / "2024-02-22-120005-a1b2c3d4-display.webp").exists()
+    assert not (category_dir / "2024-02-22-120005-a1b2c3d4-thumb.webp").exists()
+    assert not (category_dir / "2024-02-22-120005-a1b2c3d4.json").exists()
+    assert not (tmp_path / "content" / "pages" / "macro.md").exists()

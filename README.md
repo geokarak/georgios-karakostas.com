@@ -12,7 +12,7 @@ Drop new photos into `inbox/<category>/` and run:
 make ingest
 ```
 
-`make ingest` uses `INGEST_SRC=inbox` unless another source is passed explicitly. It reads the uploaded images, writes the published files into `content/images/photos/...`, and removes the source files from the inbox so the same photos are not imported again on the next run. Using `--copy` keeps the source files in the inbox while still storing only the generated WebP derivatives and metadata in the repository. The project requires `exiftool`, and photos without `EXIF:DateTimeOriginal` are skipped.
+`make ingest` uses `INGEST_SRC=inbox` unless another source is passed explicitly. It reads the uploaded images, writes the published files into `content/images/photos/...`, and removes the source files from the inbox so the same photos are not imported again on the next run. Using `--copy` keeps the source files in the inbox while still storing only the generated WebP derivatives and metadata in the repository. The ingest step stages files before committing them, so a failure does not leave half-written outputs behind or delete the original photo too early. The project requires `exiftool`, and photos without `EXIF:DateTimeOriginal` are skipped.
 
 Each ingested photo creates:
 
