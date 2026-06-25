@@ -3,9 +3,9 @@ from pathlib import PurePosixPath
 
 import pytest
 
-from dropbox_sync import download as download_helpers
-from dropbox_sync import finalize as finalize_helpers
-from dropbox_sync import paths as path_helpers
+from tooling.dropbox_sync import download as download_helpers
+from tooling.dropbox_sync import finalize as finalize_helpers
+from tooling.dropbox_sync import paths as path_helpers
 
 
 def test_normalize_dropbox_path_adds_leading_slash():

@@ -11,7 +11,7 @@ clean:
 	rm -rf $(OUTPUT_DIR)
 
 ingest:
-	uv run python scripts/ingest_photos.py --src $(INGEST_SRC)
+	uv run python -m tooling.ingest_photos --src $(INGEST_SRC)
 
 test:
 	uv run pytest

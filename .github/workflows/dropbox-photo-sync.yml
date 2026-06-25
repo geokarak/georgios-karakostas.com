@@ -51,7 +51,7 @@ jobs:
           DROPBOX_APP_KEY: ${{ secrets.DROPBOX_APP_KEY }}
           DROPBOX_APP_SECRET: ${{ secrets.DROPBOX_APP_SECRET }}
         run: >-
-          uv run python scripts/sync_dropbox_inbox.py
+          uv run python -m tooling.sync_dropbox_inbox
           download
           --staging-dir "$RUNNER_TEMP/dropbox-inbox"
           --dropbox-root "${DROPBOX_INBOX_PATH:-/site-photo-inbox}"
@@ -59,7 +59,7 @@ jobs:
 
       - name: Ingest staged photos
         run: >-
-          uv run python scripts/ingest_photos.py
+          uv run python -m tooling.ingest_photos
           --src "$RUNNER_TEMP/dropbox-inbox"
           --result-manifest "$RUNNER_TEMP/dropbox-ingest-results.json"
 
@@ -103,7 +103,7 @@ jobs:
           DROPBOX_APP_KEY: ${{ secrets.DROPBOX_APP_KEY }}
           DROPBOX_APP_SECRET: ${{ secrets.DROPBOX_APP_SECRET }}
         run: >-
-          uv run python scripts/sync_dropbox_inbox.py
+          uv run python -m tooling.sync_dropbox_inbox
           finalize
           --download-manifest "$RUNNER_TEMP/dropbox-download-manifest.json"
           --ingest-results "$RUNNER_TEMP/dropbox-ingest-results.json"

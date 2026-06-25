@@ -17,8 +17,8 @@
 
 ## Performance optimizations
 
-- [ ] Chunk batched EXIF extraction in `scripts/ingest_photos.py` if very large imports ever make the current in-memory batch lookup too heavy.
-- [ ] Refactor derivative generation in `scripts/ingest_photos.py` to decode/normalize each source image once, then write display + thumbnail variants from that single pass.
+- [ ] Chunk batched EXIF extraction in `tooling/ingest_photos.py` if very large imports ever make the current in-memory batch lookup too heavy.
+- [ ] Refactor derivative generation in `tooling/ingest_photos.py` to decode/normalize each source image once, then write display + thumbnail variants from that single pass.
 - [ ] Add `loading="lazy"` and `decoding="async"` on gallery thumbnails in `theme/templates/gallery.html`.
-- [ ] Stream Dropbox file downloads in `scripts/sync_dropbox_inbox.py` (chunked write) instead of reading full responses into memory.
-- [ ] Cache already-created remote archive folders in `scripts/sync_dropbox_inbox.py` to avoid repeated Dropbox folder-create API calls.
+- [ ] Stream Dropbox file downloads in `tooling/sync_dropbox_inbox.py` (chunked write) instead of reading full responses into memory.
+- [ ] Cache already-created remote archive folders in `tooling/sync_dropbox_inbox.py` to avoid repeated Dropbox folder-create API calls.

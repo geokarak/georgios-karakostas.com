@@ -8,11 +8,11 @@ from pathlib import Path
 import pytest
 from PIL import Image, ImageCms
 
-from photo_ingest import exif as exif_helpers
-from photo_ingest import images as image_helpers
-from photo_ingest import pages as page_helpers
-from photo_ingest import source as source_helpers
-from scripts import ingest_photos
+from tooling import ingest_photos
+from tooling.photo_ingest import exif as exif_helpers
+from tooling.photo_ingest import images as image_helpers
+from tooling.photo_ingest import pages as page_helpers
+from tooling.photo_ingest import source as source_helpers
 
 
 def test_slugify():

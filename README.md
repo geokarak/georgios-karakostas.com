@@ -30,7 +30,7 @@ Any new category folder under `inbox/` (for example `inbox/macro/`) is automatic
 
 The photo pipeline has two main steps:
 
-1. `scripts/ingest_photos.py` reads uploaded images from `inbox/<category>/` and writes web-ready files into `content/images/photos/<category>/`.
+1. `tooling/ingest_photos.py` reads uploaded images from `inbox/<category>/` and writes web-ready files into `content/images/photos/<category>/`.
 2. `plugins/photos/photos.py` reads those generated files and passes the photo data to the templates that render the gallery pages.
 
 The plugin reads the photo location from Pelican settings via `PHOTOS_PATH`, which currently points to `content/images/photos/`.
@@ -53,19 +53,19 @@ Useful options:
 ```bash
 # Use the default local inbox.
 # `--src` points to the folder that contains category subfolders.
-uv run python scripts/ingest_photos.py --src inbox
+uv run python -m tooling.ingest_photos --src inbox
 
 # Keep the source files in the inbox after ingest.
 # `--copy` copies instead of removing the uploaded files.
-uv run python scripts/ingest_photos.py --src inbox --copy
+uv run python -m tooling.ingest_photos --src inbox --copy
 
 # Treat top-level files as belonging to one category.
 # `--category street` is only needed when files are directly under `--src`.
-uv run python scripts/ingest_photos.py --src inbox --category street
+uv run python -m tooling.ingest_photos --src inbox --category street
 
 # Preview what would be created without writing files.
 # `--dry-run` prints the planned output paths only.
-uv run python scripts/ingest_photos.py --src inbox --dry-run
+uv run python -m tooling.ingest_photos --src inbox --dry-run
 ```
 
 ## Dropbox uploads

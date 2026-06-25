@@ -3,12 +3,12 @@
 import argparse
 from pathlib import Path
 
-from photo_ingest import exif as exif_helpers
-from photo_ingest import images as image_helpers
-from photo_ingest import pages as page_helpers
-from photo_ingest import results as result_helpers
-from photo_ingest import source as source_helpers
-from photo_ingest.transaction import ingest_photo_atomically
+from tooling.photo_ingest import exif as exif_helpers
+from tooling.photo_ingest import images as image_helpers
+from tooling.photo_ingest import pages as page_helpers
+from tooling.photo_ingest import results as result_helpers
+from tooling.photo_ingest import source as source_helpers
+from tooling.photo_ingest.transaction import ingest_photo_atomically
 
 
 def parse_args() -> argparse.Namespace:

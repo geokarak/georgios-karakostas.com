@@ -3,9 +3,9 @@
 import argparse
 from pathlib import Path
 
-from dropbox_sync import download as download_helpers
-from dropbox_sync import finalize as finalize_helpers
-from dropbox_sync import paths as path_helpers
+from tooling.dropbox_sync import download as download_helpers
+from tooling.dropbox_sync import finalize as finalize_helpers
+from tooling.dropbox_sync import paths as path_helpers
 
 
 def parse_args() -> argparse.Namespace:
