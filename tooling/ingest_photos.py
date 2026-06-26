@@ -56,101 +56,44 @@ def main() -> int:
     )
     ingest_results: list[dict[str, str]] = []
 
-    # When this script is used in the Dropbox workflow, `src_dir` points at the
-    # temporary staging directory created by `tooling.sync_dropbox_inbox download`.
-    # In that case the result manifest records decisions against staged local
-    # files, not Dropbox paths. The later reconcile step joins those staged paths
-    # back to the original Dropbox inbox files using the download manifest.
-
-    # Step 1: figure out the main folders we are going to work with.
-    #
-    # `project_root` is the root of this repository.
-    # `src_dir` is the inbox folder that contains the uploaded photos.
-    # `dest_dir` is where the generated website photo files will be written.
-    #
-    # We convert the input paths to absolute paths up front so the rest of the
-    # script does not have to guess where files live.
+    # Resolve repository and workflow paths.
     project_root = Path(__file__).resolve().parents[1]
     src_dir = Path(args.src).resolve()
     dest_dir = Path(args.dest).resolve()
 
-    # Step 2: make sure the source inbox actually exists.
-    #
-    # If the user points to a folder that is missing, there is no point in
-    # continuing. We stop immediately and print a clear message instead of
-    # failing later with a more confusing error.
+    # Validate source input.
     if not src_dir.exists():
         print(f"Source directory does not exist: {src_dir}")
         return 1
 
-    # Step 3: make sure `exiftool` is installed.
-    #
-    # This project uses the capture date stored in the photo metadata. That date
-    # is important because it becomes part of the generated JSON metadata and it
-    # also helps build the final photo id. We rely on `exiftool` to read that
-    # metadata, so the whole ingest process depends on it being available.
+    # Validate required external dependency.
     try:
         exiftool_path = exif_helpers.require_exiftool()
     except RuntimeError as error:
         print(error)
         return 1
 
-    # Step 4: collect the photos that are candidates for ingest.
-    #
-    # `source_images()` walks through the inbox and keeps only the file types we
-    # know how to process, such as JPG, PNG, and WebP.
-    #
-    # An empty inbox is not an error. It simply means there is nothing new to do,
-    # so we exit cleanly.
+    # Discover ingest candidates.
     images = source_helpers.source_images(src_dir)
     if not images:
         result_helpers.write_result_manifest(result_manifest, ingest_results)
         print(f"No images found in {src_dir}")
         return 0
 
-    # Step 4a: read the EXIF capture dates for the full batch in one go.
-    #
-    # We still process photos one by one below, but asking `exiftool` for every
-    # single file would repeat the same external process startup over and over.
-    #
-    # Instead, we ask for all candidate files in one batch here and keep the
-    # results in memory. The rest of the pipeline can then reuse those parsed
-    # dates without paying that startup cost again.
+    # Read EXIF capture timestamps in batch.
     detected_datetimes = exif_helpers.exif_datetimes(images, exiftool_path)
 
-    # Step 5: prepare some simple counters for the final summary.
-    #
-    # `copied` counts photos that were successfully processed.
-    # `skipped` counts photos that we deliberately ignored, for example because
-    # they did not have enough metadata or we could not work out a category.
+    # Track ingest outcomes.
     copied = 0
     skipped = 0
 
-    # Step 6: ensure the destination root exists before real work starts.
-    #
-    # We only do this in normal mode. In `--dry-run` mode, the whole point is to
-    # preview what would happen without changing the filesystem.
-    #
-    # Individual category folders such as `content/images/photos/iphone/` are
-    # still created later only if we actually ingest a photo into them.
+    # Prepare destination root unless dry-run mode is active.
     if not args.dry_run:
         dest_dir.mkdir(parents=True, exist_ok=True)
 
-    # Step 7: process each discovered source image one by one.
-    #
-    # We go photo-by-photo so each file gets its own category lookup, metadata
-    # lookup, generated filenames, and final success or skip message.
+    # Process photos one by one.
     for source_file in images:
-        # Step 7a: decide which gallery category this photo belongs to.
-        #
-        # Normally the category comes from the inbox folder name. For example:
-        # `inbox/street/picture.jpg` becomes category `street`.
-        #
-        # If the file sits directly under the source root instead of inside a
-        # category folder, we can fall back to `--category`.
-        #
-        # If we still cannot decide on a category, we skip the file because the
-        # site would not know which gallery page should show it.
+        # Determine category for this source image.
         category = source_helpers.infer_category(source_file, src_dir, args.category)
         if not category:
             ingest_results.append(
@@ -167,14 +110,7 @@ def main() -> int:
             skipped += 1
             continue
 
-        # Step 7b: read the capture date from the already-loaded EXIF results.
-        #
-        # The site expects every imported photo to have a real capture timestamp.
-        # We use it for the `DateTimeOriginal` field in the JSON metadata, and it
-        # also feeds into the generated photo id.
-        #
-        # If a photo does not have a supported EXIF capture date, we skip it
-        # instead of inventing one. That keeps the stored metadata trustworthy.
+        # Validate that EXIF capture time is available.
         detected_dt = detected_datetimes.get(source_file)
         if not detected_dt:
             ingest_results.append(
@@ -192,17 +128,7 @@ def main() -> int:
             skipped += 1
             continue
 
-        # Step 7c: decide the final output paths and build the metadata payload.
-        #
-        # At this point we know enough to plan the import:
-        # - which category folder the photo belongs to
-        # - the unique id that will identify this photo on disk
-        # - the final display image path
-        # - the final thumbnail image path
-        # - the JSON metadata file path
-        #
-        # We also create the metadata dictionary that will later be written to
-        # disk. This is the record the site reads when building the photo pages.
+        # Plan output files and metadata payload.
         category_dir = dest_dir / category
         photo_id = source_helpers.unique_id(
             category_dir,
@@ -226,13 +152,7 @@ def main() -> int:
             "thumbnail_filename": thumbnail_file.name,
         }
 
-        # Step 7d: handle `--dry-run` mode.
-        #
-        # In dry-run mode we do not write, move, or delete anything. We only show
-        # which files would be created if this were a real ingest.
-        #
-        # This is helpful when you want to sanity-check a batch before letting the
-        # script actually change the repository contents.
+        # Preview planned outputs in dry-run mode.
         if args.dry_run:
             print(f"[DRY RUN] display -> {display_file}")
             print(f"[DRY RUN] thumbnail -> {thumbnail_file}")
@@ -241,14 +161,7 @@ def main() -> int:
             copied += 1
             continue
 
-        # Step 7e: run the real import.
-        #
-        # This is the point where files are actually created.
-        #
-        # We hand off to `ingest_photo_atomically()` so the related outputs for
-        # one photo stay in sync. That helper stages the generated files first and
-        # only commits them when the full set is ready. The source file is removed
-        # only after the import has succeeded.
+        # Commit outputs atomically for this source image.
         ingest_photo_atomically(
             source_file=source_file,
             category=category,
@@ -261,11 +174,7 @@ def main() -> int:
             copy_source=args.copy,
         )
 
-        # Step 7f: record and report success for this one photo.
-        #
-        # This gives immediate feedback during larger imports and makes it easier
-        # to see which file was processed most recently if something goes wrong on
-        # a later image.
+        # Record successful ingest result.
         copied += 1
         ingest_results.append(
             {
@@ -277,14 +186,7 @@ def main() -> int:
             f"Ingested {source_file.name} -> {display_file.relative_to(dest_dir.parent)}"
         )
 
-    # Step 8: print a final summary for the whole batch.
-    #
-    # This gives the user one simple overview at the end: how many files were
-    # ingested successfully and how many were skipped.
-    #
-    # If `--copy` was used, we also print a reminder that keeping the original
-    # inbox files around makes it easier to import the same photo again by
-    # accident on the next run.
+    # Persist manifest and print final summary.
     result_helpers.write_result_manifest(result_manifest, ingest_results)
     print(f"Done. Ingested: {copied}, Skipped: {skipped}")
     if not args.dry_run and args.copy:

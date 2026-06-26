@@ -33,6 +33,8 @@ The photo pipeline has two main steps:
 1. `tooling/ingest_photos.py` reads uploaded images from `inbox/<category>/` and writes web-ready files into `content/images/photos/<category>/`.
 2. `plugins/photos/photos.py` reads those generated files and passes the photo data to the templates that render the gallery pages.
 
+For a step-by-step explanation of the ingest script flow, see `docs/INGEST_PHOTOS_FLOW.md`.
+
 The plugin reads the photo location from Pelican settings via `PHOTOS_PATH`, which currently points to `content/images/photos/`.
 
 For each published photo, `content/images/photos/<category>/` contains:
@@ -71,6 +73,10 @@ uv run python -m tooling.ingest_photos --src inbox --dry-run
 ## Dropbox uploads
 
 The local `inbox/` workflow can stay in place alongside a Dropbox-based upload path.
+
+Manifest file structure and examples are documented in `docs/MANIFESTS.md`.
+
+For a step-by-step explanation of Dropbox orchestration script flow, see `docs/SYNC_DROPBOX_INBOX_FLOW.md`.
 
 The `.github/workflows/dropbox-photo-sync.yml` workflow runs twice per day and can also be triggered manually from GitHub Actions.
 
