@@ -11,8 +11,8 @@ flowchart TD
     B -- download --> C[Resolve staging, inbox root, state file]
     C --> D[Download Dropbox inbox files]
     D --> E[Exit 0]
-    B -- apply --> F[Resolve state file and Dropbox targets]
-    F --> G[Apply inbox actions from ingest decisions]
+    B -- finalize --> F[Resolve state file and Dropbox targets]
+    F --> G[Finalize inbox actions from ingest decisions]
     G --> H[Exit 0]
 ```
 
@@ -25,7 +25,7 @@ For state file structure and examples, see `docs/DROPBOX_SYNC_STATE.md`.
 This script has two separate jobs:
 
 - `download`: fetch files from the Dropbox inbox into a local staging folder
-- `apply`: remove accepted files from the inbox and quarantine rejected files
+- `finalize`: remove accepted files from the inbox and quarantine rejected files
 
 The staging folder sits in the middle of those jobs. Dropbox files are
 downloaded first, then `tooling.ingest_photos` reads staged files, and only
@@ -48,7 +48,7 @@ The download phase stages files locally and writes the shared sync state file.
 It does not decide remove-from-inbox versus quarantine yet because ingest has
 not classified files at this point.
 
-### Step 4: resolve apply inputs
+### Step 4: resolve finalize inputs
 
 By this stage, ingest has already read staged files and updated the shared
 state file. That file now tells the workflow:
@@ -59,11 +59,11 @@ state file. That file now tells the workflow:
 That allows accepted files to leave the inbox while rejected files go to
 quarantine.
 
-### Step 5: run apply phase
+### Step 5: run finalize phase
 
-Apply reads the shared state file. If any entry is still missing `status`, it
-stops instead of guessing. Otherwise it applies the ingest decision back to the
-original Dropbox file.
+Finalize reads the shared state file. If any entry is still missing `status`,
+it stops instead of guessing. Otherwise it applies the ingest decision back to
+the original Dropbox file.
 
 ### Fallback return
 

@@ -93,9 +93,9 @@ jobs:
           git rebase origin/main
           git push
 
-      # Phase 2 applies the Dropbox inbox actions only after the workflow succeeds.
+      # Phase 2 finalizes the Dropbox inbox actions only after the workflow succeeds.
       # Accepted files are removed from the inbox; rejected files go to quarantine.
-      - name: Apply Dropbox inbox actions
+      - name: Finalize Dropbox inbox actions
         env:
           DROPBOX_ACCESS_TOKEN: ${{ secrets.DROPBOX_ACCESS_TOKEN }}
           DROPBOX_REFRESH_TOKEN: ${{ secrets.DROPBOX_REFRESH_TOKEN }}
@@ -103,7 +103,7 @@ jobs:
           DROPBOX_APP_SECRET: ${{ secrets.DROPBOX_APP_SECRET }}
         run: >-
           uv run python -m tooling.sync_dropbox_inbox
-          apply
+          finalize
           --state-file "$RUNNER_TEMP/dropbox-sync-state.json"
           --dropbox-root "${DROPBOX_INBOX_PATH:-/site-photo-inbox}"
           --quarantine-root "${DROPBOX_QUARANTINE_PATH:-/site-photo-quarantine}"

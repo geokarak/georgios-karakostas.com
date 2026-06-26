@@ -9,7 +9,7 @@ The Dropbox sync flow runs in phases:
 
 1. Download Dropbox files into a local staging folder.
 2. Run photo ingest on those local staged files.
-3. Apply ingest outcomes back to Dropbox.
+3. Finalize ingest outcomes back in Dropbox.
 
 The state file is the handoff across those phases.
 
@@ -38,7 +38,7 @@ uv run python -m tooling.ingest_photos ... --result-manifest <same-path>
 Read finally by:
 
 ```bash
-uv run python -m tooling.sync_dropbox_inbox apply ... --state-file <same-path>
+uv run python -m tooling.sync_dropbox_inbox finalize ... --state-file <same-path>
 ```
 
 Example:
@@ -62,12 +62,12 @@ Example:
 ## Status values
 
 - status omitted: download finished but ingest has not yet written a final outcome
-- `ingested`: ingest accepted the file, so apply removes it from Dropbox inbox
-- `skipped`: ingest rejected the file, so apply moves it to quarantine
+- `ingested`: ingest accepted the file, so finalize removes it from Dropbox inbox
+- `skipped`: ingest rejected the file, so finalize moves it to quarantine
 
-## Apply Behavior
+## Finalize Behavior
 
-Apply reads the same state file and applies one Dropbox action per entry:
+Finalize reads the same state file and applies one Dropbox action per entry:
 
 - `ingested` -> remove from `/site-photo-inbox/...`
 - `skipped` -> move to the quarantine folder

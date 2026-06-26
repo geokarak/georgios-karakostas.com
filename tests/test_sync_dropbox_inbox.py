@@ -3,7 +3,7 @@ from pathlib import PurePosixPath
 
 import pytest
 
-from tooling.dropbox_sync import apply as apply_helpers
+from tooling.dropbox_sync import finalize as finalize_helpers
 from tooling.dropbox_sync import download as download_helpers
 from tooling.dropbox_sync import paths as path_helpers
 
@@ -58,7 +58,7 @@ def test_download_dropbox_inbox_creates_staging_dir_when_inbox_is_empty(
     assert json.loads(state_file.read_text(encoding="utf-8")) == []
 
 
-def test_download_dropbox_inbox_writes_state_file_for_later_apply(
+def test_download_dropbox_inbox_writes_state_file_for_later_finalize(
     tmp_path, monkeypatch
 ):
     monkeypatch.setattr(download_helpers, "require_access_token", lambda: "token")
@@ -101,7 +101,7 @@ def test_download_dropbox_inbox_writes_state_file_for_later_apply(
     ]
 
 
-def test_apply_dropbox_inbox_actions_removes_ingested_and_quarantines_skipped(
+def test_finalize_dropbox_inbox_actions_removes_ingested_and_quarantines_skipped(
     monkeypatch, tmp_path
 ):
     state_file = tmp_path / "dropbox-sync-state.json"
@@ -126,27 +126,27 @@ def test_apply_dropbox_inbox_actions_removes_ingested_and_quarantines_skipped(
 
     removed_paths = []
     moved_paths = []
-    monkeypatch.setattr(apply_helpers, "require_access_token", lambda: "token")
+    monkeypatch.setattr(finalize_helpers, "require_access_token", lambda: "token")
     monkeypatch.setattr(
-        apply_helpers,
+        finalize_helpers,
         "remove_dropbox_file",
         lambda token, source_path: removed_paths.append((token, source_path)),
     )
     monkeypatch.setattr(
-        apply_helpers,
+        finalize_helpers,
         "move_dropbox_file",
         lambda token, source_path, destination_path: moved_paths.append(
             (token, source_path, destination_path)
         ),
     )
 
-    applied = apply_helpers.apply_dropbox_inbox_actions(
+    finalized = finalize_helpers.finalize_dropbox_inbox_actions(
         state_file=state_file,
         inbox_root=PurePosixPath("/site-photo-inbox"),
         quarantine_root=PurePosixPath("/site-photo-quarantine"),
     )
 
-    assert applied == 2
+    assert finalized == 2
     assert removed_paths == [
         (
             "token",
@@ -162,7 +162,7 @@ def test_apply_dropbox_inbox_actions_removes_ingested_and_quarantines_skipped(
     ]
 
 
-def test_apply_dropbox_inbox_actions_fails_when_state_is_missing_ingest_results(
+def test_finalize_dropbox_inbox_actions_fails_when_state_is_missing_ingest_results(
     monkeypatch, tmp_path
 ):
     state_file = tmp_path / "dropbox-sync-state.json"
@@ -180,14 +180,14 @@ def test_apply_dropbox_inbox_actions_fails_when_state_is_missing_ingest_results(
 
     removed_paths = []
     moved_paths = []
-    monkeypatch.setattr(apply_helpers, "require_access_token", lambda: "token")
+    monkeypatch.setattr(finalize_helpers, "require_access_token", lambda: "token")
     monkeypatch.setattr(
-        apply_helpers,
+        finalize_helpers,
         "remove_dropbox_file",
         lambda token, source_path: removed_paths.append((token, source_path)),
     )
     monkeypatch.setattr(
-        apply_helpers,
+        finalize_helpers,
         "move_dropbox_file",
         lambda token, source_path, destination_path: moved_paths.append(
             (token, source_path, destination_path)
@@ -195,7 +195,7 @@ def test_apply_dropbox_inbox_actions_fails_when_state_is_missing_ingest_results(
     )
 
     with pytest.raises(RuntimeError, match="missing ingest results"):
-        apply_helpers.apply_dropbox_inbox_actions(
+        finalize_helpers.finalize_dropbox_inbox_actions(
             state_file=state_file,
             inbox_root=PurePosixPath("/site-photo-inbox"),
             quarantine_root=PurePosixPath("/site-photo-quarantine"),

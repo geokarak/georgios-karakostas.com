@@ -3,14 +3,14 @@
 import argparse
 from pathlib import Path
 
-from tooling.dropbox_sync import apply as apply_helpers
+from tooling.dropbox_sync import finalize as finalize_helpers
 from tooling.dropbox_sync import download as download_helpers
 from tooling.dropbox_sync import paths as path_helpers
 
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Download Dropbox photos for ingest, then apply the results later.",
+        description="Download Dropbox photos for ingest, then finalize the Dropbox inbox later.",
     )
     subparsers = parser.add_subparsers(dest="command", required=True)
 
@@ -29,24 +29,24 @@ def parse_args() -> argparse.Namespace:
     download_parser.add_argument(
         "--state-file",
         required=True,
-        help="JSON file that tracks Dropbox files through download, ingest, and apply",
+        help="JSON file that tracks Dropbox files through download, ingest, and finalize",
     )
 
-    apply_parser = subparsers.add_parser(
-        "apply",
+    finalize_parser = subparsers.add_parser(
+        "finalize",
         help="Remove accepted Dropbox files from the inbox and quarantine rejected ones.",
     )
-    apply_parser.add_argument(
+    finalize_parser.add_argument(
         "--state-file",
         required=True,
-        help="JSON file shared by the download, ingest, and apply steps",
+        help="JSON file shared by the download, ingest, and finalize steps",
     )
-    apply_parser.add_argument(
+    finalize_parser.add_argument(
         "--dropbox-root",
         required=True,
         help="Dropbox inbox directory, for example /site-photo-inbox",
     )
-    apply_parser.add_argument(
+    finalize_parser.add_argument(
         "--quarantine-root",
         default="/site-photo-quarantine",
         help="Dropbox quarantine directory for rejected files",
@@ -73,14 +73,14 @@ def main() -> int:
         )
         return 0
 
-    if args.command == "apply":
+    if args.command == "finalize":
         # Resolve the shared sync state file and Dropbox targets.
         state_file = Path(args.state_file).resolve()
         inbox_root = path_helpers.normalize_dropbox_path(args.dropbox_root)
         quarantine_root = path_helpers.normalize_dropbox_path(args.quarantine_root)
 
-        # Apply ingest decisions back to Dropbox.
-        apply_helpers.apply_dropbox_inbox_actions(
+        # Finalize ingest decisions back in Dropbox.
+        finalize_helpers.finalize_dropbox_inbox_actions(
             state_file=state_file,
             inbox_root=inbox_root,
             quarantine_root=quarantine_root,

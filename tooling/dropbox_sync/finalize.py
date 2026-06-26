@@ -1,4 +1,4 @@
-"""Helpers for applying Dropbox inbox actions.
+"""Helpers for finalizing Dropbox inbox actions.
 
 This module owns the final workflow phase: read the shared sync state file,
 fail loudly if any entry is still missing an ingest outcome, remove accepted
@@ -13,12 +13,12 @@ from .paths import quarantine_destination, validate_target_root
 from .state import read_state_file, validate_state_entries
 
 
-def apply_dropbox_inbox_actions(
+def finalize_dropbox_inbox_actions(
     state_file: Path,
     inbox_root: PurePosixPath,
     quarantine_root: PurePosixPath,
 ) -> int:
-    """Apply Dropbox inbox actions from the shared sync state.
+    """Finalize Dropbox inbox actions from the shared sync state.
 
     Rules:
     - `ingested` -> remove the original Dropbox file from the inbox
@@ -29,7 +29,7 @@ def apply_dropbox_inbox_actions(
 
     state_entries = read_state_file(state_file)
     if not state_entries:
-        print("No Dropbox actions to apply")
+        print("No Dropbox actions to finalize")
         return 0
 
     validate_state_entries(state_entries)

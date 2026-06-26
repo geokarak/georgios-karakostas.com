@@ -105,10 +105,10 @@ The workflow will:
 Dropbox file lifecycle:
 
 - The Dropbox sync workflow keeps one JSON state file for the current run. Each entry records the original Dropbox path and the temporary local source file. Ingest adds `status` only after it has decided the outcome.
-- `ingested`: the file was imported successfully into the site. During apply, it is removed from the Dropbox inbox.
-- `skipped`: the file was rejected by ingest. During apply, it is moved to the quarantine folder instead of being removed.
+- `ingested`: the file was imported successfully into the site. During finalize, it is removed from the Dropbox inbox.
+- `skipped`: the file was rejected by ingest. During finalize, it is moved to the quarantine folder instead of being removed.
 
-Apply rules:
+Finalize rules:
 
 - if a state entry is `ingested`, remove the original Dropbox file from the inbox
 - if a state entry is `skipped`, move the original Dropbox file to quarantine

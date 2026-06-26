@@ -4,7 +4,7 @@ The Dropbox photo workflow uses one JSON state file across all phases:
 
 - download records the original Dropbox path and the local source file path
 - ingest adds the final `status` for each processed file
-- apply uses the final Dropbox action from that same file
+- finalize uses the final Dropbox action from that same file
 """
 
 import json
