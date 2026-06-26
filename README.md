@@ -12,7 +12,7 @@ Drop new photos into `inbox/<category>/` and run:
 make ingest
 ```
 
-`make ingest` uses `INGEST_SRC=inbox` unless another source is passed explicitly. It reads the uploaded images, writes the published files into `content/images/photos/...`, and removes the source files from the inbox so the same photos are not imported again on the next run. Using `--copy` keeps the source files in the inbox while still storing only the generated WebP derivatives and metadata in the repository. The ingest step stages files before committing them, so a failure does not leave half-written outputs behind or delete the original photo too early. The project requires `exiftool`, and photos without `EXIF:DateTimeOriginal` are skipped.
+`make ingest` uses `INGEST_SRC=inbox` unless another source is passed explicitly. It reads the uploaded images from category subfolders, writes the published files into `content/images/photos/...`, and removes the source files from the inbox so the same photos are not imported again on the next run. The ingest step stages files before committing them, so a failure does not leave half-written outputs behind or delete the original photo too early. The project requires `exiftool`, and photos without `EXIF:DateTimeOriginal` are skipped.
 
 Each ingested photo creates:
 
@@ -56,14 +56,6 @@ Useful options:
 # Use the default local inbox.
 # `--src` points to the folder that contains category subfolders.
 uv run python -m tooling.ingest_photos --src inbox
-
-# Keep the source files in the inbox after ingest.
-# `--copy` copies instead of removing the uploaded files.
-uv run python -m tooling.ingest_photos --src inbox --copy
-
-# Treat top-level files as belonging to one category.
-# `--category street` is only needed when files are directly under `--src`.
-uv run python -m tooling.ingest_photos --src inbox --category street
 
 # Preview what would be created without writing files.
 # `--dry-run` prints the planned output paths only.
@@ -116,7 +108,7 @@ Finalize rules:
 
 Current skip reasons written into Dropbox sync state or a standalone ingest results file:
 
-- `missing-category`: the file was not inside a category folder and no `--category` fallback was provided.
+- `missing-category`: the file was not inside a category folder.
 - `missing-exif-datetimeoriginal`: the file does not have the required `EXIF:DateTimeOriginal` capture timestamp.
 
 Required GitHub secrets:

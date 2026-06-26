@@ -27,16 +27,6 @@ def parse_args() -> argparse.Namespace:
         help="Destination photos directory",
     )
     parser.add_argument(
-        "--category",
-        default=None,
-        help="Fallback category for images directly under --src",
-    )
-    parser.add_argument(
-        "--copy",
-        action="store_true",
-        help="Copy files instead of moving them (default is move)",
-    )
-    parser.add_argument(
         "--draft",
         action="store_true",
         help="Mark ingested photos as unpublished",
@@ -142,7 +132,7 @@ def main() -> int:
     detected_datetimes = exif_helpers.exif_datetimes(images, exiftool_path)
 
     # Track ingest outcomes.
-    copied = 0
+    ingested = 0
     skipped = 0
 
     # Prepare destination root unless dry-run mode is active.
@@ -151,8 +141,8 @@ def main() -> int:
 
     # Process photos one by one.
     for source_file in images:
-        # Determine category for this source image.
-        category = source_helpers.infer_category(source_file, src_dir, args.category)
+        # Read category from the source path.
+        category = source_helpers.get_category(source_file, src_dir)
         if not category:
             ingest_results.append(
                 {
@@ -162,8 +152,7 @@ def main() -> int:
                 }
             )
             print(
-                "Skipping "
-                f"{source_file}: no category found. Use subfolders or pass --category."
+                f"Skipping {source_file}: not inside a category folder. Place photos in category subfolders."
             )
             skipped += 1
             continue
@@ -216,7 +205,7 @@ def main() -> int:
             print(f"[DRY RUN] thumbnail -> {thumbnail_file}")
             print(f"[DRY RUN] metadata -> {metadata_file}")
             page_helpers.ensure_gallery_page(category, project_root, dry_run=True)
-            copied += 1
+            ingested += 1
             continue
 
         # Commit outputs atomically for this source image.
@@ -229,11 +218,10 @@ def main() -> int:
             display_file=display_file,
             thumbnail_file=thumbnail_file,
             metadata=metadata,
-            copy_source=args.copy,
         )
 
         # Record successful ingest result.
-        copied += 1
+        ingested += 1
         ingest_results.append(
             {
                 "source_file": str(source_file.resolve()),
@@ -246,9 +234,7 @@ def main() -> int:
 
     # Persist ingest results and print final summary.
     write_result_manifest(result_manifest, ingest_results)
-    print(f"Done. Ingested: {copied}, Skipped: {skipped}")
-    if not args.dry_run and args.copy:
-        print("Tip: avoid --copy to prevent re-ingesting the same inbox files.")
+    print(f"Done. Ingested: {ingested}, Skipped: {skipped}")
 
     return 0
 

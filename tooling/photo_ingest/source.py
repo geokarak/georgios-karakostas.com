@@ -23,15 +23,11 @@ def generated_photo_id(captured_at: dt.datetime) -> str:
     return f"{captured_at.strftime('%Y-%m-%d-%H%M%S')}-{secrets.token_hex(4)}"
 
 
-def infer_category(
-    source_file: Path, src_root: Path, fallback: str | None
-) -> str | None:
-    """Choose the gallery category from the source folder or fallback value."""
+def get_category(source_file: Path, src_root: Path) -> str | None:
+    """Read the gallery category from the source file path."""
     relative = source_file.relative_to(src_root)
     if len(relative.parts) > 1:
         return slugify(relative.parts[0])
-    if fallback:
-        return slugify(fallback)
     return None
 
 

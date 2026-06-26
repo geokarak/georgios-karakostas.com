@@ -77,7 +77,7 @@ candidate files in one batch and reuses the parsed results.
 
 ### Step 5: prepare counters
 
-- `copied` counts photos that were successfully processed.
+- `ingested` counts photos that were successfully processed.
 - `skipped` counts photos deliberately ignored, for example because of missing
   metadata or unresolved category.
 
@@ -94,14 +94,14 @@ when ingest actually writes a photo into them.
 The script processes photos one by one so each file gets its own category
 lookup, metadata lookup, generated filenames, and final status.
 
-#### Step 7a: decide category
+#### Step 7a: read category from path
 
 Normally category comes from the inbox folder name, for example
 `inbox/street/picture.jpg` becomes category `street`.
 
-If a file is directly under the source root, `--category` can provide a
-fallback. If category still cannot be decided, the file is skipped because the
-site would not know which gallery page should display it.
+Category comes from the first subfolder under the source root. If a file is
+directly under the source root, it is skipped because the site would not know
+which gallery page should display it.
 
 #### Step 7b: validate capture date
 
@@ -149,6 +149,3 @@ later file fails.
 ### Step 8: final summary
 
 The final message reports total ingested and skipped photos.
-
-If `--copy` was used, a reminder is shown that keeping originals in the inbox
-makes it easier to re-ingest the same files by accident on the next run.

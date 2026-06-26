@@ -20,8 +20,6 @@ def patch_ingest_args(monkeypatch, tmp_path, **overrides):
     args = {
         "src": tmp_path / "inbox",
         "dest": tmp_path / "content" / "images" / "photos",
-        "category": None,
-        "copy": False,
         "draft": False,
         "dry_run": False,
         "result_manifest": None,
@@ -50,19 +48,13 @@ def test_slugify():
     assert source_helpers.slugify("  Hello, World!  ") == "hello-world"
 
 
-def test_infer_category():
+def test_get_category():
     src_root = Path("/tmp/inbox")
     nested = src_root / "Street Shots" / "img.jpg"
     top_level = src_root / "img.jpg"
 
-    assert (
-        source_helpers.infer_category(nested, src_root, fallback=None) == "street-shots"
-    )
-    assert (
-        source_helpers.infer_category(top_level, src_root, fallback="Travel Photos")
-        == "travel-photos"
-    )
-    assert source_helpers.infer_category(top_level, src_root, fallback=None) is None
+    assert source_helpers.get_category(nested, src_root) == "street-shots"
+    assert source_helpers.get_category(top_level, src_root) is None
 
 
 def test_unique_id_retries_when_files_exist(tmp_path, monkeypatch):

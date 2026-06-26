@@ -30,7 +30,6 @@ def ingest_photo_atomically(
     display_file: Path,
     thumbnail_file: Path,
     metadata: dict[str, str | bool],
-    copy_source: bool,
 ) -> None:
     """Stage one photo import first, then commit it as one safe unit."""
     staging_root = Path(
@@ -72,8 +71,7 @@ def ingest_photo_atomically(
             commit_staged_file(staged_page_file, page_file)
             created_page = True
 
-        if not copy_source:
-            source_file.unlink()
+        source_file.unlink()
     except Exception:
         for committed_path in reversed(committed_paths):
             committed_path.unlink(missing_ok=True)
