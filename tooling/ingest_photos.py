@@ -1,12 +1,17 @@
 #!/usr/bin/env python3
 
 import argparse
+import json
 from pathlib import Path
 
+from tooling.dropbox_sync.state import (
+    read_state_file,
+    validate_state_entries,
+    write_state_file,
+)
 from tooling.photo_ingest import exif as exif_helpers
 from tooling.photo_ingest import images as image_helpers
 from tooling.photo_ingest import pages as page_helpers
-from tooling.photo_ingest import results as result_helpers
 from tooling.photo_ingest import source as source_helpers
 from tooling.photo_ingest.transaction import ingest_photo_atomically
 
@@ -44,9 +49,62 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--result-manifest",
         default=None,
-        help="Optional JSON file that records which local source files were ingested or skipped",
+        help=(
+            "Optional JSON file that records ingest outcomes. "
+            "When the file already contains Dropbox sync state entries, "
+            "statuses are merged into that file instead of replacing it."
+        ),
     )
     return parser.parse_args()
+
+
+def write_result_manifest(
+    manifest_file: Path | None, entries: list[dict[str, str]]
+) -> None:
+    """Write ingest results or merge them into Dropbox sync state."""
+    if manifest_file is None:
+        return
+
+    existing_entries = read_state_file(manifest_file)
+    if any(
+        isinstance(entry, dict) and "source_path" in entry for entry in existing_entries
+    ):
+        validate_state_entries(existing_entries)
+        ingest_entry_by_source_file = {entry["source_file"]: entry for entry in entries}
+        unexpected_results = sorted(
+            source_file
+            for source_file in ingest_entry_by_source_file
+            if source_file not in {entry["source_file"] for entry in existing_entries}
+        )
+        if unexpected_results:
+            raise RuntimeError(
+                "Ingest results do not match the existing Dropbox sync state: "
+                + ", ".join(unexpected_results)
+            )
+
+        merged_entries = []
+        for existing_entry in existing_entries:
+            source_file = existing_entry["source_file"]
+            ingest_entry = ingest_entry_by_source_file.get(source_file)
+            if ingest_entry is None:
+                merged_entries.append(existing_entry)
+                continue
+
+            merged_entry = {
+                "source_path": existing_entry["source_path"],
+                "source_file": source_file,
+                "status": ingest_entry["status"],
+            }
+            reason = ingest_entry.get("reason")
+            if reason:
+                merged_entry["reason"] = reason
+            merged_entries.append(merged_entry)
+
+        write_state_file(manifest_file, merged_entries)
+        return
+
+    manifest_file.parent.mkdir(parents=True, exist_ok=True)
+    manifest_file.write_text(json.dumps(entries, indent=2) + "\n", encoding="utf-8")
 
 
 def main() -> int:
@@ -76,7 +134,7 @@ def main() -> int:
     # Discover ingest candidates.
     images = source_helpers.source_images(src_dir)
     if not images:
-        result_helpers.write_result_manifest(result_manifest, ingest_results)
+        write_result_manifest(result_manifest, ingest_results)
         print(f"No images found in {src_dir}")
         return 0
 
@@ -186,8 +244,8 @@ def main() -> int:
             f"Ingested {source_file.name} -> {display_file.relative_to(dest_dir.parent)}"
         )
 
-    # Persist manifest and print final summary.
-    result_helpers.write_result_manifest(result_manifest, ingest_results)
+    # Persist ingest results and print final summary.
+    write_result_manifest(result_manifest, ingest_results)
     print(f"Done. Ingested: {copied}, Skipped: {skipped}")
     if not args.dry_run and args.copy:
         print("Tip: avoid --copy to prevent re-ingesting the same inbox files.")

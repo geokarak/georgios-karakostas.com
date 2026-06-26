@@ -74,7 +74,7 @@ uv run python -m tooling.ingest_photos --src inbox --dry-run
 
 The local `inbox/` workflow can stay in place alongside a Dropbox-based upload path.
 
-Manifest file structure and examples are documented in `docs/MANIFESTS.md`.
+Dropbox sync state is documented in `docs/DROPBOX_SYNC_STATE.md`.
 
 For a step-by-step explanation of Dropbox orchestration script flow, see `docs/SYNC_DROPBOX_INBOX_FLOW.md`.
 
@@ -96,7 +96,7 @@ Upload photos into `site-photo-inbox/<category>/` from any device that can write
 The workflow will:
 
 - download supported images from Dropbox into a temporary inbox
-- run the existing ingest flow unchanged
+- run the existing ingest flow against that temporary inbox
 - run tests and build the site
 - commit and push any generated photo files and gallery pages
 - remove successfully processed Dropbox files from the Dropbox inbox only after the workflow succeeds
@@ -104,18 +104,17 @@ The workflow will:
 
 Dropbox file lifecycle:
 
-- Naming convention in the Dropbox sync code: `dropbox_*` means Dropbox-specific paths or operations, and `staged_*` means local temporary files created during the download step.
-- Pending: the file is still sitting in `site-photo-inbox/<category>/` and has not been processed yet. This is an implied state in Dropbox, not a manifest status.
-- `ingested`: the file was imported successfully into the site. During reconcile, it is removed from the Dropbox inbox.
-- `skipped`: the file was rejected by ingest. During reconcile, it is moved to the quarantine folder instead of being removed.
+- The Dropbox sync workflow keeps one JSON state file for the current run. Each entry records the original Dropbox path and the temporary local source file. Ingest adds `status` only after it has decided the outcome.
+- `ingested`: the file was imported successfully into the site. During apply, it is removed from the Dropbox inbox.
+- `skipped`: the file was rejected by ingest. During apply, it is moved to the quarantine folder instead of being removed.
 
-Reconcile rules:
+Apply rules:
 
-- if a staged file was `ingested`, remove the original Dropbox file from the inbox
-- if a staged file was `skipped`, move the original Dropbox file to quarantine
-- if the manifests do not line up, stop instead of guessing
+- if a state entry is `ingested`, remove the original Dropbox file from the inbox
+- if a state entry is `skipped`, move the original Dropbox file to quarantine
+- if any state entry is still missing `status`, stop instead of guessing
 
-Current skip reasons written to the ingest results manifest:
+Current skip reasons written into Dropbox sync state or a standalone ingest results file:
 
 - `missing-category`: the file was not inside a category folder and no `--category` fallback was provided.
 - `missing-exif-datetimeoriginal`: the file does not have the required `EXIF:DateTimeOriginal` capture timestamp.

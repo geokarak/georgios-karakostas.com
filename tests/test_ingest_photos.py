@@ -1,3 +1,4 @@
+import argparse
 import json
 import subprocess
 import sys
@@ -13,6 +14,36 @@ from tooling.photo_ingest import exif as exif_helpers
 from tooling.photo_ingest import images as image_helpers
 from tooling.photo_ingest import pages as page_helpers
 from tooling.photo_ingest import source as source_helpers
+
+
+def patch_ingest_args(monkeypatch, tmp_path, **overrides):
+    args = {
+        "src": tmp_path / "inbox",
+        "dest": tmp_path / "content" / "images" / "photos",
+        "category": None,
+        "copy": False,
+        "draft": False,
+        "dry_run": False,
+        "result_manifest": None,
+    }
+    args.update(overrides)
+
+    for key in ("src", "dest", "result_manifest"):
+        value = args[key]
+        if value is not None:
+            args[key] = str(value)
+
+    monkeypatch.setattr(ingest_photos, "parse_args", lambda: argparse.Namespace(**args))
+
+
+def stub_exiftool_run(monkeypatch, payload):
+    monkeypatch.setattr(
+        exif_helpers.subprocess,
+        "run",
+        lambda *args, **kwargs: subprocess.CompletedProcess(
+            args[0], 0, stdout=json.dumps(payload), stderr=""
+        ),
+    )
 
 
 def test_slugify():
@@ -76,38 +107,40 @@ def test_parse_exiftool_datetime_supports_common_formats():
     )
 
 
-def test_exiftool_datetime_from_metadata_prefers_supported_tags():
-    metadata = {
-        "ExifIFD:CreateDate": "2015:04:16 13:01:15",
-        "ExifIFD:DateTimeOriginal": "2015:04:16 12:59:59",
-    }
-
-    detected = exif_helpers.exiftool_datetime_from_metadata(metadata)
-    assert detected.strftime("%Y-%m-%d %H:%M:%S") == "2015-04-16 12:59:59"
-
-
-def test_exif_datetimes_prefers_original_date_tags(monkeypatch, tmp_path):
+@pytest.mark.parametrize(
+    ("metadata", "expected"),
+    [
+        (
+            {
+                "ExifIFD:CreateDate": "2015:04:16 13:01:15",
+                "ExifIFD:DateTimeOriginal": "2015:04:16 12:59:59",
+            },
+            "2015-04-16 12:59:59",
+        ),
+        (
+            {
+                "ExifIFD:CreateDate": "2016:05:17 14:02:16",
+            },
+            "2016-05-17 14:02:16",
+        ),
+        (
+            {
+                "XMP:CreateDate": "2015:04:16 13:01:15",
+            },
+            None,
+        ),
+    ],
+)
+def test_exif_datetimes_reads_supported_tags(monkeypatch, tmp_path, metadata, expected):
     sample = tmp_path / "sample.jpg"
     sample.write_bytes(b"x")
-    payload = json.dumps(
-        [
-            {
-                "SourceFile": str(sample.resolve()),
-                "ExifIFD:DateTimeOriginal": "2015:04:16 13:01:15",
-            }
-        ]
-    )
-
-    monkeypatch.setattr(
-        exif_helpers.subprocess,
-        "run",
-        lambda *args, **kwargs: subprocess.CompletedProcess(
-            args[0], 0, stdout=payload, stderr=""
-        ),
-    )
+    stub_exiftool_run(monkeypatch, [{"SourceFile": str(sample.resolve()), **metadata}])
 
     detected = exif_helpers.exif_datetimes([sample], "/usr/bin/exiftool")[sample]
-    assert detected.strftime("%Y-%m-%d") == "2015-04-16"
+    if expected is None:
+        assert detected is None
+    else:
+        assert detected.strftime("%Y-%m-%d %H:%M:%S") == expected
 
 
 def test_exif_datetimes_reads_multiple_files_in_one_call(monkeypatch, tmp_path):
@@ -115,7 +148,8 @@ def test_exif_datetimes_reads_multiple_files_in_one_call(monkeypatch, tmp_path):
     second = tmp_path / "second.jpg"
     first.write_bytes(b"x")
     second.write_bytes(b"y")
-    payload = json.dumps(
+    stub_exiftool_run(
+        monkeypatch,
         [
             {
                 "SourceFile": str(first.resolve()),
@@ -125,15 +159,7 @@ def test_exif_datetimes_reads_multiple_files_in_one_call(monkeypatch, tmp_path):
                 "SourceFile": str(second.resolve()),
                 "ExifIFD:CreateDate": "2016:05:17 14:02:16",
             },
-        ]
-    )
-
-    monkeypatch.setattr(
-        exif_helpers.subprocess,
-        "run",
-        lambda *args, **kwargs: subprocess.CompletedProcess(
-            args[0], 0, stdout=payload, stderr=""
-        ),
+        ],
     )
 
     detected = exif_helpers.exif_datetimes([first, second], "/usr/bin/exiftool")
@@ -188,73 +214,18 @@ def test_exif_datetimes_processes_multiple_chunks(monkeypatch, tmp_path):
     assert all(value is not None for value in detected.values())
 
 
-def test_exif_datetimes_returns_createdate_when_datetimeoriginal_missing(
-    monkeypatch, tmp_path
-):
-    sample = tmp_path / "sample.jpg"
-    sample.write_bytes(b"x")
-    payload = json.dumps(
-        [
-            {
-                "SourceFile": str(sample.resolve()),
-                "ExifIFD:CreateDate": "2015:04:16 13:01:15",
-                "XMP:CreateDate": "2015:04:16 13:01:15",
-            }
-        ]
-    )
+@pytest.mark.parametrize(
+    ("category", "title"), [("macro", "Macro"), ("iphone", "iPhone")]
+)
+def test_ensure_gallery_page_creates_page(tmp_path, category, title):
+    page_helpers.ensure_gallery_page(category, tmp_path, dry_run=False)
 
-    monkeypatch.setattr(
-        exif_helpers.subprocess,
-        "run",
-        lambda *args, **kwargs: subprocess.CompletedProcess(
-            args[0], 0, stdout=payload, stderr=""
-        ),
-    )
-
-    detected = exif_helpers.exif_datetimes([sample], "/usr/bin/exiftool")[sample]
-    assert detected.strftime("%Y-%m-%d %H:%M:%S") == "2015-04-16 13:01:15"
-
-
-def test_exif_datetimes_returns_none_without_supported_exif_tags(monkeypatch, tmp_path):
-    sample = tmp_path / "sample.jpg"
-    sample.write_bytes(b"x")
-    payload = json.dumps(
-        [
-            {
-                "SourceFile": str(sample.resolve()),
-                "XMP:CreateDate": "2015:04:16 13:01:15",
-            }
-        ]
-    )
-
-    monkeypatch.setattr(
-        exif_helpers.subprocess,
-        "run",
-        lambda *args, **kwargs: subprocess.CompletedProcess(
-            args[0], 0, stdout=payload, stderr=""
-        ),
-    )
-
-    assert exif_helpers.exif_datetimes([sample], "/usr/bin/exiftool")[sample] is None
-
-
-def test_ensure_gallery_page_creates_page(tmp_path):
-    page_helpers.ensure_gallery_page("macro", tmp_path, dry_run=False)
-
-    page_file = tmp_path / "content" / "pages" / "macro.md"
+    page_file = tmp_path / "content" / "pages" / f"{category}.md"
+    text = page_file.read_text(encoding="utf-8")
     assert page_file.exists()
-    text = page_file.read_text(encoding="utf-8")
-    assert "title: Macro" in text
-    assert "slug: macro" in text
+    assert f"title: {title}" in text
+    assert f"slug: {category}" in text
     assert "template: gallery" in text
-
-
-def test_ensure_gallery_page_handles_iphone_exception(tmp_path):
-    page_helpers.ensure_gallery_page("iphone", tmp_path, dry_run=False)
-
-    page_file = tmp_path / "content" / "pages" / "iphone.md"
-    text = page_file.read_text(encoding="utf-8")
-    assert "title: iPhone" in text
 
 
 def test_source_images_filters_supported_extensions(tmp_path):
@@ -264,21 +235,6 @@ def test_source_images_filters_supported_extensions(tmp_path):
 
     found = source_helpers.source_images(tmp_path)
     assert [path.name for path in found] == ["a.jpg", "c.PNG"]
-
-
-def test_generated_metadata_schema_is_serializable():
-    metadata = {
-        "id": "2024-01-01-132045-a1b2c3d4",
-        "category": "street",
-        "DateTimeOriginal": "2024:01:01 13:20:45",
-        "location": "",
-        "caption": "",
-        "published": True,
-        "display_filename": "2024-01-01-132045-a1b2c3d4-display.webp",
-        "thumbnail_filename": "2024-01-01-132045-a1b2c3d4-thumb.webp",
-    }
-    serialized = json.dumps(metadata)
-    assert isinstance(serialized, str)
 
 
 def test_save_web_derivative_resizes_large_image(tmp_path):
@@ -328,22 +284,8 @@ def test_main_writes_only_derivatives_and_metadata(tmp_path, monkeypatch):
     source = src_dir / "test.jpg"
     Image.new("RGB", (1600, 1200), color="green").save(source, format="JPEG")
 
-    monkeypatch.setattr(
-        ingest_photos,
-        "parse_args",
-        lambda: type(
-            "Args",
-            (),
-            {
-                "src": str(tmp_path / "inbox"),
-                "dest": str(dest_dir),
-                "category": None,
-                "copy": False,
-                "draft": False,
-                "dry_run": False,
-                "result_manifest": str(result_manifest),
-            },
-        )(),
+    patch_ingest_args(
+        monkeypatch, tmp_path, dest=dest_dir, result_manifest=result_manifest
     )
     monkeypatch.setattr(exif_helpers, "require_exiftool", lambda: "/usr/bin/exiftool")
     monkeypatch.setattr(
@@ -391,29 +333,12 @@ def test_main_writes_only_derivatives_and_metadata(tmp_path, monkeypatch):
 
 def test_main_writes_skip_results_to_manifest(tmp_path, monkeypatch):
     src_dir = tmp_path / "inbox" / "iphone"
-    dest_dir = tmp_path / "content" / "images" / "photos"
     result_manifest = tmp_path / "ingest-results.json"
     src_dir.mkdir(parents=True)
     skipped_source = src_dir / "skipped.jpg"
     Image.new("RGB", (1600, 1200), color="orange").save(skipped_source, format="JPEG")
 
-    monkeypatch.setattr(
-        ingest_photos,
-        "parse_args",
-        lambda: type(
-            "Args",
-            (),
-            {
-                "src": str(tmp_path / "inbox"),
-                "dest": str(dest_dir),
-                "category": None,
-                "copy": False,
-                "draft": False,
-                "dry_run": False,
-                "result_manifest": str(result_manifest),
-            },
-        )(),
-    )
+    patch_ingest_args(monkeypatch, tmp_path, result_manifest=result_manifest)
     monkeypatch.setattr(exif_helpers, "require_exiftool", lambda: "/usr/bin/exiftool")
     monkeypatch.setattr(
         exif_helpers,
@@ -432,6 +357,44 @@ def test_main_writes_skip_results_to_manifest(tmp_path, monkeypatch):
     ]
 
 
+def test_main_merges_results_into_existing_dropbox_sync_state(tmp_path, monkeypatch):
+    src_dir = tmp_path / "inbox" / "iphone"
+    state_file = tmp_path / "dropbox-sync-state.json"
+    src_dir.mkdir(parents=True)
+    skipped_source = src_dir / "skipped.jpg"
+    Image.new("RGB", (1600, 1200), color="orange").save(skipped_source, format="JPEG")
+    state_file.write_text(
+        json.dumps(
+            [
+                {
+                    "source_path": "/site-photo-inbox/iphone/skipped.jpg",
+                    "source_file": str(skipped_source.resolve()),
+                }
+            ]
+        ),
+        encoding="utf-8",
+    )
+
+    patch_ingest_args(monkeypatch, tmp_path, result_manifest=state_file)
+    monkeypatch.setattr(exif_helpers, "require_exiftool", lambda: "/usr/bin/exiftool")
+    monkeypatch.setattr(
+        exif_helpers,
+        "exif_datetimes",
+        lambda paths, exiftool_path: {path: None for path in paths},
+    )
+
+    assert ingest_photos.main() == 0
+
+    assert json.loads(state_file.read_text(encoding="utf-8")) == [
+        {
+            "source_path": "/site-photo-inbox/iphone/skipped.jpg",
+            "source_file": str(skipped_source.resolve()),
+            "status": "skipped",
+            "reason": "missing-exif-datetimeoriginal",
+        }
+    ]
+
+
 def test_main_rolls_back_outputs_when_source_removal_fails(tmp_path, monkeypatch):
     src_dir = tmp_path / "inbox" / "macro"
     dest_dir = tmp_path / "content" / "images" / "photos"
@@ -439,23 +402,7 @@ def test_main_rolls_back_outputs_when_source_removal_fails(tmp_path, monkeypatch
     source = src_dir / "test.jpg"
     Image.new("RGB", (1600, 1200), color="purple").save(source, format="JPEG")
 
-    monkeypatch.setattr(
-        ingest_photos,
-        "parse_args",
-        lambda: type(
-            "Args",
-            (),
-            {
-                "src": str(tmp_path / "inbox"),
-                "dest": str(dest_dir),
-                "category": None,
-                "copy": False,
-                "draft": False,
-                "dry_run": False,
-                "result_manifest": None,
-            },
-        )(),
-    )
+    patch_ingest_args(monkeypatch, tmp_path, dest=dest_dir)
     monkeypatch.setattr(exif_helpers, "require_exiftool", lambda: "/usr/bin/exiftool")
     monkeypatch.setattr(
         exif_helpers,

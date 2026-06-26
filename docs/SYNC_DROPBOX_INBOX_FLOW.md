@@ -8,24 +8,24 @@ This document provides detailed execution notes for
 ```mermaid
 flowchart TD
     A[Parse args] --> B{command}
-    B -- download --> C[Resolve staging, inbox root, manifest]
+    B -- download --> C[Resolve staging, inbox root, state file]
     C --> D[Download Dropbox inbox files]
     D --> E[Exit 0]
-    B -- reconcile --> F[Resolve manifests and Dropbox targets]
-    F --> G[Reconcile inbox using ingest decisions]
+    B -- apply --> F[Resolve state file and Dropbox targets]
+    F --> G[Apply inbox actions from ingest decisions]
     G --> H[Exit 0]
 ```
 
 ## Detailed step explanations
 
-For manifest structure and examples, see `docs/MANIFESTS.md`.
+For state file structure and examples, see `docs/DROPBOX_SYNC_STATE.md`.
 
 ### Step 1: choose workflow phase
 
 This script has two separate jobs:
 
 - `download`: fetch files from the Dropbox inbox into a local staging folder
-- `reconcile`: remove accepted files from the inbox and quarantine rejected files
+- `apply`: remove accepted files from the inbox and quarantine rejected files
 
 The staging folder sits in the middle of those jobs. Dropbox files are
 downloaded first, then `tooling.ingest_photos` reads staged files, and only
@@ -39,36 +39,31 @@ rejected.
 
 - `staging_dir` is the temporary local folder that will receive files.
 - `inbox_root` is the Dropbox folder scanned for new uploads.
-- `manifest_file` is the JSON bridge between Dropbox and local ingest: it
-  records which Dropbox source file produced which local staged file.
+- `state_file` is the JSON bridge between Dropbox and local ingest: it records
+  the original Dropbox path, the local source file, and the current status.
 
 ### Step 3: run download phase
 
-The download phase stages files locally and writes the download manifest. It
-does not decide remove-from-inbox versus quarantine yet because ingest has not
-classified staged files at this point.
+The download phase stages files locally and writes the shared sync state file.
+It does not decide remove-from-inbox versus quarantine yet because ingest has
+not classified files at this point.
 
-### Step 4: resolve reconcile inputs
+### Step 4: resolve apply inputs
 
-By this stage, ingest has already read staged files and written an ingest
-results manifest. Together, the two manifest files tell the workflow:
+By this stage, ingest has already read staged files and updated the shared
+state file. That file now tells the workflow:
 
-- which Dropbox inbox file became which staged file
-- which staged files were ingested vs skipped
+- which Dropbox inbox file became which local source file
+- which files were ingested vs skipped
 
 That allows accepted files to leave the inbox while rejected files go to
 quarantine.
 
-### Step 5: run reconcile phase
+### Step 5: run apply phase
 
-Reconcile reads:
-
-- the download manifest, mapping Dropbox inbox files to local staged files
-- the ingest results manifest, describing whether each staged file was ingested
-  or skipped
-
-With both manifests together, the workflow applies the ingest decision back to
-the original Dropbox file.
+Apply reads the shared state file. If any entry is still missing `status`, it
+stops instead of guessing. Otherwise it applies the ingest decision back to the
+original Dropbox file.
 
 ### Fallback return
 

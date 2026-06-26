@@ -13,11 +13,11 @@ flowchart TD
     D -- no --> E[Print error and exit 1]
     D -- yes --> F[Discover source images]
     F --> G{Any images found?}
-    G -- no --> H[Write empty manifest and exit 0]
+    G -- no --> H[Write empty result file and exit 0]
     G -- yes --> I[Read EXIF datetimes in batch]
     I --> J[Create destination root unless dry-run]
     J --> K[Process each source image]
-    K --> L[Write result manifest and summary]
+    K --> L[Write ingest results and summary]
 ```
 
 ## Detailed step explanations
@@ -31,14 +31,14 @@ During sync, files are downloaded to a temporary local folder. In this run,
 
 The flow is:
 
-1. Download phase writes a manifest with `source_path` (Dropbox) and
-   `staging_path` (local file).
-2. Ingest phase reads each `staging_path` and writes an ingest result manifest
-   with `source_file` and `status`.
-3. Reconcile phase matches `source_file` to `staging_path`, gets the related
-   Dropbox `source_path`, and then applies the final action in Dropbox.
+1. Download phase writes one state file entry per Dropbox file with
+   `source_path` and `source_file`.
+2. Ingest phase reads each `source_file` and adds `status: ingested` or
+   `status: skipped` to that same state file entry.
+3. Apply phase reads the final state file and applies the matching Dropbox
+   action.
 
-For manifest structure and examples, see `docs/MANIFESTS.md`.
+For state file structure and examples, see `docs/DROPBOX_SYNC_STATE.md`.
 
 ### Step 1: figure out the main folders
 
