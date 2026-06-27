@@ -1,7 +1,58 @@
 # ingest_photos.py flow
 
-This document provides detailed execution notes for
-`tooling/ingest_photos.py`.
+This document provides execution notes for `tooling/ingest_photos.py` and how
+the generated files become gallery pages.
+
+## Local photo workflow
+
+Add new photos under `inbox/<category>/` and run:
+
+```bash
+make ingest
+```
+
+`make ingest` uses `INGEST_SRC=inbox` unless another source is passed
+explicitly.
+
+The ingest step:
+
+- reads uploaded images from category subfolders under the source directory
+- writes published files into `content/images/photos/<category>/`
+- removes source files only after ingest succeeds so the same photos are not
+  imported twice
+- stages generated files before committing them so a failure does not leave a
+  partial import behind
+- requires `exiftool`
+- skips photos that do not provide `EXIF:DateTimeOriginal`
+
+Each ingested photo creates:
+
+- `content/images/photos/<category>/<id>-display.webp`
+- `content/images/photos/<category>/<id>-thumb.webp`
+- `content/images/photos/<category>/<id>.json`
+
+Any new category folder under the source inbox becomes available as a gallery
+page at `/<category>/` after ingest and build.
+
+## How photo pages work
+
+The photo pipeline has two main steps:
+
+1. `tooling/ingest_photos.py` reads uploaded images from `inbox/<category>/`
+   and writes web-ready files into `content/images/photos/<category>/`.
+2. `plugins/photos/photos.py` reads those generated files and passes photo data
+   to the templates that render gallery pages. The plugin reads the photo
+   location from Pelican settings via `PHOTOS_PATH`.
+
+Useful commands:
+
+```bash
+# Use the default local inbox.
+uv run python -m tooling.ingest_photos --src inbox
+
+# Preview planned outputs without writing files.
+uv run python -m tooling.ingest_photos --src inbox --dry-run
+```
 
 ## High-level flow
 

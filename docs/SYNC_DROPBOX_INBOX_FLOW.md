@@ -1,7 +1,26 @@
 # sync_dropbox_inbox.py flow
 
-This document provides detailed execution notes for
-`tooling/sync_dropbox_inbox.py`.
+This document provides execution notes for `tooling/sync_dropbox_inbox.py` and
+the Dropbox-backed upload path.
+
+## Dropbox uploads
+
+The local `inbox/` flow can run alongside a Dropbox-backed upload flow.
+
+The GitHub Actions workflow in `.github/workflows/dropbox-photo-sync.yml`
+downloads uploads from Dropbox, runs ingest and site checks, then applies the
+final outcome back to Dropbox.
+
+Dropbox app settings live at `https://www.dropbox.com/developers/apps`.
+
+Uploads go into `site-photo-inbox/<category>/`. The workflow then:
+
+- downloads supported images from Dropbox into a temporary local inbox
+- runs the existing ingest flow against that temporary inbox
+- runs repository checks and builds the site
+- commits and pushes generated photo files and gallery pages
+- removes successfully processed Dropbox files only after the workflow succeeds
+- moves rejected Dropbox files into a quarantine folder for manual review
 
 ## High-level flow
 
