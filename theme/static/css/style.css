@@ -81,6 +81,22 @@ h6 {
   color: var(--accent);
 }
 
+.article-content h2,
+.article-content h3,
+.article-content h4,
+.article-content h5,
+.article-content h6 {
+  color: var(--accent);
+}
+
+.article-content p,
+.article-content li,
+.article-content blockquote {
+  text-align: justify;
+  text-justify: inter-word;
+  hyphens: auto;
+}
+
 blockquote {
   margin: 1.5rem 0;
   padding: 1rem 1.25rem;
