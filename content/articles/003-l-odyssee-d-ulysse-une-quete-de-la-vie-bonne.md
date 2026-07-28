@@ -6,15 +6,15 @@ slug: odyssee-ulysse-quete-vie-bonne
 
 Parmi les grandes questions de la philosophie, il en est une, essentielle, qui reste simple à formuler mais difficile à traiter : qu'est-ce qu'une vie bonne ? Qu'est-ce qu'une vie réussie, non pas au sens scolaire, social ou économique, mais au sens le plus profond du terme ? Qu'est-ce qu'une existence humaine accomplie ? Et, plus précisément encore, qu'est-ce qu'une vie bonne pour des êtres mortels ?
 
-La précision est décisive : une vie bonne pour des dieux n'est pas une vie bonne pour des hommes. Un dieu n'est pas exposé à la limite, à l'usure, à la mort, à la perte des proches ni au temps qui emporte ; l'humain, lui, vit sous ces conditions. Toute personne qui voudrait réfléchir sur l'existence humaine doit donc partir de là : nous sommes mortels. Ainsi, la vie bonne n'est pas une vie imaginaire, dégagée de toute finitude, mais une vie bonne à l'intérieur de la condition humaine réelle.
+La précision est décisive : une vie bonne pour des dieux n'est pas une vie bonne pour des hommes. Un dieu n'est pas exposé à la limite, à l'usure, à la mort, à la perte des proches ni au temps qui emporte ; l'humain, lui, vit sous ces conditions. Ainsi, la vie bonne pour les hommes n'est pas une vie imaginaire, dégagée de toute finitude, mais une vie bonne à l'intérieur de la condition humaine réelle.
 
 Pour approcher cette question, il existe deux voies. La première consiste à construire une théorie abstraite ; la seconde à suivre des récits, des figures, des destins, pour laisser apparaître dans ces histoires une certaine image de l'existence accomplie. Les grandes civilisations ont souvent choisi cette seconde voie : elles ont pensé avec des épopées, des mythes, des drames et des personnages, laissant se dessiner, dans le mouvement même du récit, des réponses philosophiques majeures.
 
-Parmi ces récits, l'**Odyssée** occupe une place unique. C'est l'un des premiers grands textes écrits en grec, au VIIIe siècle avant Jésus-Christ. On croit souvent le connaître parce qu'on se souvient des Sirènes, du Cyclope, des tempêtes, de Circé ou de Calypso. On y voit volontiers un chef-d'oeuvre d'aventures maritimes, de ruses, de monstres et de dangers. Mais si l'on prend la peine de le suivre en profondeur, on découvre qu'il raconte le trajet même vers la vie bonne : du chaos à l'harmonie, de la guerre à la paix, de la haine à l'amour, de l'exil au chez-soi, de la dispersion à l'unité.
+Parmi ces récits, l'**Odyssée** occupe une place unique. C'est l'un des premiers grands textes écrits en grec, au VIIIe siècle avant Jésus-Christ. On croit souvent le connaître parce qu'on se souvient du Cyclope, des Sirènes, des tempêtes, de Circé ou de Calypso. On y voit volontiers un chef-d'oeuvre d'aventures maritimes, de ruses, de monstres et de dangers. Mais si l'on prend la peine de le suivre en profondeur, on découvre qu'il dessine en fait une réponse à la question de la vie bonne.
 
 ## Une histoire très ancienne pour une question toujours actuelle
 
-L'histoire d'Ulysse peut se raconter comme si on ne l'avait jamais entendue. Au commencement, tout semble simple : Ulysse est un roi grec, marié à une femme ravissante et intelligente, Pénélope, et père d'un petit garçon, Télémaque. Il habite Ithaque, la cité dont il est le roi ; il a sa femme, son fils, son palais et sa ville. Au moment où l'histoire commence, il est parfaitement heureux. Autrement dit, avant la guerre et avant l'errance, Ulysse vit déjà dans une forme d'harmonie.
+L'histoire d'Ulysse peut se raconter comme si on ne l'avait jamais entendue. Au commencement, tout semble simple : Ulysse est un roi grec, marié à une femme ravissante et intelligente, Pénélope, et père d'un petit garçon, Télémaque. Il habite Ithaque, la petite île dont il est le roi, aujourd'hui encore située dans la mer Ionienne, à l'ouest de la Grèce continentale ; il a sa femme, son fils, son palais et son royaume. Au moment où l'histoire commence, il est parfaitement heureux. Autrement dit, avant la guerre et avant l'errance, Ulysse vit déjà dans une forme d'harmonie.
 
 Cette remarque est importante, parce qu'elle change entièrement le sens du récit. Ulysse n'est pas un homme qui chercherait à inventer une vie meilleure que celle qu'il avait ; il est un homme arraché à une vie bonne préexistante, puis condamné à la retrouver. Son voyage n'est donc pas une conquête de l'inconnu au sens moderne, mais un retour vers la vie bonne.
 
@@ -22,23 +22,23 @@ Mais avant ce retour, il faut comprendre la catastrophe qui a brisé cet ordre. 
 
 ## Des Chants Cypriens à l'origine de la guerre
 
-Pour comprendre comment un roi d'Ithaque heureux avec sa femme et son fils s'est retrouvé jeté dans la guerre puis dans vingt années d'errance, il faut revenir à un autre événement, antérieur à l'**Odyssée** proprement dite. Il existait un poème aujourd'hui perdu, les *Chants Cypriens*, dont nous n'avons plus que des échos, et qui racontait l'origine de la guerre de Troie. C'est là qu'apparaît l'histoire de la pomme de discorde. Elle se joue à l'occasion du mariage de Thétis et de Pélée.
+Pour comprendre comment un roi d'Ithaque heureux avec sa femme et son fils s'est retrouvé jeté dans la guerre puis dans vingt années d'errance, il faut revenir à un autre événement, antérieur à l'**Odyssée** proprement dite. Il existait autrefois un poème, les *Chants Cypriens*, dont nous n'avons aujourd'hui plus que des vestiges, et qui racontait l'origine de la guerre de Troie. C’est là qu’entre en scène l’épisode célèbre de la *Pomme d'or de la discorde*, lié au mariage de Thétis et de Pélée.
 
-Dans la mythologie grecque, cette scène a une portée immense. Thétis est une grande divinité marine ; Pélée, lui, est un mortel. Lors de leur mariage, tous les dieux sont invités, ou presque. Une seule divinité n'est pas conviée : Éris, la déesse de la discorde, du conflit et de la haine. On croit ainsi tenir le désordre hors de la célébration. C'est l'inverse qui se produit.
+Dans la mythologie grecque, cette union a une portée immense : Thétis est une grande divinité de la mer, tandis que Pélée appartient au monde des mortels. Lors de leur mariage, tous les dieux sont invités, ou presque. Une seule divinité n'est pas conviée : Éris, la déesse de la discorde, du conflit et de la haine. On croit ainsi tenir le désordre hors de la célébration. C'est l'inverse qui se produit.
 
-Éris, offensée de ne pas avoir été invitée, trouble pourtant la fête en lançant une pomme d'or. La pomme semble illuminée de l'intérieur, et sa beauté en fait aussitôt un objet de désir. Sur la pomme est inscrite cette simple formule : « à la plus belle ». Tout est alors en place pour que le désir se transforme en rivalité. Héra, Athéna et Aphrodite veulent chacune être reconnue comme la plus belle.
+Éris parvient tout de même à troubler la fête à sa manière en déposant sur la table du festin, parmi les dieux, une pomme d'or. L'objet est magnifique. Il semble même illuminé de l'intérieur, et sa beauté en fait aussitôt un objet de convoitise. Une inscription y figure : « à la plus belle ».  Il n'en faut pas davantage pour que la rivalité éclate. Héra, Athéna et Aphrodite veulent chacune se l'approprier, car la posséder, c'est recevoir pour soi le titre qu'elle promet.
 
-Cette petite scène a quelque chose d'éternel. Les Grecs avaient compris que la discorde ne naît pas toujours de la pure agressivité. Elle surgit aussi du désir comparé, de la rivalité et de la jalousie, c'est-à-dire là même où il y a de l'attachement. Il y a, dans cette logique, une proximité profonde entre Éris, la discorde, et Éros, l'amour, presque comme les deux faces d'une même médaille. On ne se dispute jamais autant qu'avec les gens qu'on aime le plus : c'est là que les querelles vont le plus vite, deviennent les plus intenses et souvent les plus violentes.
+Les Grecs avaient vu, dans cette scène, quelque chose de très profond. La discorde ne naît pas toujours de la haine nue ; elle surgit aussi du désir comparé, de la rivalité et de la jalousie, c'est-à-dire, là même où il y a de l'attachement. La discorde ne s’installe donc pas seulement là où les êtres se détestent, mais aussi là où ils se désirent et s’estiment. On ne se dispute en effet jamais autant qu'avec les gens qu'on aime le plus : c'est là que les querelles vont le plus vite, deviennent les plus intenses et souvent les plus violentes. Il y a, dans cette logique, une proximité profonde entre Éris, la discorde, et Éros, l'amour, presque comme les deux faces d'une même médaille.
 
-Cette structure mythique se retrouvera plus tard dans de nombreux contes de fées de la tradition occidentale. L'exemple le plus net est celui de **La Belle au bois dormant** : la méchante sorcière n'est pas invitée, puis elle jette un mauvais sort. On retrouve la même logique d'une exclusion qui revient sous la forme du désastre.
+Cette structure mythique se retrouvera plus tard dans de nombreux contes de fées de la tradition occidentale. L'exemple le plus net est celui de **La Belle au bois dormant** : la méchante sorcière écartée de la fête revient pour transformer l’exclusion en malédiction.
 
 ## Le choix de Paris
 
-Trois déesses restent en lice : Héra, la femme de Zeus ; Athéna, sa fille préférée ; et Aphrodite, en latin Vénus, la déesse de la beauté et de l'amour. Zeus ne veut pas trancher entre les déesses. Comme souvent dans la mythologie, les dieux eux-mêmes sont incapables de régler ce qu'ils ont contribué à déclencher. Il confie donc la décision à un jeune berger de la montagne, Paris, qu'Hermès conduit devant elles. Mais ce prétendu petit berger n'est pas n'importe qui : c'est en réalité un prince troyen, fils de Priam et frère d'Hector.
+La rivalité pour la pomme est désormais engagée ; reste encore à désigner celui qui jugera. Zeus ne veut pas trancher entre les déesses. Comme souvent dans la mythologie, les dieux eux-mêmes sont incapables de régler ce qu'ils ont contribué à déclencher. Il confie donc la décision à un jeune berger de la montagne, Paris, qu'Hermès conduit devant elles. Mais ce prétendu berger n'est pas n'importe qui : c'est en réalité un prince troyen, fils de Priam et frère d'Hector.
 
-Le choix de Paris ne se réduit pas à un concours de beauté. Chacune des déesses s'avance vers lui avec une promesse, c'est-à-dire avec une certaine image de ce qui compte le plus dans une vie.
+Le choix de Paris ne se réduit pas à un concours de beauté. Chacune des déesses s'avance vers lui avec une promesse, c'est-à-dire, avec une certaine image de ce qui compte le plus dans une vie.
 
-Héra promet l'empire, c'est-à-dire la puissance politique, la domination et le commandement sur des royaumes immenses. Athéna promet la victoire dans les guerres ; avec elle, il obtiendrait la gloire militaire, le triomphe sur les ennemis et la force consacrée par le succès. Il est d'ailleurs frappant que, dans la mythologie grecque, ce soit une femme qui incarne à la fois l'intelligence et la guerre. Aphrodite promet la plus belle femme du monde, autrement dit l'amour ou du moins la possession du plus désirable.
+Héra promet l'empire, c'est-à-dire la puissance politique, la domination et le commandement sur des royaumes immenses. Athéna promet la victoire dans les guerres ; avec elle, il obtiendrait la gloire militaire, le triomphe sur les ennemis et la force consacrée par le succès. Aphrodite promet la plus belle femme du monde.
 
 La scène est capitale parce qu'elle montre que toute grande catastrophe naît aussi d'un certain type de choix : Paris choisit Aphrodite, c'est-à-dire le désir et la promesse de la plus belle femme du monde. Ce choix est la source du désastre qui suivra.
 
@@ -104,33 +104,17 @@ Cela signifie qu'une vie humaine peut manquer son but même lorsqu'elle dispose 
 
 Calypso ne propose donc pas seulement une belle vie, mais une vie qui n'est plus proprement humaine.
 
-## Le précédent de Tithon
-
-La promesse de Calypso prend tout son relief lorsqu'on la met en regard d'un autre récit mythologique : celui de Tithon.
-
-Aurore, elle aussi, est tombée amoureuse d'un mortel et a demandé pour lui l'immortalité. Mais elle a oublié de demander la jeunesse éternelle. Tithon ne meurt donc plus, mais il vieillit sans fin, se fane, se rapetisse et se dégrade interminablement. Son immortalité tourne à la caricature de la vie.
-
-Cette histoire est d'une intelligence remarquable. Elle montre qu'il ne suffit pas de durer pour bien vivre, que la durée en elle-même n'est pas le bien suprême et qu'une existence infinie peut devenir une catastrophe si elle manque la vie bonne.
-
-On comprend alors pourquoi Calypso ajoute la jeunesse à l'immortalité. La mythologie grecque sait déjà qu'une immortalité sans jeunesse ne vaut rien, mais l'enseignement va plus loin : même complétée par la jeunesse, l'immortalité n'est pas nécessairement le bien propre d'un humain.
-
-Tout va se jouer dans la réponse d'Ulysse.
-
 ## Le refus d'Ulysse
 
 Ulysse dit non.
 
-Ce non est l'un des gestes les plus profonds de toute la tradition antique. Ulysse refuse, non par manque d'imagination, non parce que Calypso serait indigne, non parce que son île serait triste, mais parce qu'il comprend qu'une vie humaine accomplie vaut mieux qu'une éternité qui ferait manquer le but de la vie humaine. Il va jusqu'à reconnaître que Pénélope est moins belle que Calypso ; pourtant, c'est vers Pénélope, vers Ithaque et vers sa condition mortelle qu'il veut revenir.
+Ce non est l'un des gestes les plus profonds de toute la tradition antique. Ulysse refuse, non parce que Calypso serait indigne, non parce que son île serait triste, mais parce qu'il comprend qu'une vie humaine accomplie vaut mieux qu'une éternité qui ferait manquer le but de la vie humaine. Il va jusqu'à reconnaître que Pénélope est moins belle que Calypso ; pourtant, c'est vers Pénélope, vers Ithaque et vers sa condition mortelle qu'il veut revenir.
 
 Il préfère revenir à Ithaque, retrouver Pénélope et assumer sa condition mortelle ; en somme, il préfère une vie finie, exposée à la perte et à la mort, mais accordée à sa vérité, plutôt qu'une sortie hors du temps qui l'arracherait à ce qu'il est.
 
 Le choix est vertigineux. Instinctivement, beaucoup d'humains diraient sans doute oui à la proposition de Calypso : qui ne voudrait pas ne plus mourir, garder la jeunesse et habiter un paradis sensuel auprès d'une déesse amoureuse ? Ulysse, pourtant, refuse.
 
-Ce refus contient déjà une thèse philosophique majeure : **une vie de mortel réussie est préférable à une vie d'immortel qui manque le véritable but de l'existence humaine**.
-
-Ulysse dit en substance : mieux vaut une existence humaine fidèle à elle-même qu'une éternité qui me ferait cesser d'être ce que je suis.
-
-Il y a là un geste fondateur. L'histoire de la philosophie commence là, avec le refus d'Ulysse : le non opposé à l'offre de Calypso devient en même temps la naissance de la philosophie et la première grande réponse à la question de la vie bonne.
+Ce refus contient déjà une thèse philosophique majeure : **une vie de mortel réussie est préférable à une vie d'immortel qui manque le véritable but de l'existence humaine**. Ulysse dit en substance : mieux vaut une existence humaine fidèle à elle-même qu'une éternité qui me ferait cesser d'être ce que je suis.
 
 ## Du récit à la philosophie
 
@@ -154,11 +138,11 @@ Une vie bonne n'est donc pas possible tant qu'on reste gouverné par la logique 
 
 ## La peur comme maladie spirituelle
 
-Il ne faut pas sous-estimer ce diagnostic. Dire que la peur est l'opposé de la sagesse, ce n'est pas prononcer une phrase morale un peu vague ; c'est poser une thèse anthropologique. L'humain effrayé devient moins humain, moins capable de raison, de justice et d'amour.
+Il ne faut pas sous-estimer ce diagnostic. Dire que la peur est l'opposé de la sagesse, ce n'est pas prononcer une phrase morale un peu vague. L'humain effrayé devient moins humain, moins capable de raison, de justice et d'amour.
 
-La peur agrandit les dangers et rapetisse les êtres. Celui qui a une phobie d'une petite souris tremble comme si un requin blanc surgissait devant lui. Ce décalage dit quelque chose de profond : la peur n'épouse pas le réel, elle le déforme et nous enferme dans une perception faussée du monde.
+La peur agrandit les dangers et rapetisse les êtres. Celui qui a la phobie des araignées tremble comme si un requin blanc surgissait devant lui. Ce décalage dit quelque chose de profond : la peur n'épouse pas le réel, elle le déforme et nous enferme dans une perception faussée du monde.
 
-On pourrait ajouter que beaucoup de sociétés modernes vivent elles aussi sous ce signe. Nous vivons dans une **société de la peur** : peur du réchauffement climatique, de l'effet de serre, du trou dans la couche d'ozone, des micro-ondes, de la Turquie, de la mondialisation, de Claude Allègre et de deux mille autres choses encore. Nous sommes tétanisés d'angoisse. Certaines de ces peurs ont des objets réels, mais cela ne change pas la question philosophique : que devient une vie quand la peur la gouverne ? Elle se rétrécit, devient plus égocentrique, plus crispée, moins capable de pensée libre et d'amour.
+On pourrait ajouter que beaucoup de sociétés modernes vivent elles aussi sous ce signe. Nous vivons dans une **société de la peur** : peur du réchauffement climatique, de l'effet de serre, du trou dans la couche d'ozone, de la Russie, de Poutine, de la mondialisation et de deux mille autres choses encore. Nous sommes tétanisés d'angoisse. Certaines de ces peurs ont des objets réels, mais cela ne change pas la question philosophique : que devient une vie quand la peur la gouverne ? Elle se rétrécit, devient plus égocentrique, plus crispée, moins capable de pensée libre et d'amour.
 
 Le premier critère de la vie bonne consiste donc à desserrer cette emprise, non à supprimer magiquement toute peur, mais à faire en sorte qu'elle ne commande plus l'existence. Il n'y a pas de vie bonne sans victoire sur les peurs, et le sage, dans cette perspective, est celui qui les a vaincues, notamment la peur suprême, la peur de la mort.
 
@@ -168,9 +152,9 @@ Ulysse le montre en acte. S'il avait placé la conservation pure au-dessus de to
 
 Le deuxième critère de la vie bonne concerne notre rapport au temps. Les Grecs voyaient très clairement que deux grandes puissances, deux fléaux si l'on veut, nous empêchent d'accéder à la vie bonne : le passé et le futur.
 
-Le passé nous tire en arrière. Il peut prendre la forme de la nostalgie du bon vieux temps, quand on se dit que la vraie vie était hier, qu'elle a déjà eu lieu et qu'elle est derrière nous. Mais il peut aussi revenir sous la forme des remords, des regrets, des culpabilités, de ce que plus tard Spinoza appellera les passions tristes. On se réveille la nuit en repensant à une parole malheureuse, à une faute, à une occasion ratée, à un geste qu'on voudrait effacer, et l'esprit reconstruit sans fin ce qui n'est plus.
+Le passé nous tire en arrière. Il peut prendre la forme de la nostalgie du bon vieux temps, quand on se dit que la vraie vie était hier, qu'elle a déjà eu lieu et qu'elle est derrière nous. Mais il peut aussi revenir sous la forme des remords, des regrets, des culpabilités, de ce que plus tard Spinoza appellera *les passions tristes*. On se réveille la nuit en repensant à une parole malheureuse, à une faute, à une occasion ratée, à un geste qu'on voudrait effacer, et l'esprit reconstruit sans fin ce qui n'est plus.
 
-Le futur, lui, nous tire en avant. On se dit que la vie commencera plus tard, quand les conditions seront réunies, quand on aura changé quelque chose à sa situation, à son apparence, à son travail, à sa maison, à ses relations, à son statut, de voiture, de coiffure, de chaussures, d'amis, de mari ou de femme. On reporte ainsi sans cesse la possibilité de vivre au nom d'un demain toujours promis.
+Le futur, lui, nous tire en avant. On se dit que la vie commencera plus tard, quand les conditions seront réunies, quand on aura changé quelque chose à sa situation, à son physique, à son travail, à ses relations, à son statut, de voiture, de coiffure, de chaussures, d'amis, de mari ou de femme. On reporte ainsi sans cesse la possibilité de vivre au nom d'un demain toujours promis.
 
 Dans les deux cas, le passé et le futur nous font manquer de vivre. Or le présent est la seule dimension réelle du temps : le passé n'est plus, le futur n'est pas encore ; ce sont, au sens fort, des figures du néant. Seul le présent est, comme le rappelle le fameux *carpe diem* d'Horace : saisis le présent, vis au présent.
 
@@ -192,7 +176,7 @@ Cette sagesse du présent éclaire à nouveau l'histoire d'Ulysse. Pendant vingt
 
 Cette observation ajoute une couche supplémentaire au sens du retour. Rejoindre Ithaque, ce n'est pas seulement atteindre un lieu ; c'est enfin pouvoir habiter le présent, ne plus être expulsé hors de soi par le regret ou par l'attente, ne plus faire de la vie un simple passage, et être là où l'on est, avec ceux que l'on aime, dans l'existence qui convient.
 
-La vie bonne n'est donc pas seulement une victoire sur la peur. Elle est aussi la reconquête de la présence.
+La vie bonne n'est donc pas seulement une victoire sur la peur. Elle est aussi la reconquête du présent.
 
 ## Troisième critère : trouver sa place dans l'ordre du monde
 
@@ -204,24 +188,12 @@ Les Grecs pensaient volontiers l'humain comme un fragment du cosmos, et donc com
 
 C'est pourquoi les trois critères se tiennent ensemble : on ne vainc vraiment la peur que si l'on n'est plus obsédé par sa petite conservation individuelle ; on n'habite vraiment le présent que si l'on accepte de s'inscrire dans le réel tel qu'il est ; et l'on ne trouve sa place dans le monde que si l'on cesse de vouloir tout plier à l'ego et à ses fantasmes d'illimitation.
 
-## La première grande réponse occidentale
-
-Si l'on rassemble maintenant tous les fils du récit, la leçon devient plus nette : l'**Odyssée** ne raconte pas seulement une aventure héroïque ; elle donne déjà, dans la tradition occidentale, une première grande réponse à la question de la vie bonne.
-
-Une vie bonne, pour un mortel, n'est pas une vie qui échappe à toute limite, qui gagne l'éternité en renonçant à sa vérité humaine, qui s'absorbe dans la peur, qui reste prisonnière du passé et du futur ou qui demeure sans place dans le monde.
-
-Une vie bonne est au contraire une vie qui a vaincu un certain rapport peureux à l'existence, qui sait habiter le présent, qui retrouve sa place dans un ordre plus vaste, et qui reste fidèle à ce qui lui donne sens au lieu de se perdre dans les séductions de l'oubli.
-
-Sous cette lumière, le refus d'Ulysse devant Calypso devient le moment central du poème. Il y dit, en acte, que l'humain n'a pas pour vocation de devenir un dieu, mais de vivre humainement, aussi pleinement que possible, dans l'acceptation de sa condition mortelle.
-
-## Une ouverture plus large
-
-Il serait possible d'élargir encore cette perspective. Cette première réponse n'épuise évidemment pas toute l'histoire de la sagesse, et l'on retrouverait des intuitions voisines ailleurs, bien avant même la Grèce classique ou en dehors d'elle : dans l'épopée de Gilgamesh, qui confronte elle aussi un héros à la mort et au désir d'immortalité ; dans certaines traditions orientales, notamment bouddhistes, qui pensent autrement l'attachement, le temps, le désir et la paix intérieure.
-
-Mais il n'est pas nécessaire d'aller plus loin pour saisir ce qui se joue ici. L'**Odyssée** suffit déjà à faire apparaître quelque chose de fondamental : la grandeur d'une vie humaine ne se mesure ni à sa durée, ni à son intensité apparente, ni à la somme de ses aventures, mais à sa fidélité, à sa capacité d'échapper à la dispersion et à son aptitude à retrouver la vie bonne.
-
 ## Ce qu'il faut sauver d'une vie
 
-Au fond, toute cette lecture pourrait se résumer ainsi : sauver la mémoire contre l'oubli, l'amour contre la dispersion du désir, le courage contre le gouvernement de la peur, le présent contre l'emprise du passé et du futur, la mesure humaine contre le fantasme de l'illimité, et enfin la possibilité d'une place dans le monde. Alors seulement Ithaque cesse d'être une île antique et devient une image universelle, le nom d'une vie enfin retrouvée, d'une existence réconciliée avec elle-même.
+Si l'on rassemble tous les fils du récit, une leçon se dégage plus nettement : l'**Odyssée** ne raconte pas seulement un voyage, mais la lutte d'une existence contre tout ce qui la disperse. La grandeur d'une vie humaine ne se mesure donc ni à sa durée, ni à son intensité apparente, ni à la somme de ses aventures, mais à sa fidélité, à sa capacité de résister à la dispersion et à son aptitude à retrouver la vie bonne.
 
-Ulysse n'est donc pas seulement le héros du voyage ; il est le héros du retour. Et c'est peut-être cela, au fond, la vie bonne : non pas courir sans fin vers de nouvelles promesses, mais revenir, à travers les épreuves, vers ce qui mérite vraiment qu'on lui consacre sa vie.
+C'est aussi ce qui rend ce poème si proche de nous. Les Lotophages, Circé, les Sirènes ou Calypso n'appartiennent pas seulement à un autre âge. Ils donnent une forme visible à des tentations qui n'ont pas disparu. Aujourd'hui encore, la vie se laisse facilement disperser : dans l'accumulation des sollicitations, dans la poursuite indéfinie de nouveautés, dans l'agitation qui remplit les jours sans leur donner de centre. Nous rêvons d'intensité, de vitesse, d'ouverture infinie des possibles, et nous découvrons souvent, trop tard, que cette fuite en avant peut aussi nous éloigner de nous-mêmes.
+
+Cette dispersion tient aussi à notre rapport au temps. Nous vivons de plus en plus dans l'instant pur : un clou chasse l'autre, une information en recouvre une autre, puis une autre encore, si bien que ce qui faisait l'événement à l'instant $t$ est aussitôt oublié à l'instant $t + 1$. Sur Twitter, Instagram, Facebook, sur les chaînes d'information en continu, dans le défilement hypnotique des stories de quelques secondes, le centre du monde change sans cesse, puis s'évanouit. Ce qui faisait événement disparaît avant même d'avoir été pensé. Nous passons d'une image à l'autre, d'une urgence à l'autre, et nous perdons peu à peu la capacité d'inscrire le présent dans une histoire plus vaste. Le centre du monde est ici, puis ailleurs, puis nulle part. Ce régime de l'attention nous habitue à recevoir sans retenir, à voir sans relier, à réagir sans inscrire ce que nous vivons dans une longue durée. Or le présent ne tient pas tout seul : il s'enracine dans le passé et produit des effets dans l'avenir. Quand cet enracinement se défait, il ne reste qu'un flux sans mémoire, et avec lui l'oubli du temps long.
+
+C'est peut-être pour cela qu'Ulysse nous parle encore avec autant de force. Il n'est pas seulement le héros du voyage, de l'aventure ou de l'épreuve ; il est celui qui refuse de se laisser dissoudre dans l'oubli, dans la dispersion, dans l'instant sans lendemain. Son retour vers Ithaque n'est pas seulement un déplacement dans l'espace : c'est la reconquête d'une continuité, d'une fidélité, d'une durée. En ce sens, il est le héros du retour. Et c'est peut-être cela, au fond, la vie bonne : non pas courir sans fin vers de nouvelles promesses, mais revenir, à travers les épreuves, vers les êtres, les liens et les choses qui méritent vraiment qu'on leur consacre notre vie.
