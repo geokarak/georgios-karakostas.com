@@ -9,3 +9,18 @@
         <div class="article-content">{{ article.content }}</div>
     {% endif %}
 {% endblock %}
+{% block extra_scripts %}
+    {% if article.category == 'blog' and '$' in article.content %}
+        <script>
+            window.MathJax = {
+                tex: {
+                    inlineMath: [['$', '$'], ['\\(', '\\)']],
+                    displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                },
+            };
+        </script>
+        <script id="MathJax-script"
+                async
+                src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+    {% endif %}
+{% endblock %}
