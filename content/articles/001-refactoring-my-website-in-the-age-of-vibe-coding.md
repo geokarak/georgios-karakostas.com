@@ -17,12 +17,3 @@ That ended up being the main lesson from the whole exercise: with LLMs, it is ve
 Every now and then, I will also make a point of going through the process of implementing a new idea myself and then let the agent roast me afterwards. The most valuable learning will always come from wrestling with a problem on your own first.
 
 ***Vibe, but not too close to the sun.***
-
-## Changelog
-
-- Gallery browsing upgraded with GLightbox and direct template-driven photo rendering.
-- Photos no longer modeled as Pelican articles.
-- Ingestion rebuilt to generate display/thumbnail WebP derivatives plus JSON metadata.
-- Colour profile handling fixed during image conversion.
-- Dropbox-to-GitHub publishing automation added.
-- CI, tests, packaging, and workflow guards tightened.
