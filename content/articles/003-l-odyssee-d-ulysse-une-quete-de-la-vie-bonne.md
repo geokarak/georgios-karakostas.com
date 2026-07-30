@@ -8,11 +8,11 @@ Parmi les grandes questions de la philosophie, il en est une, essentielle, qui r
 
 Pour approcher cette question, il existe deux voies. La première consiste à construire une théorie abstraite ; la seconde à suivre des récits, des figures, des destins, pour laisser apparaître dans ces histoires une certaine image de l'existence accomplie. Les grandes civilisations ont souvent choisi cette seconde voie : elles ont pensé avec des épopées, des mythes, des drames et des personnages, laissant se dessiner, dans le mouvement même de ces récits, des réponses philosophiques majeures.
 
-Parmi ces récits, l'**Odyssée** d'Homère occupe une place unique. C'est l'un des premiers grands textes écrits en grec, au VIIIe siècle avant Jésus-Christ. On croit souvent le connaître parce qu'on se souvient du Cyclope, des Sirènes, des tempêtes, de Circé ou de Calypso. On y voit volontiers un chef-d'oeuvre d'aventures maritimes, de ruses, de monstres et de dangers. Mais si l'on prend la peine de le suivre en profondeur, on découvre qu'il dessine en fait une réponse à la question de la vie bonne.
+Parmi ces récits, l'**Odyssée** d'Homère occupe une place singulière. C'est l'un des premiers grands textes de la littérature grecque, composé au VIIIe siècle avant Jésus-Christ. On croit souvent le connaître parce qu'on se souvient du Cyclope, des Sirènes, des tempêtes, de Circé ou de Calypso. On y voit volontiers un chef-d'oeuvre d'aventures maritimes, de ruses, de monstres et de périls. Mais si l'on prend la peine de suivre le poème en profondeur, on découvre qu'il dessine en fait une réponse à la question de la vie bonne.
 
 ## Une histoire très ancienne pour une question toujours actuelle
 
-L'histoire d'Ulysse peut se raconter comme si on ne l'avait jamais entendue. Au commencement, tout semble simple : Ulysse est un roi grec, marié à une femme ravissante et intelligente, Pénélope, et père d'un petit garçon, Télémaque. Il habite Ithaque, une petite île dont il est le roi située en mer Ionienne ; il a sa femme, son fils, son palais et son royaume. Au moment où l'histoire commence, il est parfaitement heureux. Autrement dit, avant la guerre et avant l'errance, Ulysse vit déjà dans une forme d'harmonie.
+L'histoire d'Ulysse peut se raconter comme si on ne l'avait jamais entendue. Au commencement, tout semble simple : Ulysse est un roi grec, marié à une femme ravissante et intelligente, Pénélope, et père d'un petit garçon, Télémaque. Il règne sur Ithaque, petite île de la mer Ionienne. Il a sa femme, son fils, son palais et son royaume. Au moment où l'histoire commence, il est parfaitement heureux.
 
 Cette remarque est importante, parce qu'elle change entièrement le sens du récit. Ulysse n'est pas un homme qui chercherait à inventer une vie meilleure que celle qu'il avait ; il est un homme arraché à une vie bonne préexistante, puis condamné à la retrouver. Son voyage n'est donc pas une conquête de l'inconnu au sens moderne, mais un retour vers la vie bonne.
 
@@ -26,15 +26,15 @@ Dans la mythologie grecque, cette union a une portée immense : Thétis est une 
 
 Les Grecs avaient vu, dans cette scène, quelque chose de très profond. La discorde ne naît pas toujours de la haine nue ; elle surgit aussi du désir comparé, de la rivalité et de la jalousie, c'est-à-dire, là même où il y a de l'attachement. La discorde ne s’installe donc pas seulement là où les êtres se détestent, mais aussi là où ils se désirent et s’estiment. On ne se dispute en effet jamais autant qu'avec les gens qu'on aime le plus : c'est là que les querelles vont le plus vite, deviennent les plus intenses et souvent les plus violentes. Il y a, dans cette logique, une proximité profonde entre Éris, la discorde, et Éros, l'amour, presque comme les deux faces d'une même médaille.
 
-Cette structure mythique se retrouvera plus tard dans de nombreux contes de fées de la tradition occidentale. Un exemple bien connu est celui de **La Belle au bois dormant** : la méchante sorcière écartée de la fête revient pour transformer l’exclusion en malédiction.
+Cette structure mythique se retrouvera plus tard dans de nombreux contes de fées de la tradition occidentale. Un exemple bien connu est celui de **La Belle au bois dormant** : la méchante sorcière exclue de la fête revient pour transformer son exclusion en malédiction.
 
 ## Le choix de Paris
 
 La rivalité pour la pomme est désormais engagée ; reste encore à savoir à quelle déesse elle reviendra. Zeus ne veut pas trancher entre les déesses. Comme souvent dans la mythologie, les dieux eux-mêmes sont incapables de régler ce qu'ils ont contribué à déclencher. Il confie donc la décision à un jeune berger de la montagne, Paris, qu'Hermès conduit devant elles. Mais ce prétendu berger n'est pas n'importe qui : c'est en réalité un prince troyen, fils de Priam et frère d'Hector.
 
-Le choix de Paris ne se réduit pas à un concours de beauté. Chacune des déesses s'avance vers lui avec une promesse, c'est-à-dire, avec une certaine image de ce qui compte le plus dans une vie.
+Le choix de Paris ne se réduit pas à un simple concours de beauté. Chacune des déesses s'avance vers lui avec une promesse, et chaque promesse dessine en creux une idée de ce qui compte le plus dans une vie.
 
-Héra promet l'empire, c'est-à-dire la puissance politique, la domination et le commandement sur des royaumes immenses. Athéna promet la victoire dans les guerres ; avec elle, il obtiendrait la gloire militaire, le triomphe sur les ennemis et la force consacrée par le succès. Aphrodite promet la plus belle femme du monde.
+Héra promet l'empire, c'est-à-dire la puissance politique, la domination et le commandement sur des royaumes immenses. Athéna promet la victoire dans les guerres ; avec elle, il obtiendrait la gloire militaire, le triomphe sur les ennemis et la force consacrée par le succès. Aphrodite, enfin, promet la plus belle femme du monde.
 
 La scène est capitale parce qu'elle montre que toute grande catastrophe naît aussi d'un certain type de choix : Paris choisit Aphrodite, c'est-à-dire le désir et la promesse de la plus belle femme du monde. Ce choix est la source du désastre qui suivra.
 
@@ -98,9 +98,13 @@ Ce refus contient ainsi une thèse philosophique majeure : **une vie de mortel r
 
 Une fois ce point établi, l'histoire d'Ulysse peut être abstraite : elle n'est plus seulement le destin singulier d'un héros grec, mais une première grande réponse occidentale à la question de la vie bonne.
 
-Cette réponse peut se formuler en trois critères principaux : il n'y a pas de vie bonne sans victoire sur les peurs, et d'abord sur la peur de la mort ; il n'y a pas de vie bonne sans capacité à habiter le présent plutôt que d'être prisonnier du passé ou du futur ; il n'y a pas non plus de vie bonne sans ajustement à un ordre du monde, sans capacité à trouver sa place dans un cosmos beau, bon, harmonieux et juste.
+Cette réponse peut se formuler en trois critères principaux :
 
-Ces trois critères peuvent maintenant se déployer l'un après l'autre.
+1. Il n'y a pas de vie bonne sans victoire sur les peurs, et d'abord sur la peur de la mort.
+2. Il n'y a pas de vie bonne sans capacité à habiter le présent, plutôt que d'être prisonnier du passé ou du futur.
+3. Il n'y a pas non plus de vie bonne sans ajustement à un ordre du monde, sans capacité à trouver sa place dans un cosmos beau, bon, harmonieux et juste.
+
+Ces trois critères peuvent maintenant être développés l'un après l'autre.
 
 ## Premier critère : vaincre les peurs
 
