@@ -10,6 +10,11 @@ Pour approcher cette question, il existe deux voies. La première consiste à co
 
 Parmi ces récits, l'**Odyssée** d'Homère occupe une place singulière. C'est l'un des premiers grands textes de la littérature grecque, composé au VIIIe siècle avant Jésus-Christ. On croit souvent le connaître parce qu'on se souvient du Cyclope, des Sirènes, des tempêtes, de Circé ou de Calypso. On y voit volontiers un chef-d'oeuvre d'aventures maritimes, de ruses, de monstres et de périls. Mais si l'on prend la peine de suivre le poème en profondeur, on découvre qu'il dessine en fait une réponse à la question de la vie bonne.
 
+<figure>
+  <img src="https://upload.wikimedia.org/wikipedia/commons/2/2e/Ulysses_and_Argo_%28cropped%29.png" alt="Ulysse reconnu par Argos">
+  <figcaption>Ulysse reconnu par Argos. Illustration de 1905, dans le domaine public, via <a href="https://commons.wikimedia.org/wiki/File:Ulysses_and_Argo_%28cropped%29.png">Wikimedia Commons</a>.</figcaption>
+</figure>
+
 ## Une histoire très ancienne pour une question toujours actuelle
 
 L'histoire d'Ulysse peut se raconter comme si on ne l'avait jamais entendue. Au commencement, tout semble simple : Ulysse est un roi grec, marié à une femme ravissante et intelligente, Pénélope, et père d'un petit garçon, Télémaque. Il règne sur Ithaque, petite île de la mer Ionienne. Il a sa femme, son fils, son palais et son royaume. Au moment où l'histoire commence, il est parfaitement heureux.
@@ -18,29 +23,38 @@ Cette remarque est importante, parce qu'elle change entièrement le sens du réc
 
 ## Des Chants Cypriens à l'origine de la guerre
 
+### Éris et la pomme d'or
+
 Pour comprendre comment un roi d'Ithaque heureux avec sa femme et son fils s'est retrouvé jeté dans la guerre puis dans vingt années d'errance, il faut revenir à un autre événement, antérieur à l'**Odyssée** proprement dite. Il existait autrefois un poème, les *Chants Cypriens*, dont nous n'avons aujourd'hui plus que des vestiges, et qui racontait l'origine de la guerre de Troie. C’est là qu’entre en scène l’épisode célèbre de la *Pomme d'or de la discorde*, lié au mariage de Thétis et de Pélée.
 
 Dans la mythologie grecque, cette union a une portée immense : Thétis est une grande divinité de la mer, tandis que Pélée appartient au monde des mortels. Lors de leur mariage, tous les dieux sont invités, ou presque. Une seule divinité n'est pas conviée : Éris, la déesse de la discorde, du conflit et de la haine. On croit ainsi tenir le désordre hors de la célébration.
 
-Éris parvient néanmoins à troubler la fête en déposant sur la table du festin, parmi les dieux, une pomme d'or. L'objet est magnifique. Il semble illuminé de l'intérieur, et sa beauté en fait aussitôt un objet de convoitise. Une inscription y figure : « à la plus belle ».  Il n'en faut pas davantage pour que la rivalité éclate. Héra, Athéna et Aphrodite veulent chacune se l'approprier, car la posséder, c'est recevoir pour soi le titre qu'elle promet.
+Éris parvient néanmoins à troubler la fête en déposant sur la table du festin, parmi les dieux, une pomme d'or. L'objet est magnifique. Il semble illuminé de l'intérieur, et sa beauté en fait aussitôt un objet de convoitise. Une inscription y figure : « à la plus belle ». Il n'en faut pas davantage pour que la rivalité éclate. Héra, Athéna et Aphrodite veulent chacune se l'approprier, car la posséder, c'est recevoir pour soi le titre qu'elle promet.
+
+### La discorde au coeur du désir
 
 Les Grecs avaient vu, dans cette scène, quelque chose de très profond. La discorde ne naît pas toujours de la haine nue ; elle surgit aussi du désir comparé, de la rivalité et de la jalousie, c'est-à-dire, là même où il y a de l'attachement. La discorde ne s’installe donc pas seulement là où les êtres se détestent, mais aussi là où ils se désirent et s’estiment. On ne se dispute en effet jamais autant qu'avec les gens qu'on aime le plus : c'est là que les querelles vont le plus vite, deviennent les plus intenses et souvent les plus violentes. Il y a, dans cette logique, une proximité profonde entre Éris, la discorde, et Éros, l'amour, presque comme les deux faces d'une même médaille.
 
 Cette structure mythique se retrouvera plus tard dans de nombreux contes de fées de la tradition occidentale. Un exemple bien connu est celui de **La Belle au bois dormant** : la méchante sorcière exclue de la fête revient pour transformer son exclusion en malédiction.
 
-## Le choix de Paris
+## Le jugement de Pâris
 
-La rivalité pour la pomme est désormais engagée ; reste encore à savoir à quelle déesse elle reviendra. Zeus ne veut pas trancher entre les déesses. Comme souvent dans la mythologie, les dieux eux-mêmes sont incapables de régler ce qu'ils ont contribué à déclencher. Il confie donc la décision à un jeune berger de la montagne, Paris, qu'Hermès conduit devant elles. Mais ce prétendu berger n'est pas n'importe qui : c'est en réalité un prince troyen, fils de Priam et frère d'Hector.
+La rivalité pour la pomme est désormais engagée ; reste encore à savoir à quelle déesse elle reviendra. Zeus ne veut pas trancher entre les déesses. Comme souvent dans la mythologie, les dieux eux-mêmes sont incapables de régler ce qu'ils ont contribué à déclencher. Il confie donc la décision à un jeune berger de la montagne, Pâris, qu'Hermès conduit devant elles. Mais ce prétendu berger n'est pas n'importe qui : c'est en réalité un prince troyen, fils de Priam et frère d'Hector.
 
-Le choix de Paris ne se réduit pas à un simple concours de beauté. Chacune des déesses s'avance vers lui avec une promesse, et chaque promesse dessine en creux une idée de ce qui compte le plus dans une vie.
+<figure>
+  <img src="https://upload.wikimedia.org/wikipedia/commons/c/cd/Fran%C3%A7ois-Xavier_Fabre_-_The_Judgment_of_Paris.jpg" alt="Le Jugement de Pâris, François-Xavier Fabre">
+  <figcaption>Le Jugement de Pâris, par François-Xavier Fabre (1808), dans le domaine public, via <a href="https://commons.wikimedia.org/wiki/File:Fran%C3%A7ois-Xavier_Fabre_-_The_Judgment_of_Paris.jpg">Wikimedia Commons</a>.</figcaption>
+</figure>
+
+Le choix de Pâris ne se réduit pas à un simple concours de beauté. Chacune des déesses s'avance vers lui avec une promesse, et chaque promesse dessine en creux une idée de ce qui compte le plus dans une vie.
 
 Héra promet l'empire, c'est-à-dire la puissance politique, la domination et le commandement sur des royaumes immenses. Athéna promet la victoire dans les guerres ; avec elle, il obtiendrait la gloire militaire, le triomphe sur les ennemis et la force consacrée par le succès. Aphrodite, enfin, promet la plus belle femme du monde.
 
-La scène est capitale parce qu'elle montre que toute grande catastrophe naît aussi d'un certain type de choix : Paris choisit Aphrodite, c'est-à-dire le désir et la promesse de la plus belle femme du monde. Ce choix est la source du désastre qui suivra.
+La scène est capitale parce qu'elle montre que toute grande catastrophe naît aussi d'un certain type de choix : Pâris choisit Aphrodite, c'est-à-dire le désir et la promesse de la plus belle femme du monde. Ce choix est la source du désastre qui suivra.
 
 ## Hélène, l'enlèvement, la guerre
 
-La plus belle femme du monde, c'est Hélène, princesse et reine grecque, épouse de Ménélas, roi de Sparte, la ville des guerriers. Paris, lui, est un prince troyen. Reçu à Sparte comme hôte, il rencontre Hélène et, sous la protection d'Aphrodite, repart avec elle vers Troie. C'est ainsi que la guerre éclate. Il faut comprendre que cette guerre n'est pas seulement, comme on pourrait le dire trivialement, une histoire de mari trompé : c'est une guerre entre Grecs et Troyens, et même une hospitalité trahie qui met le feu à tout un monde. Les rois grecs sont obligés de partir pour tenter de récupérer Hélène et de la rendre à Ménélas. Ulysse, qui est l'un de ces rois grecs, doit donc lui aussi partir. Le voici donc arraché à Ithaque.
+La plus belle femme du monde, c'est Hélène, princesse et reine grecque, épouse de Ménélas, roi de Sparte, la ville des guerriers. Pâris, lui, est un prince troyen. Reçu à Sparte comme hôte, il rencontre Hélène et, sous la protection d'Aphrodite, repart avec elle vers Troie. C'est ainsi que la guerre éclate. Il faut comprendre que cette guerre n'est pas seulement, comme on pourrait le dire trivialement, une histoire de mari trompé : c'est une guerre entre Grecs et Troyens, et même une hospitalité trahie qui met le feu à tout un monde. Les rois grecs sont obligés de partir pour tenter de récupérer Hélène et de la rendre à Ménélas. Ulysse, qui est l'un de ces rois grecs, doit donc lui aussi partir. Le voici donc arraché à Ithaque.
 
 La guerre de Troie durera dix ans, dix années de violence, de mort, de haine, d'incendies et de massacres. Elle est atroce, épouvantable. Et quand cette guerre s'achève, ce n'est pas dans la noblesse pure d'une victoire régulière, mais dans la ruse du cheval de Troie, la destruction de la ville et le massacre final, lorsque les soldats grecs sortent des flancs du cheval, en pleine nuit, pour tuer les Troyens. Le sac de la ville est marqué par des crimes si graves que même Athéna, qui avait soutenu les Grecs, finit par se retourner contre eux, notamment après le sacrilège commis contre Cassandre dans son sanctuaire.
 
@@ -52,23 +66,54 @@ L'un des aspects les plus saisissants du récit est sa durée. On retient volont
 
 Il ne s'agit pas seulement ici d'une séparation sentimentale. Une si longue durée implique une transformation de l'être même : on peut se perdre en vingt ans, oublier le visage de ce que l'on aime, cesser de vouloir rentrer et finir par ne plus savoir ce qui donnait autrefois une forme à l'existence. L'enjeu profond du voyage d'Ulysse n'est donc pas uniquement de survivre à des obstacles, mais de ne pas oublier ce pour quoi il vit.
 
+<figure>
+  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7a/%22Penelope_Unraveling_Her_Work_at_Night%22_MET_ADA6426.jpg/1280px-%22Penelope_Unraveling_Her_Work_at_Night%22_MET_ADA6426.jpg" alt="Pénélope défait son ouvrage pendant la nuit">
+  <figcaption>Pénélope défaisant son ouvrage pendant la nuit, par Dora Wheeler Keith (1886), image en CC0 via <a href="https://commons.wikimedia.org/wiki/File:%22Penelope_Unraveling_Her_Work_at_Night%22_MET_ADA6426.jpg">Wikimedia Commons</a>.</figcaption>
+</figure>
+
 Cette idée est absolument centrale. Ce qui menace Ulysse tout au long de l'**Odyssée**, ce n'est pas seulement la mort, mais la perte du sens : l'oubli d'Ithaque, l'oubli de Pénélope et, plus profondément encore, l'oubli de la destination intérieure de sa vie.
 
 ## Poséidon, Polyphème et le retour empêché
 
-Pourquoi le retour est-il si long, et pourquoi les dieux semblent-ils s'acharner à ce point contre Ulysse ? Cet acharnement trouve son origine dans un épisode précis : après avoir aveuglé Polyphème, le Cyclope fils de Poséidon, Ulysse déclenche la colère du dieu de la mer. Poséidon se met dès lors à poursuivre Ulysse de sa haine, multipliant les obstacles, les vents contraires, les tempêtes, les détours et les retards. Même lorsque le rivage d'Ithaque semble presque à portée de main, une nouvelle épreuve survient, comme si le chemin de retour devait sans cesse être défait.
+Pourquoi le retour est-il si long ? La réponse tient à un épisode précis : en aveuglant Polyphème, le Cyclope fils de Poséidon, Ulysse s'attire la colère du dieu de la mer. Dès lors, Poséidon se met à poursuivre Ulysse de sa haine, multipliant les obstacles, les vents contraires, les tempêtes, les détours et les retards. Même lorsque le rivage d'Ithaque semble presque à portée de main, une nouvelle épreuve survient, comme si le chemin de retour devait sans cesse être défait.
 
-Si l'on cherche le sens profond de ces épisodes, une interprétation philosophique se dessine : Poséidon représente tout ce qui empêche le retour à une vie bonne, tout ce qui maintient l'existence dans la dispersion, le tumulte et l'exil loin de soi. Et c'est ici que les grandes étapes du voyage prennent leur unité.
+<figure>
+  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/Plate_6-_Ulysses_driving_a_burning_stake_into_Polyphemus%27_eye_Met_DP885436.jpg/1280px-Plate_6-_Ulysses_driving_a_burning_stake_into_Polyphemus%27_eye_Met_DP885436.jpg" alt="Ulysse enfonçant un pieu ardent dans l'oeil de Polyphème">
+  <figcaption>Ulysse aveuglant Polyphème, gravure de Bartolomeo Crivellari d'après Pellegrino Tibaldi (1756), image en CC0 via <a href="https://commons.wikimedia.org/wiki/File:Plate_6-_Ulysses_driving_a_burning_stake_into_Polyphemus%27_eye_Met_DP885436.jpg">Wikimedia Commons</a>.</figcaption>
+</figure>
+
+Si l'on cherche le sens profond de ces épisodes, une interprétation philosophique se dessine : Poséidon représente tout ce qui empêche le retour à une vie bonne, tout ce qui maintient l'existence dans la dispersion, le tumulte et l'exil loin de soi.
 
 ## Les aventures d'Ulysse comme figures de l'oubli
 
-On peut lire tous les obstacles rencontrés par Ulysse comme autant de figures de l'oubli. Toutes les embûches que Poséidon sème sur son chemin vers Ithaque renvoient à la même menace : faire en sorte qu'il oublie le sens de sa vie, celui de son voyage et, plus profondément, celui de son itinéraire vers la vie bonne.
+On peut lire tous les obstacles rencontrés par Ulysse comme autant de figures de l'oubli. C'est sans doute là le vrai sens de la vengeance de Poséidon : non pas faire mourir Ulysse, mais le condamner à une errance telle qu'il finisse par ne plus savoir ce qu'il cherche, ni pour qui il lutte, ni vers quoi il doit revenir. En ce sens, Poséidon vise presque pire que la mort. Car mourir, c'est tomber ; oublier, c'est se perdre.
+
+### Les Lotophages
 
 Chez les Lotophages, sur la terre de ce peuple nourri du lotus, le danger n'est ni la guerre ni le monstre. Les compagnons d'Ulysse goûtent ce fruit et oublient aussitôt le retour ; ils ne veulent plus repartir, et Ulysse doit les ramener de force sur le navire. L'oubli prend ici la forme la plus douce : non pas la souffrance, mais une torpeur heureuse qui dissout le désir de rentrer.
 
+<figure>
+  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/The_Lotus_Eaters%2C_by_Thomas_Moran%2C_1895%2C_oil_on_canvas_-_Portland_Museum_of_Art_-_Portland%2C_Maine_-_DSC04269.jpg/1280px-The_Lotus_Eaters%2C_by_Thomas_Moran%2C_1895%2C_oil_on_canvas_-_Portland_Museum_of_Art_-_Portland%2C_Maine_-_DSC04269.jpg" alt="The Lotus Eaters, par Thomas Moran">
+  <figcaption>The Lotus Eaters, par Thomas Moran (1895), image en CC0 via <a href="https://commons.wikimedia.org/wiki/File:The_Lotus_Eaters,_by_Thomas_Moran,_1895,_oil_on_canvas_-_Portland_Museum_of_Art_-_Portland,_Maine_-_DSC04269.jpg">Wikimedia Commons</a>.</figcaption>
+</figure>
+
+### Les Sirènes
+
 Les Sirènes, elles, vivent sur un rivage de mort et attirent les marins par leur chant. Circé a prévenu Ulysse : ses compagnons se bouchent donc les oreilles avec de la cire, tandis que lui-même se fait attacher au mât pour entendre sans céder. Ici, l'oubli ne vient plus d'une perte de soi, mais d'un détournement de l'esprit : le chant des Sirènes arrache l'homme à sa route et lui fait oublier ce vers quoi il tend.
 
+<figure>
+  <img src="https://upload.wikimedia.org/wikipedia/commons/d/dc/Bardo_Mosaic_Ulysses_copy.png" alt="Mosaïque d'Ulysse attaché au mât face aux Sirènes">
+  <figcaption>Ulysse attaché au mât pour résister au chant des Sirènes, mosaïque conservée au musée du Bardo, image de Dennis G. Jarvis sous licence <a href="https://creativecommons.org/licenses/by-sa/3.0/deed.fr">CC BY-SA 3.0</a>, via <a href="https://commons.wikimedia.org/wiki/File:Bardo_Mosaic_Ulysses_copy.png">Wikimedia Commons</a>.</figcaption>
+</figure>
+
+### Circé
+
 Chez Circé enfin, sur l'île d'Aiaié, les compagnons d'Ulysse sont changés en porcs, et Ulysse ne les sauve qu'avec l'aide d'Hermès. Mais l'épreuve ne s'arrête pas là : une fois le danger écarté, Ulysse demeure chez Circé pendant une année entière, dans le confort et le plaisir, jusqu'à ce que ses compagnons lui rappellent qu'il faut repartir. L'oubli prend alors une troisième figure : non plus une perte de soi ni un détournement de l'esprit, mais l'immobilisation dans un présent agréable qui fait oublier la nécessité du retour.
+
+<figure>
+  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/Circe_MET_DT6532.jpg/960px-Circe_MET_DT6532.jpg" alt="Circé, portrait photographique de Julia Margaret Cameron">
+  <figcaption>Circé, photographie de Julia Margaret Cameron (1865), image en CC0 via <a href="https://commons.wikimedia.org/wiki/File:Circe_MET_DT6532.jpg">Wikimedia Commons</a>.</figcaption>
+</figure>
 
 Les tempêtes, les vents contraires, les naufrages répétés, les apparitions d'Ithaque aussitôt suivies de nouveaux détours, tout cela raconte la même chose sous des formes différentes : Poséidon essaie, à chaque fois, de faire oublier à Ulysse le sens de sa vie. Le voyage d'Ulysse apparaît alors comme un itinéraire à travers tout ce qui, dans une vie, peut faire perdre la mémoire de ce qui compte vraiment.
 
@@ -78,9 +123,14 @@ Parmi toutes les épreuves, il en est une qui concentre le sens philosophique du
 
 Calypso, divinité secondaire d'une beauté parfaite et immortelle, retient Ulysse sur son île d'Ogygie pendant sept ans. Elle tombe follement amoureuse de lui et souhaite le garder auprès d'elle. Son île est l'opposé des mondes hostiles qu'Ulysse a traversés : Homère la décrit comme un véritable paradis, un lieu d'abondance et de beauté divine, où tout semble conçu pour offrir le repos après les souffrances du voyage.
 
+<figure>
+  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Hitchcock%2C_George_-_Calypso_-_Google_Art_Project.jpg/960px-Hitchcock%2C_George_-_Calypso_-_Google_Art_Project.jpg" alt="Calypso, par George Hitchcock">
+  <figcaption>Calypso, par George Hitchcock, vers 1906, dans le domaine public, via <a href="https://commons.wikimedia.org/wiki/File:Hitchcock,_George_-_Calypso_-_Google_Art_Project.jpg">Wikimedia Commons</a>.</figcaption>
+</figure>
+
 Nous ne sommes plus face à la brutalité du Cyclope, à la menace des tempêtes ou à la violence de la guerre, mais face à une tentation infiniment plus subtile : celle d'un bonheur parfait. Son nom même peut être rapproché du grec **καλύπτω** (*kaluptô*) : cacher. Calypso est celle qui cache, celle qui maintient Ulysse à l'écart d'Ithaque, de Pénélope et de la route qui donne un sens à son existence.
 
-Elle incarne ainsi une forme ultime de l'oubli. Non pas l'effacement de la mémoire, mais la disparition progressive du désir de retrouver ce vers quoi l'on tend. Sa puissance tient à ce qu'elle ne propose pas seulement l'amour et le plaisir : elle offre aussi à Ulysse l'immortalité et jeunesse éternelle, c'est-à-dire, échapper aux limites de sa condition humaine.
+Elle incarne ainsi une forme ultime de l'oubli. Non pas l'effacement de la mémoire, mais la disparition progressive du désir de retrouver ce vers quoi l'on tend. Sa puissance tient à ce qu'elle ne propose pas seulement l'amour et le plaisir : elle offre aussi à Ulysse l'immortalité et la jeunesse éternelle, c'est-à-dire échapper aux limites de sa condition humaine.
 
 Il faut comprendre pourquoi cet épisode est décisif. Si l'**Odyssée** ne racontait qu'une lutte contre des monstres, nous resterions dans l'épique. Mais avec Calypso, le récit bascule dans la philosophie, car l'enjeu n'est plus seulement de savoir comment échapper à un danger : il devient de savoir ce qu'un homme doit désirer.
 
@@ -110,7 +160,11 @@ Ces trois critères peuvent maintenant être développés l'un après l'autre.
 
 La vie bonne commence par une victoire sur la peur. Pourquoi ? Parce que la peur serre nos vies, coince nos existences, les replie sur elles-mêmes et empêche à la fois de penser librement et d'aimer. Une vie gouvernée par la peur n'est pas une vie ouverte, généreuse et disponible, mais une vie contractée, réactive, défensive.
 
+### Les peurs ordinaires
+
 Les peurs peuvent prendre des formes très diverses. Il y a d'abord les peurs immédiates et concrètes : la timidité quand on doit parler en public, la gorge sèche, le coeur qui bat, le corps qui se crispe. Il y a aussi les phobies, parfois minuscules dans leur objet mais immenses dans leurs effets : peur des araignées, des insectes, de l'eau sombre, des ascenseurs en panne. Bref, de tout ce qui peut paraître absurde à un observateur extérieur mais qui, pour celui qui la subit, envahit l'esprit tout entier.
+
+### La peur de la mort
 
 Et puis, il y a la grande peur : la peur de la mort. Non pas seulement de sa propre mort, mais aussi de celle des proches, de ceux qu'on aime. Cette peur est plus profonde que les autres ; elle travaille silencieusement nos existences et peut tout contaminer.
 
@@ -118,7 +172,7 @@ Pourquoi les Grecs faisaient-ils de cette peur le contraire de la sagesse ? Parc
 
 Une vie bonne n'est donc pas possible tant qu'on reste gouverné par la logique du salut permanent de soi.
 
-## La peur comme maladie spirituelle
+### La peur comme maladie spirituelle
 
 Il ne faut pas sous-estimer ce diagnostic. Dire que la peur est l'opposé de la sagesse, ce n'est pas prononcer une phrase morale un peu vague. L'humain effrayé devient moins humain, moins capable de raison, de justice et d'amour.
 
@@ -134,7 +188,11 @@ Ulysse le montre en acte. S'il avait placé la conservation pure au-dessus de to
 
 Le deuxième critère de la vie bonne concerne notre rapport au temps. Les Grecs voyaient très clairement que deux grandes puissances nous empêchent d'accéder à la vie bonne : le passé et le futur.
 
+### Le poids du passé
+
 Le passé nous tire en arrière. Il peut prendre la forme de la nostalgie du bon vieux temps, quand on se dit que la vraie vie était hier, qu'elle a déjà eu lieu et qu'elle est derrière nous. Mais il peut aussi revenir sous la forme des remords, des regrets, des culpabilités, de ce que plus tard Spinoza appellera *les passions tristes*. On se réveille la nuit en repensant à une parole malheureuse, à une faute, à une occasion ratée, à un geste qu'on voudrait effacer, et l'esprit reconstruit sans fin ce qui n'est plus.
+
+### L'illusion du futur
 
 Le futur, lui, nous tire en avant. On se dit que la vie commencera plus tard, quand les conditions seront réunies, quand on aura changé quelque chose à sa situation, à son physique, à son travail, à ses relations, à son statut, de voiture, de coiffure, de chaussures, d'amis, de mari ou de femme. On reporte ainsi sans cesse la possibilité de vivre au nom d'un demain toujours promis.
 
@@ -142,7 +200,7 @@ Dans les deux cas, le passé et le futur nous font manquer de vivre. Or le prés
 
 Vivre bien suppose donc d'habiter le présent.
 
-## Pourquoi le passé et le futur nous font manquer la vie
+### Pourquoi le passé et le futur nous font manquer la vie
 
 Cette idée a traversé toute la sagesse antique. On la retrouvera chez les stoïciens, chez Sénèque dans les *Lettres à Lucilius*, dans l'appel à saisir le jour, et même beaucoup plus tard dans des formules comme l'**amor fati**, l'amour de ce qui est.
 
@@ -152,7 +210,7 @@ L'humain ordinaire est souvent excentré de lui-même : il vit dans les souvenir
 
 D'où la formule, très forte, qu'on peut tirer de toute cette tradition, formule stoïcienne remise en lumière par André Comte-Sponville : le sage est peut-être celui qui parvient à regretter un peu moins, à espérer un peu moins, et à aimer un peu plus, autrement dit celui qui réussit mieux que les autres à demeurer dans le réel.
 
-## Ulysse et le présent impossible
+### Ulysse et le présent impossible
 
 Cette sagesse du présent éclaire à nouveau l'histoire d'Ulysse. Pendant vingt ans, il est presque toujours arraché au moment présent, et il pourrait difficilement en être autrement tant ce qu'il traverse est atroce : guerre, mer, exil, embûches, détours, pertes, absence, douleur. Sur la mer, il n'habite jamais vraiment l'instant : il endure, il attend, il espère. Chez Calypso, même au coeur d'un paradis, il regarde ailleurs. Et lorsque Ithaque semble enfin apparaître, un nouveau détour vient encore l'en séparer. Ulysse vit ainsi constamment dans la nostalgie et l'espérance, mais presque jamais dans l'amour, dans la jouissance au sens propre, dans le présent ; son présent lui est rarement habitable.
 
@@ -164,7 +222,9 @@ La vie bonne n'est donc pas seulement une victoire sur la peur. Elle est aussi l
 
 Le troisième critère est sans doute le plus étranger à nos habitudes modernes, mais il est central dans la pensée grecque. Pour les Grecs, le monde n'est pas un chaos absurde ; il est d'abord un **cosmos**, **κόσμος**, c'est-à-dire un ordre, et même un ordre éternel.
 
-Le cosmos n'est pas simplement l'univers au sens physique. C'est un ordre juste, harmonieux, beau, bon, structuré. Penser ainsi le monde, c'est croire qu'il existe une place ajustée pour chaque chose, une manière d'être dans l'ensemble qui ne soit pas arbitraire ; chacun y a sa place. Dans cette perspective, la vie bonne n'est pas l'exaltation du moi comme puissance illimitée, mais la recherche d'un ajustement. Vivre bien, c'est trouver sa place dans l'ordre du monde.
+Le **cosmos** n'est pas simplement l'univers au sens physique. C'est un ordre juste, harmonieux, beau, bon, structuré. Penser ainsi le monde, c'est croire qu'il existe une place ajustée pour chaque chose, une manière d'être dans l'ensemble qui ne soit pas arbitraire ; chacun y a sa place. Dans cette perspective, la **vie bonne** n'est pas l'exaltation du moi comme puissance illimitée, mais la recherche d'un ajustement.
+
+> Vivre bien, c'est trouver sa place dans l'ordre du monde.
 
 Les Grecs pensaient volontiers l'humain comme un fragment du cosmos, et donc comme un petit fragment d'éternité, au sens où il participe à un ordre plus vaste que lui. Aristote parlera plus tard de « lieu naturel ». L'image est simple : de même qu'un organe comme le coeur trouve sa place dans un organisme, de même l'humain est appelé à une inscription dans un tout qui le dépasse. La vie bonne n'est pas seulement affaire d'intériorité subjective ; elle suppose une certaine harmonie entre soi, les autres et l'ordre du monde. Ithaque reprend ici un sens encore plus profond. Ulysse ne cherche pas seulement un toit ou une femme ; il cherche sa place, le point d'ajustement où son existence cessera d'être en exil.
 
@@ -172,7 +232,14 @@ C'est pourquoi les trois critères se tiennent ensemble : on ne vainc vraiment l
 
 ## Ce qu'il faut sauver d'une vie
 
+*La vie bonne n'est pas la fuite vers l'infini, mais le retour vers ce qui mérite fidélité.*
+
 Si l'on rassemble tous les fils du récit, une leçon se dégage plus nettement : l'**Odyssée** ne raconte pas seulement un voyage, mais la lutte d'une existence contre tout ce qui la disperse. La grandeur d'une vie humaine ne se mesure donc ni à sa durée, ni à son intensité apparente, ni à la somme de ses aventures, mais à sa fidélité et à sa capacité de résister à la dispersion.
+
+<figure>
+  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/Ulysse_et_Penelope_%28NYPL_b12149230-5107444%29.jpg/960px-Ulysse_et_Penelope_%28NYPL_b12149230-5107444%29.jpg" alt="Ulysse et Pénélope">
+  <figcaption>Ulysse et Pénélope, gravure de 1706 conservée par la New York Public Library, dans le domaine public, via <a href="https://commons.wikimedia.org/wiki/File:Ulysse_et_Penelope_%28NYPL_b12149230-5107444%29.jpg">Wikimedia Commons</a>.</figcaption>
+</figure>
 
 C'est aussi ce qui rend ce poème si proche de nous. Les Lotophages, Circé, les Sirènes ou Calypso n'appartiennent pas seulement à un autre âge. Ils donnent une forme visible à des tentations qui n'ont pas disparu. Aujourd'hui encore, la vie se laisse facilement disperser : dans l'accumulation des sollicitations, dans la poursuite indéfinie de nouveautés, dans l'agitation qui remplit les jours sans leur donner de centre. Nous rêvons d'intensité, de vitesse, d'ouverture infinie des possibles, et nous découvrons souvent, trop tard, que cette fuite en avant peut aussi nous éloigner de nous-mêmes.
 

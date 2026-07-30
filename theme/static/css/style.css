@@ -97,6 +97,25 @@ h6 {
   hyphens: auto;
 }
 
+.article-content figure {
+  margin: 1.5rem 0;
+}
+
+.article-content figure img {
+  display: block;
+  margin: 0 auto;
+}
+
+.article-content figcaption {
+  margin-top: 0.75rem;
+  text-align: center;
+  text-justify: auto;
+  hyphens: none;
+  font-size: 0.95rem;
+  font-style: italic;
+  color: var(--muted);
+}
+
 blockquote {
   margin: 1.5rem 0;
   padding: 1rem 1.25rem;
