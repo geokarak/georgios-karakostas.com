@@ -1,8 +1,8 @@
-title: L’Odyssée d’Ulysse : une quête de la vie bonne
+title: L’Odyssée ou la quête de la vie bonne
 date: 07-26-2026
 description: Une relecture philosophique de l'Odyssée, suivie dans l'ordre du récit, comme première grande réponse occidentale à la question de la vie bonne.
 status: published
-slug: odyssee-ulysse-quete-vie-bonne
+slug: odyssee-quete-vie-bonne
 
 Parmi les grandes questions de la philosophie, il en est une, essentielle, qui reste simple à formuler mais difficile à traiter : qu'est-ce qu'une vie bonne ? Qu'est-ce qu'une vie réussie, non pas au sens scolaire, social ou économique, mais au sens le plus profond du terme ? Qu'est-ce qu'une existence humaine accomplie ?
 
@@ -11,8 +11,8 @@ Pour approcher cette question, il existe deux voies. La première consiste à co
 Parmi ces récits, l'**Odyssée** d'Homère occupe une place singulière. C'est l'un des premiers grands textes de la littérature grecque, composé au VIIIe siècle avant Jésus-Christ. On croit souvent le connaître parce qu'on se souvient du Cyclope, des Sirènes, des tempêtes, de Circé ou de Calypso. On y voit volontiers un chef-d'oeuvre d'aventures maritimes, de ruses, de monstres et de périls. Mais si l'on prend la peine de suivre le poème en profondeur, on découvre qu'il dessine en fait une réponse à la question de la vie bonne.
 
 <figure>
-  <img src="https://upload.wikimedia.org/wikipedia/commons/2/2e/Ulysses_and_Argo_%28cropped%29.png" alt="Ulysse reconnu par Argos">
-  <figcaption>Ulysse reconnu par Argos. Illustration de 1905, dans le domaine public, via <a href="https://commons.wikimedia.org/wiki/File:Ulysses_and_Argo_%28cropped%29.png">Wikimedia Commons</a>.</figcaption>
+  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/72/Apollonio_di_Giovanni_-_The_Adventures_of_Ulysses_-_1933.1006_-_Art_Institute_of_Chicago.jpg/1280px-Apollonio_di_Giovanni_-_The_Adventures_of_Ulysses_-_1933.1006_-_Art_Institute_of_Chicago.jpg" alt="Les aventures d'Ulysse">
+  <figcaption>Les aventures d'Ulysse, par Apollonio di Giovanni, entre 1435 et 1445, dans le domaine public, via <a href="https://commons.wikimedia.org/wiki/File:Apollonio_di_Giovanni_-_The_Adventures_of_Ulysses_-_1933.1006_-_Art_Institute_of_Chicago.jpg">Wikimedia Commons</a>.</figcaption>
 </figure>
 
 ## Une histoire très ancienne pour une question toujours actuelle
@@ -31,13 +31,18 @@ Dans la mythologie grecque, cette union a une portée immense : Thétis est une 
 
 Éris parvient néanmoins à troubler la fête en déposant sur la table du festin, parmi les dieux, une pomme d'or. L'objet est magnifique. Il semble illuminé de l'intérieur, et sa beauté en fait aussitôt un objet de convoitise. Une inscription y figure : « à la plus belle ». Il n'en faut pas davantage pour que la rivalité éclate. Héra, Athéna et Aphrodite veulent chacune se l'approprier, car la posséder, c'est recevoir pour soi le titre qu'elle promet.
 
+<figure>
+  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/Apple_of_Discord_Thrown_by_Eris_at_the_Marriage_of_Peleus_and_Thetis-_Study_for_Fresco_in_the_Hall_of_Henri_II_at_Fountainebleau_MET_DP801508.jpg/1280px-Apple_of_Discord_Thrown_by_Eris_at_the_Marriage_of_Peleus_and_Thetis-_Study_for_Fresco_in_the_Hall_of_Henri_II_at_Fountainebleau_MET_DP801508.jpg" alt="Éris jetant la pomme de discorde au mariage de Thétis et de Pélée">
+  <figcaption>Éris jetant la pomme de discorde au mariage de Thétis et de Pélée, étude de Francesco Primaticcio pour une fresque de Fontainebleau, image en CC0 via <a href="https://commons.wikimedia.org/wiki/File:Apple_of_Discord_Thrown_by_Eris_at_the_Marriage_of_Peleus_and_Thetis-_Study_for_Fresco_in_the_Hall_of_Henri_II_at_Fountainebleau_MET_DP801508.jpg">Wikimedia Commons</a>.</figcaption>
+</figure>
+
 ### La discorde au coeur du désir
 
 Les Grecs avaient vu, dans cette scène, quelque chose de très profond. La discorde ne naît pas toujours de la haine nue ; elle surgit aussi du désir comparé, de la rivalité et de la jalousie, c'est-à-dire, là même où il y a de l'attachement. La discorde ne s’installe donc pas seulement là où les êtres se détestent, mais aussi là où ils se désirent et s’estiment. On ne se dispute en effet jamais autant qu'avec les gens qu'on aime le plus : c'est là que les querelles vont le plus vite, deviennent les plus intenses et souvent les plus violentes. Il y a, dans cette logique, une proximité profonde entre Éris, la discorde, et Éros, l'amour, presque comme les deux faces d'une même médaille.
 
 Cette structure mythique se retrouvera plus tard dans de nombreux contes de fées de la tradition occidentale. Un exemple bien connu est celui de **La Belle au bois dormant** : la méchante sorcière exclue de la fête revient pour transformer son exclusion en malédiction.
 
-## Le jugement de Pâris
+### Le jugement de Pâris
 
 La rivalité pour la pomme est désormais engagée ; reste encore à savoir à quelle déesse elle reviendra. Zeus ne veut pas trancher entre les déesses. Comme souvent dans la mythologie, les dieux eux-mêmes sont incapables de régler ce qu'ils ont contribué à déclencher. Il confie donc la décision à un jeune berger de la montagne, Pâris, qu'Hermès conduit devant elles. Mais ce prétendu berger n'est pas n'importe qui : c'est en réalité un prince troyen, fils de Priam et frère d'Hector.
 
@@ -52,7 +57,7 @@ Héra promet l'empire, c'est-à-dire la puissance politique, la domination et le
 
 La scène est capitale parce qu'elle montre que toute grande catastrophe naît aussi d'un certain type de choix : Pâris choisit Aphrodite, c'est-à-dire le désir et la promesse de la plus belle femme du monde. Ce choix est la source du désastre qui suivra.
 
-## Hélène, l'enlèvement, la guerre
+### Hélène, l'enlèvement, la guerre
 
 La plus belle femme du monde, c'est Hélène, princesse et reine grecque, épouse de Ménélas, roi de Sparte, la ville des guerriers. Pâris, lui, est un prince troyen. Reçu à Sparte comme hôte, il rencontre Hélène et, sous la protection d'Aphrodite, repart avec elle vers Troie. C'est ainsi que la guerre éclate. Il faut comprendre que cette guerre n'est pas seulement, comme on pourrait le dire trivialement, une histoire de mari trompé : c'est une guerre entre Grecs et Troyens, et même une hospitalité trahie qui met le feu à tout un monde. Les rois grecs sont obligés de partir pour tenter de récupérer Hélène et de la rendre à Ménélas. Ulysse, qui est l'un de ces rois grecs, doit donc lui aussi partir. Le voici donc arraché à Ithaque.
 
@@ -111,8 +116,8 @@ Les Sirènes, elles, vivent sur un rivage de mort et attirent les marins par leu
 Chez Circé enfin, sur l'île d'Aiaié, les compagnons d'Ulysse sont changés en porcs, et Ulysse ne les sauve qu'avec l'aide d'Hermès. Mais l'épreuve ne s'arrête pas là : une fois le danger écarté, Ulysse demeure chez Circé pendant une année entière, dans le confort et le plaisir, jusqu'à ce que ses compagnons lui rappellent qu'il faut repartir. L'oubli prend alors une troisième figure : non plus une perte de soi ni un détournement de l'esprit, mais l'immobilisation dans un présent agréable qui fait oublier la nécessité du retour.
 
 <figure>
-  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/Circe_MET_DT6532.jpg/960px-Circe_MET_DT6532.jpg" alt="Circé, portrait photographique de Julia Margaret Cameron">
-  <figcaption>Circé, photographie de Julia Margaret Cameron (1865), image en CC0 via <a href="https://commons.wikimedia.org/wiki/File:Circe_MET_DT6532.jpg">Wikimedia Commons</a>.</figcaption>
+  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/The_magician_Circe_poisons_Odysseus%27_shipmates_%28Allori%29.jpg/960px-The_magician_Circe_poisons_Odysseus%27_shipmates_%28Allori%29.jpg" alt="La magicienne Circé empoisonne les compagnons d'Ulysse">
+  <figcaption>La magicienne Circé empoisonne les compagnons d'Ulysse, par Alessandro Allori (vers 1580), dans le domaine public, via <a href="https://commons.wikimedia.org/wiki/File:The_magician_Circe_poisons_Odysseus%27_shipmates_%28Allori%29.jpg">Wikimedia Commons</a>.</figcaption>
 </figure>
 
 Les tempêtes, les vents contraires, les naufrages répétés, les apparitions d'Ithaque aussitôt suivies de nouveaux détours, tout cela raconte la même chose sous des formes différentes : Poséidon essaie, à chaque fois, de faire oublier à Ulysse le sens de sa vie. Le voyage d'Ulysse apparaît alors comme un itinéraire à travers tout ce qui, dans une vie, peut faire perdre la mémoire de ce qui compte vraiment.
@@ -222,9 +227,7 @@ La vie bonne n'est donc pas seulement une victoire sur la peur. Elle est aussi l
 
 Le troisième critère est sans doute le plus étranger à nos habitudes modernes, mais il est central dans la pensée grecque. Pour les Grecs, le monde n'est pas un chaos absurde ; il est d'abord un **cosmos**, **κόσμος**, c'est-à-dire un ordre, et même un ordre éternel.
 
-Le **cosmos** n'est pas simplement l'univers au sens physique. C'est un ordre juste, harmonieux, beau, bon, structuré. Penser ainsi le monde, c'est croire qu'il existe une place ajustée pour chaque chose, une manière d'être dans l'ensemble qui ne soit pas arbitraire ; chacun y a sa place. Dans cette perspective, la **vie bonne** n'est pas l'exaltation du moi comme puissance illimitée, mais la recherche d'un ajustement.
-
-> Vivre bien, c'est trouver sa place dans l'ordre du monde.
+Le **cosmos** n'est pas simplement l'univers au sens physique. C'est un ordre juste, harmonieux, beau, bon, structuré. Penser ainsi le monde, c'est croire qu'il existe une place ajustée pour chaque chose, une manière d'être dans l'ensemble qui ne soit pas arbitraire ; chacun y a sa place. Dans cette perspective, la **vie bonne** n'est pas l'exaltation du moi comme puissance illimitée, mais la recherche d'un ajustement. **Vivre bien, c'est trouver sa place dans l'ordre du monde.**
 
 Les Grecs pensaient volontiers l'humain comme un fragment du cosmos, et donc comme un petit fragment d'éternité, au sens où il participe à un ordre plus vaste que lui. Aristote parlera plus tard de « lieu naturel ». L'image est simple : de même qu'un organe comme le coeur trouve sa place dans un organisme, de même l'humain est appelé à une inscription dans un tout qui le dépasse. La vie bonne n'est pas seulement affaire d'intériorité subjective ; elle suppose une certaine harmonie entre soi, les autres et l'ordre du monde. Ithaque reprend ici un sens encore plus profond. Ulysse ne cherche pas seulement un toit ou une femme ; il cherche sa place, le point d'ajustement où son existence cessera d'être en exil.
 
@@ -232,16 +235,14 @@ C'est pourquoi les trois critères se tiennent ensemble : on ne vainc vraiment l
 
 ## Ce qu'il faut sauver d'une vie
 
-*La vie bonne n'est pas la fuite vers l'infini, mais le retour vers ce qui mérite fidélité.*
-
-Si l'on rassemble tous les fils du récit, une leçon se dégage plus nettement : l'**Odyssée** ne raconte pas seulement un voyage, mais la lutte d'une existence contre tout ce qui la disperse. La grandeur d'une vie humaine ne se mesure donc ni à sa durée, ni à son intensité apparente, ni à la somme de ses aventures, mais à sa fidélité et à sa capacité de résister à la dispersion.
+Si l'on rassemble tous les fils du récit, une leçon se dégage plus nettement : l'**Odyssée** ne raconte pas seulement un voyage, mais la lutte d'une existence contre tout ce qui la disperse. **La grandeur d'une vie humaine ne se mesure donc ni à sa durée, ni à son intensité apparente, ni à la somme de ses aventures, mais à sa fidélité et à sa capacité de résister à la dispersion.**
 
 <figure>
   <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/Ulysse_et_Penelope_%28NYPL_b12149230-5107444%29.jpg/960px-Ulysse_et_Penelope_%28NYPL_b12149230-5107444%29.jpg" alt="Ulysse et Pénélope">
   <figcaption>Ulysse et Pénélope, gravure de 1706 conservée par la New York Public Library, dans le domaine public, via <a href="https://commons.wikimedia.org/wiki/File:Ulysse_et_Penelope_%28NYPL_b12149230-5107444%29.jpg">Wikimedia Commons</a>.</figcaption>
 </figure>
 
-C'est aussi ce qui rend ce poème si proche de nous. Les Lotophages, Circé, les Sirènes ou Calypso n'appartiennent pas seulement à un autre âge. Ils donnent une forme visible à des tentations qui n'ont pas disparu. Aujourd'hui encore, la vie se laisse facilement disperser : dans l'accumulation des sollicitations, dans la poursuite indéfinie de nouveautés, dans l'agitation qui remplit les jours sans leur donner de centre. Nous rêvons d'intensité, de vitesse, d'ouverture infinie des possibles, et nous découvrons souvent, trop tard, que cette fuite en avant peut aussi nous éloigner de nous-mêmes.
+C'est aussi ce qui rend ce poème si proche de nous. Les Lotophages, les Sirènes, Circé ou Calypso n'appartiennent pas seulement à un autre âge. Ils donnent une forme visible à des tentations qui n'ont pas disparu. Aujourd'hui encore, la vie se laisse facilement disperser : dans l'accumulation des sollicitations, dans la poursuite indéfinie de nouveautés, dans l'agitation qui remplit les jours sans leur donner de centre. Nous rêvons d'intensité, de vitesse, d'ouverture infinie des possibles, et nous découvrons souvent, trop tard, que cette fuite en avant peut aussi nous éloigner de nous-mêmes.
 
 Cette dispersion tient aussi à notre rapport au temps. Nous vivons de plus en plus dans l'instant pur : un clou chasse l'autre, une information en recouvre une autre, puis une autre encore, si bien que ce qui faisait l'événement à l'instant $t$ est aussitôt oublié à l'instant $t + 1$. Sur Twitter, Instagram, Facebook, sur les chaînes d'information en continu, dans le défilement hypnotique des stories de quelques secondes, le centre du monde change sans cesse, puis s'évanouit. Ce qui faisait événement disparaît avant même d'avoir été pensé. Nous passons d'une image à l'autre, d'une urgence à l'autre, et nous perdons peu à peu la capacité d'inscrire le présent dans une histoire plus vaste. Le centre du monde est ici, puis ailleurs, puis nulle part. Ce régime de l'attention nous habitue à recevoir sans retenir, à voir sans relier, à réagir sans inscrire ce que nous vivons dans une longue durée. Or le présent ne tient pas tout seul : il s'enracine dans le passé et produit des effets dans l'avenir. Quand cet enracinement se défait, il ne reste qu'un flux sans mémoire, et avec lui l'oubli du temps long.
 
