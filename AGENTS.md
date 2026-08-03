@@ -16,3 +16,4 @@
 - Anytime a new feature is added, unit tests must be written for them.
 - I prefer my functions to be small in interface but long in functionality.
 - When doing changes, run `make format` and `make check` to confirm all is OK
+- Commit messages should always be in English.
