@@ -24,6 +24,8 @@ The ingest step:
   partial import behind
 - requires `exiftool`
 - skips photos that do not provide `EXIF:DateTimeOriginal`
+- skips photos whose image bytes cannot be decoded safely and leaves them in
+  place for later quarantine or manual review
 
 Each ingested photo creates:
 

@@ -7,13 +7,17 @@ resizing, and writing the display and thumbnail files used by the site.
 import io
 from pathlib import Path
 
-from PIL import Image, ImageCms, ImageOps
+from PIL import Image, ImageCms, ImageOps, UnidentifiedImageError
 
 DISPLAY_MAX_EDGE = 2200
 THUMBNAIL_MAX_EDGE = 900
 DERIVATIVE_FORMAT = "WEBP"
 DERIVATIVE_EXTENSION = ".webp"
 DERIVATIVE_QUALITY = 82
+
+
+class InvalidImageError(RuntimeError):
+    """Raised when source image bytes cannot be decoded safely."""
 
 
 def srgb_profile_bytes() -> bytes:
@@ -65,22 +69,25 @@ def save_web_derivative(
     source_file: Path, destination_file: Path, max_edge: int
 ) -> None:
     """Create one resized web-ready image derivative."""
-    with Image.open(source_file) as image:
-        icc_profile = image.info.get("icc_profile")
-        rendered = ImageOps.exif_transpose(image)
-        if rendered.mode not in {"RGB", "RGBA"}:
-            rendered = rendered.convert("RGB")
+    try:
+        with Image.open(source_file) as image:
+            icc_profile = image.info.get("icc_profile")
+            rendered = ImageOps.exif_transpose(image)
+            if rendered.mode not in {"RGB", "RGBA"}:
+                rendered = rendered.convert("RGB")
 
-        rendered, derivative_icc_profile = convert_to_srgb(rendered, icc_profile)
+            rendered, derivative_icc_profile = convert_to_srgb(rendered, icc_profile)
 
-        rendered.thumbnail((max_edge, max_edge), Image.Resampling.LANCZOS)
-        save_options = {
-            "format": DERIVATIVE_FORMAT,
-            "quality": DERIVATIVE_QUALITY,
-            "method": 6,
-            "icc_profile": derivative_icc_profile,
-        }
-        if rendered.mode == "RGBA":
-            save_options["lossless"] = False
+            rendered.thumbnail((max_edge, max_edge), Image.Resampling.LANCZOS)
+            save_options = {
+                "format": DERIVATIVE_FORMAT,
+                "quality": DERIVATIVE_QUALITY,
+                "method": 6,
+                "icc_profile": derivative_icc_profile,
+            }
+            if rendered.mode == "RGBA":
+                save_options["lossless"] = False
 
-        rendered.save(destination_file, **save_options)
+            rendered.save(destination_file, **save_options)
+    except (OSError, UnidentifiedImageError, Image.DecompressionBombError) as error:
+        raise InvalidImageError(str(error)) from error

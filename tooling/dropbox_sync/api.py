@@ -14,6 +14,8 @@ from .paths import is_supported_image
 
 API_BASE_URL = "https://api.dropboxapi.com/2"
 CONTENT_BASE_URL = "https://content.dropboxapi.com/2"
+DOWNLOAD_CHUNK_SIZE = 1024 * 1024
+MAX_DOWNLOAD_BYTES = 50 * 1024 * 1024
 
 
 def read_error_payload(error: HTTPError) -> str:
@@ -99,9 +101,17 @@ def list_dropbox_images(token: str, inbox_root: PurePosixPath) -> list[dict]:
 
 
 def download_dropbox_file(
-    token: str, dropbox_source_path: str, staged_file_path: Path
+    token: str,
+    dropbox_source_path: str,
+    staged_file_path: Path,
+    expected_size: int | None = None,
 ) -> None:
     """Download one Dropbox file into a local destination path."""
+    if expected_size is not None and expected_size > MAX_DOWNLOAD_BYTES:
+        raise RuntimeError(
+            f"Dropbox file is too large to download safely: {dropbox_source_path}"
+        )
+
     request = Request(
         f"{CONTENT_BASE_URL}/files/download",
         headers={
@@ -112,15 +122,28 @@ def download_dropbox_file(
     )
 
     try:
-        with urlopen(request) as response:
-            contents = response.read()
+        staged_file_path.parent.mkdir(parents=True, exist_ok=True)
+        bytes_written = 0
+        with urlopen(request) as response, staged_file_path.open("wb") as staged_file:
+            while True:
+                chunk = response.read(DOWNLOAD_CHUNK_SIZE)
+                if not chunk:
+                    break
+
+                bytes_written += len(chunk)
+                if bytes_written > MAX_DOWNLOAD_BYTES:
+                    raise RuntimeError(
+                        "Dropbox file is too large to download safely: "
+                        f"{dropbox_source_path}"
+                    )
+                staged_file.write(chunk)
     except HTTPError as error:
         raise RuntimeError(
             f"Dropbox download failed for {dropbox_source_path}: {read_error_payload(error)}"
         ) from error
-
-    staged_file_path.parent.mkdir(parents=True, exist_ok=True)
-    staged_file_path.write_bytes(contents)
+    except Exception:
+        staged_file_path.unlink(missing_ok=True)
+        raise
 
 
 def move_dropbox_file(

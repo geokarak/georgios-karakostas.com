@@ -16,6 +16,8 @@ Dropbox app settings live at `https://www.dropbox.com/developers/apps`.
 Uploads go into `site-photo-inbox/<category>/`. The workflow then:
 
 - downloads supported images from Dropbox into a temporary local inbox
+- rejects suspicious Dropbox paths and over-large files before they can write
+  outside the staging area or exhaust runner memory
 - runs the existing ingest flow against that temporary inbox
 - runs repository checks and builds the site
 - commits and pushes generated photo files and gallery pages
@@ -66,6 +68,10 @@ rejected.
 The download phase stages files locally and writes the shared sync state file.
 It does not decide remove-from-inbox versus quarantine yet because ingest has
 not classified files at this point.
+
+Suspicious Dropbox paths and files that exceed the configured safe download
+limit are marked as `skipped` immediately so the final phase can quarantine
+them.
 
 ### Step 4: resolve finalize inputs
 

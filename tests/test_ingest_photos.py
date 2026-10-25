@@ -387,6 +387,40 @@ def test_main_merges_results_into_existing_dropbox_sync_state(tmp_path, monkeypa
     ]
 
 
+def test_main_marks_invalid_images_as_skipped_in_manifest(tmp_path, monkeypatch):
+    src_dir = tmp_path / "inbox" / "iphone"
+    result_manifest = tmp_path / "ingest-results.json"
+    src_dir.mkdir(parents=True)
+    bad_source = src_dir / "broken.jpg"
+    bad_source.write_bytes(b"not-an-image")
+
+    patch_ingest_args(monkeypatch, tmp_path, result_manifest=result_manifest)
+    monkeypatch.setattr(exif_helpers, "require_exiftool", lambda: "/usr/bin/exiftool")
+    monkeypatch.setattr(
+        exif_helpers,
+        "exif_datetimes",
+        lambda paths, exiftool_path: {
+            path: dt.datetime(2024, 2, 22, 12, 0, 5) for path in paths
+        },
+    )
+    monkeypatch.setattr(
+        source_helpers,
+        "generated_photo_id",
+        lambda captured_at: "2024-02-22-120005-a1b2c3d4",
+    )
+
+    assert ingest_photos.main() == 0
+
+    assert json.loads(result_manifest.read_text(encoding="utf-8")) == [
+        {
+            "source_file": str(bad_source.resolve()),
+            "status": "skipped",
+            "reason": "invalid-image-data",
+        }
+    ]
+    assert bad_source.exists()
+
+
 def test_main_rolls_back_outputs_when_source_removal_fails(tmp_path, monkeypatch):
     src_dir = tmp_path / "inbox" / "macro"
     dest_dir = tmp_path / "content" / "images" / "photos"

@@ -19,6 +19,10 @@ def normalize_dropbox_path(path: str) -> PurePosixPath:
     normalized = PurePosixPath(cleaned if cleaned.startswith("/") else f"/{cleaned}")
     if normalized == PurePosixPath("."):
         raise ValueError("Dropbox path cannot resolve to the current directory")
+    if any(part in {".", ".."} for part in normalized.parts):
+        raise ValueError(
+            f"Dropbox path contains unsupported traversal segments: {path}"
+        )
     return normalized
 
 

@@ -28,6 +28,11 @@ def test_dropbox_paths_preserve_relative_structure():
     ) == PurePosixPath("/site-photo-quarantine/street/frame.webp")
 
 
+def test_normalize_dropbox_path_rejects_traversal_segments():
+    with pytest.raises(ValueError, match="traversal"):
+        path_helpers.normalize_dropbox_path("/site-photo-inbox/../evil.jpg")
+
+
 @pytest.mark.parametrize(
     ("path", "expected"),
     [
@@ -70,7 +75,7 @@ def test_download_dropbox_inbox_writes_state_file_for_later_finalize(
         ],
     )
 
-    def fake_download(token, source_path, destination):
+    def fake_download(token, source_path, destination, expected_size=None):
         destination.parent.mkdir(parents=True, exist_ok=True)
         destination.write_bytes(b"img")
 
@@ -97,6 +102,71 @@ def test_download_dropbox_inbox_writes_state_file_for_later_finalize(
         {
             "source_path": "/site-photo-inbox/iphone/a.jpg",
             "source_file": str((staging_dir / "iphone" / "a.jpg").resolve()),
+        }
+    ]
+
+
+def test_download_dropbox_inbox_marks_invalid_paths_as_skipped(tmp_path, monkeypatch):
+    monkeypatch.setattr(download_helpers, "require_access_token", lambda: "token")
+    monkeypatch.setattr(
+        download_helpers,
+        "list_dropbox_images",
+        lambda token, root: [
+            {
+                "path_display": "/site-photo-inbox/../outside.jpg",
+                "path_lower": "/site-photo-inbox/../outside.jpg",
+            }
+        ],
+    )
+
+    state_file = tmp_path / "dropbox-sync-state.json"
+    downloaded = download_helpers.download_dropbox_inbox(
+        staging_dir=tmp_path / "dropbox-inbox",
+        inbox_root=PurePosixPath("/site-photo-inbox"),
+        state_file=state_file,
+    )
+
+    assert downloaded == 0
+    assert json.loads(state_file.read_text(encoding="utf-8")) == [
+        {
+            "source_path": "/site-photo-inbox/../outside.jpg",
+            "source_file": "",
+            "status": "skipped",
+            "reason": "invalid-dropbox-path",
+        }
+    ]
+
+
+def test_download_dropbox_inbox_marks_large_files_as_skipped(tmp_path, monkeypatch):
+    monkeypatch.setattr(download_helpers, "require_access_token", lambda: "token")
+    monkeypatch.setattr(
+        download_helpers,
+        "list_dropbox_images",
+        lambda token, root: [
+            {
+                "path_display": "/site-photo-inbox/iphone/huge.jpg",
+                "path_lower": "/site-photo-inbox/iphone/huge.jpg",
+                "size": download_helpers.MAX_DOWNLOAD_BYTES + 1,
+            }
+        ],
+    )
+
+    state_file = tmp_path / "dropbox-sync-state.json"
+    downloaded = download_helpers.download_dropbox_inbox(
+        staging_dir=tmp_path / "dropbox-inbox",
+        inbox_root=PurePosixPath("/site-photo-inbox"),
+        state_file=state_file,
+    )
+
+    assert downloaded == 0
+    assert json.loads(state_file.read_text(encoding="utf-8")) == [
+        {
+            "source_path": "/site-photo-inbox/iphone/huge.jpg",
+            "source_file": str(
+                (tmp_path / "dropbox-inbox" / "iphone" / "huge.jpg").resolve()
+            ),
+            "status": "skipped",
+            "reason": "file-too-large",
         }
     ]
 

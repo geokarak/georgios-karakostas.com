@@ -2,7 +2,7 @@
 {% block title %}{{ page.title }} - {{ SITENAME }}{% endblock %}
 {% block extra_head %}
     <link rel="stylesheet"
-          href="https://cdn.jsdelivr.net/npm/glightbox/dist/css/glightbox.min.css" />
+          href="{{ SITEURL }}/theme/vendor/glightbox/glightbox.min.css" />
 {% endblock %}
 {% block content %}
     <div class="gallery">
@@ -20,7 +20,7 @@
     </div>
 {% endblock %}
 {% block extra_scripts %}
-    <script src="https://cdn.jsdelivr.net/npm/glightbox/dist/js/glightbox.min.js"></script>
+    <script src="{{ SITEURL }}/theme/vendor/glightbox/glightbox.min.js"></script>
     <script>
       GLightbox({
         selector: ".glightbox",

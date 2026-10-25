@@ -7,7 +7,7 @@ rest of the workflow.
 
 from pathlib import Path, PurePosixPath
 
-from .api import download_dropbox_file, list_dropbox_images
+from .api import MAX_DOWNLOAD_BYTES, download_dropbox_file, list_dropbox_images
 from .auth import require_access_token
 from .paths import relative_dropbox_path
 from .state import write_state_file
@@ -33,10 +33,58 @@ def download_dropbox_inbox(
     state_entries = []
     for dropbox_file in dropbox_files:
         dropbox_source_path = dropbox_file["path_display"]
-        relative_path = relative_dropbox_path(dropbox_source_path, inbox_root)
-        source_file = staging_dir.joinpath(*relative_path.parts)
+        try:
+            relative_path = relative_dropbox_path(dropbox_source_path, inbox_root)
+        except ValueError as error:
+            state_entries.append(
+                {
+                    "source_path": dropbox_source_path,
+                    "source_file": "",
+                    "status": "skipped",
+                    "reason": "invalid-dropbox-path",
+                }
+            )
+            print(f"Skipping {dropbox_source_path}: {error}")
+            continue
 
-        download_dropbox_file(access_token, dropbox_source_path, source_file)
+        source_file = staging_dir.joinpath(*relative_path.parts)
+        file_size = dropbox_file.get("size")
+        if isinstance(file_size, int) and file_size > MAX_DOWNLOAD_BYTES:
+            state_entries.append(
+                {
+                    "source_path": dropbox_source_path,
+                    "source_file": str(source_file.resolve()),
+                    "status": "skipped",
+                    "reason": "file-too-large",
+                }
+            )
+            print(
+                "Skipping "
+                f"{dropbox_source_path}: file exceeds {MAX_DOWNLOAD_BYTES} bytes"
+            )
+            continue
+
+        try:
+            download_dropbox_file(
+                access_token,
+                dropbox_source_path,
+                source_file,
+                expected_size=file_size if isinstance(file_size, int) else None,
+            )
+        except RuntimeError as error:
+            if "too large to download safely" not in str(error):
+                raise
+            state_entries.append(
+                {
+                    "source_path": dropbox_source_path,
+                    "source_file": str(source_file.resolve()),
+                    "status": "skipped",
+                    "reason": "file-too-large",
+                }
+            )
+            print(f"Skipping {dropbox_source_path}: {error}")
+            continue
+
         state_entries.append(
             {
                 "source_path": dropbox_source_path,

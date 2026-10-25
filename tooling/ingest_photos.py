@@ -209,16 +209,28 @@ def main() -> int:
             continue
 
         # Commit outputs atomically for this source image.
-        ingest_photo_atomically(
-            source_file=source_file,
-            category=category,
-            project_root=project_root,
-            category_dir=category_dir,
-            metadata_file=metadata_file,
-            display_file=display_file,
-            thumbnail_file=thumbnail_file,
-            metadata=metadata,
-        )
+        try:
+            ingest_photo_atomically(
+                source_file=source_file,
+                category=category,
+                project_root=project_root,
+                category_dir=category_dir,
+                metadata_file=metadata_file,
+                display_file=display_file,
+                thumbnail_file=thumbnail_file,
+                metadata=metadata,
+            )
+        except image_helpers.InvalidImageError as error:
+            ingest_results.append(
+                {
+                    "source_file": str(source_file.resolve()),
+                    "status": "skipped",
+                    "reason": "invalid-image-data",
+                }
+            )
+            print(f"Skipping {source_file}: cannot process image data ({error})")
+            skipped += 1
+            continue
 
         # Record successful ingest result.
         ingested += 1
