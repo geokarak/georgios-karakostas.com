@@ -13,7 +13,9 @@
                        data-gallery="{{ page.slug }}"
                        data-title="{{ photo.caption | striptags if photo.caption else '' }}">
                         <img src="{{ photo.thumbnail_url }}"
-                             alt="{{ photo.caption | striptags if photo.caption else photo.photo_id | replace('-', ' ') }}" />
+                             alt="{{ photo.caption | striptags if photo.caption else page.title ~ ' photograph from ' ~ (photo.date | strftime('%B %-d, %Y')) }}"
+                             loading="lazy"
+                             decoding="async" />
                     </a>
                 </div>
         {% endfor %}

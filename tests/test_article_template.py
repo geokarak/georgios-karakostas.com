@@ -36,7 +36,17 @@ def render_gallery_page():
     page = SimpleNamespace(slug="iphone", title="iPhone")
     return template.render(
         page=page,
-        photos_by_category={"iphone": []},
+        photos_by_category={
+            "iphone": [
+                {
+                    "date": dt.datetime(2026, 7, 28),
+                    "photo_url": "/photo.webp",
+                    "thumbnail_url": "/thumb.webp",
+                    "caption": "",
+                    "photo_id": "photo-id",
+                }
+            ]
+        },
         SITENAME="Site",
         SITEURL="",
         output_file="iphone.html",
@@ -89,6 +99,14 @@ def test_gallery_template_uses_local_glightbox_assets():
 
     assert "/theme/vendor/glightbox/glightbox.min.css" in rendered
     assert "/theme/vendor/glightbox/glightbox.min.js" in rendered
+
+
+def test_gallery_template_uses_lazy_images_with_useful_alt_text():
+    rendered = render_gallery_page()
+
+    assert 'loading="lazy"' in rendered
+    assert 'decoding="async"' in rendered
+    assert 'alt="iPhone photograph from July 28, 2026"' in rendered
 
 
 def test_article_template_uses_local_vega_assets():

@@ -27,6 +27,9 @@ jobs:
       - name: Install dependencies
         run: uv sync --frozen
 
+      - name: Run code checks
+        run: make check
+
       # CI should validate the same configuration the live site uses.
       - name: Build production site
         run: uv run pelican -s publishconf.py -t theme -o output

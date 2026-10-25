@@ -8,8 +8,18 @@ the Dropbox-backed upload path.
 The local `inbox/` flow can run alongside a Dropbox-backed upload flow.
 
 The GitHub Actions workflow in `.github/workflows/dropbox-photo-sync.yml`
-downloads uploads from Dropbox, runs ingest and site checks, then applies the
-final outcome back to Dropbox.
+downloads uploads from Dropbox, runs ingest, tests and a production build, then
+applies the final outcome back to Dropbox.
+
+The workflow pushes generated photos and gallery pages directly to `main`.
+Access to the configured Dropbox inbox therefore grants authority to publish
+photo content to the site. GitHub currently has no branch protection or rulesets
+on `main`; Dropbox inbox access should be limited accordingly.
+
+Inbox subfolders determine gallery categories, while uploaded image bytes and
+EXIF capture dates supply the source photo and timestamp. The ingest tool
+generates the sidecars and any missing gallery page; it does not copy arbitrary
+page metadata from Dropbox uploads.
 
 Dropbox app settings live at `https://www.dropbox.com/developers/apps`.
 

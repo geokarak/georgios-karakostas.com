@@ -16,5 +16,6 @@
 - Every line of code is a liability - we should strive to make our code simple and concise.
 - Anytime a new feature is added, unit tests must be written for them.
 - I prefer my functions to be small in interface but long in functionality.
+- Preserve working command conventions such as `uv run <tool>`; diagnose local executable-resolution issues before changing project commands or entrypoints.
 - When doing changes, run `make format` and `make check` to confirm all is OK
 - Commit messages should always be in English.
