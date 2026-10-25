@@ -1,4 +1,4 @@
-title: L’Odyssée ou la quête de la vie bonne
+title: L’odyssée ou la quête de la vie bonne
 date: 07-26-2026
 description: Une relecture philosophique de l'Odyssée, suivie dans l'ordre du récit, comme première grande réponse occidentale à la question de la vie bonne.
 status: published

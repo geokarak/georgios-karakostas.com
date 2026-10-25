@@ -1,4 +1,4 @@
-title: AI and the Upsurge of the Mind
+title: AI and the upsurge of the mind
 date: 07-08-2026
 description: A short reflection on Francois Jullien, abstraction, and what AI may call forth in human intelligence.
 status: published

@@ -1,4 +1,4 @@
-title: Refactoring My Website in the Age of Vibe Coding
+title: Refactoring my website in the age of vibe coding
 date: 05-16-2026
 description: A technical write-up on refactoring my website's gallery, ingestion, color handling, Dropbox sync, and CI workflow with GPT-5.4.
 status: published
